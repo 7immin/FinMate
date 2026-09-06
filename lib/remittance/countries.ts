@@ -1,10 +1,12 @@
 /**
  * 송금 가능 국가와 통화.
  *
- * 나라 이름은 여기 적지 않는다. 이 앱은 네 언어를 쓰고, 나라 이름을 네 벌
- * 적어 두면 나라를 하나 더할 때마다 네 곳을 고쳐야 한다. 브라우저의
- * Intl.DisplayNames가 ISO 코드에서 그 언어의 이름을 만들어 주므로
- * 코드와 통화만 여기 둔다.
+ * 나라 이름은 여기 적지 않는다. lib/data/countries.ts와 같은 규약으로
+ * ISO 코드만 두고, 이름은 translateShared("country", code)가 만든다.
+ *
+ * 그 목록(가입 시 국적 선택)과 이 목록이 다른 이유: 국적은 어느 나라든
+ * 고를 수 있어야 하지만, 송금은 통화와 환율을 아는 나라에만 보낼 수 있다.
+ * 모르는 나라를 목록에 넣으면 받는 금액을 잘못 계산해 보여주게 된다.
  *
  * 환율은 고정값이다. 실시간 시세를 붙이려면 환율 API 계약이 필요한데,
  * 그건 이 앱이 혼자 정할 수 있는 일이 아니다. 대신 화면에서 "참고 환율,
@@ -13,7 +15,7 @@
  */
 
 export interface RemittanceCountry {
-  /** ISO 3166-1 alpha-2 (소문자). Intl.DisplayNames의 입력이다. */
+  /** ISO 3166-1 alpha-2 (대문자). lib/data/countries.ts와 같은 표기다. */
   code: string;
   /** ISO 4217 통화 코드. */
   currency: string;
@@ -30,50 +32,37 @@ export const RATE_AS_OF = "2026-09-01";
  * 목록에 넣으면 금액을 잘못 계산해 보여주게 된다.
  */
 export const REMITTANCE_COUNTRIES: RemittanceCountry[] = [
-  { code: "vn", currency: "VND", perKrw: 18.4 },
-  { code: "cn", currency: "CNY", perKrw: 0.0052 },
-  { code: "mn", currency: "MNT", perKrw: 2.55 },
-  { code: "np", currency: "NPR", perKrw: 0.1 },
-  { code: "mm", currency: "MMK", perKrw: 1.55 },
-  { code: "uz", currency: "UZS", perKrw: 9.2 },
-  { code: "kh", currency: "KHR", perKrw: 2.95 },
-  { code: "id", currency: "IDR", perKrw: 11.9 },
-  { code: "ph", currency: "PHP", perKrw: 0.042 },
-  { code: "th", currency: "THB", perKrw: 0.024 },
-  { code: "in", currency: "INR", perKrw: 0.063 },
-  { code: "bd", currency: "BDT", perKrw: 0.088 },
-  { code: "pk", currency: "PKR", perKrw: 0.2 },
-  { code: "lk", currency: "LKR", perKrw: 0.22 },
-  { code: "jp", currency: "JPY", perKrw: 0.11 },
-  { code: "us", currency: "USD", perKrw: 0.00072 },
-  { code: "ru", currency: "RUB", perKrw: 0.06 },
-  { code: "kz", currency: "KZT", perKrw: 0.36 },
-  { code: "tr", currency: "TRY", perKrw: 0.029 },
-  { code: "fr", currency: "EUR", perKrw: 0.00066 },
-  { code: "de", currency: "EUR", perKrw: 0.00066 },
-  { code: "gb", currency: "GBP", perKrw: 0.00056 },
-  { code: "ca", currency: "CAD", perKrw: 0.001 },
-  { code: "au", currency: "AUD", perKrw: 0.0011 },
+  { code: "VN", currency: "VND", perKrw: 18.4 },
+  { code: "CN", currency: "CNY", perKrw: 0.0052 },
+  { code: "MN", currency: "MNT", perKrw: 2.55 },
+  { code: "NP", currency: "NPR", perKrw: 0.1 },
+  { code: "MM", currency: "MMK", perKrw: 1.55 },
+  { code: "UZ", currency: "UZS", perKrw: 9.2 },
+  { code: "KH", currency: "KHR", perKrw: 2.95 },
+  { code: "ID", currency: "IDR", perKrw: 11.9 },
+  { code: "PH", currency: "PHP", perKrw: 0.042 },
+  { code: "TH", currency: "THB", perKrw: 0.024 },
+  { code: "IN", currency: "INR", perKrw: 0.063 },
+  { code: "BD", currency: "BDT", perKrw: 0.088 },
+  { code: "PK", currency: "PKR", perKrw: 0.2 },
+  { code: "LK", currency: "LKR", perKrw: 0.22 },
+  { code: "JP", currency: "JPY", perKrw: 0.11 },
+  { code: "US", currency: "USD", perKrw: 0.00072 },
+  { code: "RU", currency: "RUB", perKrw: 0.06 },
+  { code: "KZ", currency: "KZT", perKrw: 0.36 },
+  { code: "TR", currency: "TRY", perKrw: 0.029 },
+  { code: "FR", currency: "EUR", perKrw: 0.00066 },
+  { code: "DE", currency: "EUR", perKrw: 0.00066 },
+  { code: "GB", currency: "GBP", perKrw: 0.00056 },
+  { code: "CA", currency: "CAD", perKrw: 0.001 },
+  { code: "AU", currency: "AUD", perKrw: 0.0011 },
 ];
 
-export const DEFAULT_COUNTRY_CODE = "vn";
+export const DEFAULT_COUNTRY_CODE = "VN";
 
 export function findCountry(code: string): RemittanceCountry | undefined {
-  return REMITTANCE_COUNTRIES.find((country) => country.code === code);
-}
-
-/**
- * 그 언어로 된 나라 이름.
- *
- * Intl.DisplayNames를 지원하지 않는 환경에서는 코드를 대문자로 돌려준다 —
- * 이름을 못 만들었다고 목록이 통째로 비면 송금을 아예 못 하게 된다.
- */
-export function countryName(code: string, lang: string): string {
-  try {
-    return new Intl.DisplayNames([lang], { type: "region" }).of(code.toUpperCase()) ?? code.toUpperCase();
-  } catch {
-    return code.toUpperCase();
-  }
+  const upper = code.toUpperCase();
+  return REMITTANCE_COUNTRIES.find((country) => country.code === upper);
 }
 
 /**

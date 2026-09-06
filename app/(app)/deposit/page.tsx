@@ -29,6 +29,13 @@ export default function DepositPage() {
     setStep("verifying");
     try {
       const result = await readLeaseContract(file);
+      // Gemini is instructed to leave fields blank rather than guess when it
+      // can't read the document (e.g. a blurry real-world photo) -- that's a
+      // valid 200 response, not a thrown error, so it wouldn't otherwise be
+      // caught below. Treat "read nothing useful" the same as a failed OCR
+      // call instead of silently keeping the previous (mock) contract values.
+      const readSomething = Boolean(result.address) || Boolean(result.deposit);
+      if (!readSomething) throw new Error("ocr_empty");
       setContract((prev) => ({
         ...prev,
         fileName: file.name,

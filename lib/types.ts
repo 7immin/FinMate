@@ -9,14 +9,9 @@ export interface ChecklistItem {
   done: boolean;
 }
 
-export type NationalityId =
-  | "vietnam"
-  | "china"
-  | "mongolia"
-  | "nepal"
-  | "myanmar"
-  | "uzbekistan"
-  | "cambodia";
+// ISO 3166-1 alpha-2 country code (e.g. "VN", "KR"), resolved to a localized
+// name at render time via translateShared(lang, "country", code).
+export type NationalityId = string;
 
 export type SchoolId = "hanyang" | "snu" | "yonsei" | "korea" | "skk";
 

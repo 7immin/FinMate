@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { AppShell } from "@/components/layout/AppShell";
@@ -52,43 +53,54 @@ export default function SignupPage() {
   }
 
   return (
-    <AppShell className="flex flex-col justify-center px-6">
-      <Logo height={26} glow className="mb-8 self-start" />
-      <h1 className="text-[24px] font-bold text-foreground">회원가입</h1>
-      <p className="mt-2 text-sm text-foreground-muted">
-        이메일과 비밀번호만으로 FinMate를 시작할 수 있어요.
-      </p>
+    <AppShell className="flex flex-col justify-between px-6 pb-6 pt-16">
+      <div>
+        <Logo height={26} glow className="mb-8 self-start" />
+        <h1 className="text-[24px] font-bold text-foreground">회원가입</h1>
+        <p className="mt-2 text-sm text-foreground-muted">
+          이메일과 비밀번호만으로 FinMate를 시작할 수 있어요.
+        </p>
 
-      <form onSubmit={handleSignup} className="mt-6 space-y-4">
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="이메일"
-          className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-foreground outline-none focus:border-primary"
-        />
-        <input
-          type="password"
-          required
-          minLength={6}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="비밀번호 (6자 이상)"
-          className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-foreground outline-none focus:border-primary"
-        />
-        {error && <p className="text-sm text-danger">{error}</p>}
-        <Button type="submit" disabled={loading}>
-          {loading ? "가입 중…" : "회원가입"}
-        </Button>
-      </form>
+        <form onSubmit={handleSignup} className="mt-6 space-y-4">
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="이메일"
+            className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-foreground outline-none focus:border-primary"
+          />
+          <input
+            type="password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="비밀번호 (6자 이상)"
+            className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-foreground outline-none focus:border-primary"
+          />
+          {error && <p className="text-sm text-danger">{error}</p>}
+          <Button type="submit" disabled={loading}>
+            {loading ? "가입 중…" : "회원가입"}
+          </Button>
+        </form>
 
-      <p className="mt-6 text-center text-sm text-foreground-muted">
-        이미 계정이 있으신가요?{" "}
-        <Link href="/login" className="font-medium text-primary">
-          로그인
-        </Link>
-      </p>
+        <p className="mt-6 text-center text-sm text-foreground-muted">
+          이미 계정이 있으신가요?{" "}
+          <Link href="/login" className="font-medium text-primary">
+            로그인
+          </Link>
+        </p>
+      </div>
+
+      <Button
+        variant="outline"
+        onClick={() => router.push("/")}
+        className="h-[50px] border-primary text-foreground"
+      >
+        비회원으로 이용하기
+        <ArrowRight className="h-[15px] w-[15px] text-primary" />
+      </Button>
     </AppShell>
   );
 }

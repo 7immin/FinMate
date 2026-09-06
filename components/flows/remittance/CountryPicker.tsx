@@ -3,11 +3,8 @@
 import { useMemo, useState } from "react";
 import { Check, ChevronDown, Search, X } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import {
-  REMITTANCE_COUNTRIES,
-  countryName,
-  findCountry,
-} from "@/lib/remittance/countries";
+import { translateShared } from "@/lib/i18n";
+import { REMITTANCE_COUNTRIES, findCountry } from "@/lib/remittance/countries";
 import { cn } from "@/lib/utils/cn";
 
 /**
@@ -22,7 +19,7 @@ import { cn } from "@/lib/utils/cn";
  * 양쪽에 걸리게 한다 — 한국어 화면을 쓰면서 "Vietnam"이라고 치는 사람이
  * 있고, 그 반대도 있다.
  */
-const QUICK_CODES = ["vn", "cn", "mn", "np"];
+const QUICK_CODES = ["VN", "CN", "MN", "NP"];
 
 export function CountryPicker({
   value,
@@ -31,7 +28,7 @@ export function CountryPicker({
   value: string;
   onChange: (code: string) => void;
 }) {
-  const { t, lang } = useTranslation();
+  const { t, tShared } = useTranslation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -40,10 +37,12 @@ export function CountryPicker({
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
+    // 이름은 팀원이 만든 translateShared("country")를 그대로 쓴다.
+    // 같은 일을 하는 함수를 둘 두면 언젠가 두 화면의 나라 이름이 갈린다.
     const withNames = REMITTANCE_COUNTRIES.map((country) => ({
       ...country,
-      label: countryName(country.code, lang),
-      english: countryName(country.code, "en"),
+      label: tShared("country", country.code),
+      english: translateShared("en", "country", country.code),
     }));
     if (!q) return withNames;
     return withNames.filter(
@@ -51,9 +50,9 @@ export function CountryPicker({
         c.label.toLowerCase().includes(q) ||
         c.english.toLowerCase().includes(q) ||
         c.currency.toLowerCase().includes(q) ||
-        c.code.includes(q)
+        c.code.toLowerCase().includes(q)
     );
-  }, [query, lang]);
+  }, [query, tShared]);
 
   return (
     <>
@@ -70,7 +69,7 @@ export function CountryPicker({
                 : "border-border text-foreground-muted hover:border-border-strong"
             )}
           >
-            {countryName(code, lang)}
+            {tShared("country", code)}
           </button>
         ))}
         {/* 검색으로 고른 나라는 이 자리에 남는다. 안 그러면 고른 뒤에
@@ -88,7 +87,9 @@ export function CountryPicker({
               : "border-border text-foreground-muted hover:border-border-strong"
           )}
         >
-          {!selectedIsQuick && selected ? countryName(value, lang) : t("remittance.input.otherCountry")}
+          {!selectedIsQuick && selected
+            ? tShared("country", value)
+            : t("remittance.input.otherCountry")}
           <ChevronDown className="h-3.5 w-3.5" />
         </button>
       </div>

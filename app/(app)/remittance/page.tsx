@@ -13,6 +13,7 @@ import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { RemittanceChannel, ReasonId } from "@/lib/mock/remittance";
 import { DEFAULT_COUNTRY_CODE } from "@/lib/remittance/countries";
+import { NationalityId } from "@/lib/types";
 
 type Step = "input" | "check" | "unlock" | "requested" | "channel" | "tracking";
 
@@ -21,7 +22,7 @@ export default function RemittancePage() {
   const { state, requestLimit } = useAppState();
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>("input");
-  const [country, setCountry] = useState<string>(DEFAULT_COUNTRY_CODE);
+  const [country, setCountry] = useState<NationalityId>(DEFAULT_COUNTRY_CODE);
   const [recipient, setRecipient] = useState("NGUYEN VAN MINH");
   const [reason, setReason] = useState<ReasonId>("living");
   const [amount, setAmount] = useState(1800000);

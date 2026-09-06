@@ -3,15 +3,6 @@ import { Language } from "@/lib/types";
 // Shared vocabulary reused across multiple screens (countries, visit reasons, etc.)
 const shared = {
   ko: {
-    country: {
-      vietnam: "베트남",
-      china: "중국",
-      mongolia: "몽골",
-      nepal: "네팔",
-      myanmar: "미얀마",
-      uzbekistan: "우즈베키스탄",
-      cambodia: "캄보디아",
-    },
     school: {
       hanyang: "한양대학교",
       snu: "서울대학교",
@@ -22,15 +13,6 @@ const shared = {
     status: { yes: "있음", no: "없음", unknown: "확인 필요", unknownShort: "잘 모름" },
   },
   en: {
-    country: {
-      vietnam: "Vietnam",
-      china: "China",
-      mongolia: "Mongolia",
-      nepal: "Nepal",
-      myanmar: "Myanmar",
-      uzbekistan: "Uzbekistan",
-      cambodia: "Cambodia",
-    },
     school: {
       hanyang: "Hanyang University",
       snu: "Seoul National University",
@@ -41,15 +23,6 @@ const shared = {
     status: { yes: "Yes", no: "No", unknown: "Needs check", unknownShort: "Not sure" },
   },
   zh: {
-    country: {
-      vietnam: "越南",
-      china: "中国",
-      mongolia: "蒙古",
-      nepal: "尼泊尔",
-      myanmar: "缅甸",
-      uzbekistan: "乌兹别克斯坦",
-      cambodia: "柬埔寨",
-    },
     school: {
       hanyang: "汉阳大学",
       snu: "首尔大学",
@@ -60,15 +33,6 @@ const shared = {
     status: { yes: "有", no: "没有", unknown: "需确认", unknownShort: "不确定" },
   },
   vi: {
-    country: {
-      vietnam: "Việt Nam",
-      china: "Trung Quốc",
-      mongolia: "Mông Cổ",
-      nepal: "Nepal",
-      myanmar: "Myanmar",
-      uzbekistan: "Uzbekistan",
-      cambodia: "Campuchia",
-    },
     school: {
       hanyang: "Đại học Hanyang",
       snu: "Đại học Quốc gia Seoul",
@@ -110,6 +74,9 @@ const ko = {
     fieldArrival: "입국 시점",
     next: "다음",
     visaOther: "기타",
+    selectPlaceholder: "선택해주세요",
+    fillAllFields: "모든 항목을 입력해주세요.",
+    arrivalPlaceholder: "예: 2026년 3월",
   },
   guest: {
     askPlaceholder: "무엇이든 물어보세요",
@@ -665,6 +632,9 @@ const en: typeof ko = {
     fieldArrival: "Arrival date",
     next: "Next",
     visaOther: "Other",
+    selectPlaceholder: "Please select",
+    fillAllFields: "Please fill in all fields.",
+    arrivalPlaceholder: "e.g. March 2026",
   },
   guest: {
     askPlaceholder: "Ask anything",
@@ -1216,6 +1186,9 @@ const zh: typeof ko = {
     fieldArrival: "入境时间",
     next: "下一步",
     visaOther: "其他",
+    selectPlaceholder: "请选择",
+    fillAllFields: "请填写所有项目。",
+    arrivalPlaceholder: "例：2026年3月",
   },
   guest: {
     askPlaceholder: "有什么都可以问",
@@ -1763,6 +1736,9 @@ const vi: typeof ko = {
     fieldArrival: "Thời điểm nhập cảnh",
     next: "Tiếp theo",
     visaOther: "Khác",
+    selectPlaceholder: "Vui lòng chọn",
+    fillAllFields: "Vui lòng điền đầy đủ thông tin.",
+    arrivalPlaceholder: "vd: Tháng 3 năm 2026",
   },
   guest: {
     askPlaceholder: "Hỏi bất cứ điều gì",

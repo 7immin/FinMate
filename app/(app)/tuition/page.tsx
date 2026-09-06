@@ -43,6 +43,13 @@ export default function TuitionPage() {
     try {
       const result = await ocrPromiseRef.current;
       if (result) {
+        // Gemini is instructed to leave fields blank rather than guess when
+        // it can't read the document -- that's a valid response, not a
+        // thrown error, so it wouldn't otherwise be caught below. Treat
+        // "read nothing useful" the same as a failed OCR call instead of
+        // silently keeping the previous (mock) invoice values.
+        const readSomething = Boolean(result.title) || Boolean(result.amount);
+        if (!readSomething) throw new Error("ocr_empty");
         setInvoice((prev) => ({
           ...prev,
           title: result.title || prev.title,
