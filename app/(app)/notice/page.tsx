@@ -2,12 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, CalendarClock, ExternalLink, Loader2 } from "lucide-react";
+import { AlertTriangle, CalendarClock, ExternalLink, Link2, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { TopBar } from "@/components/layout/TopBar";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useAppState } from "@/lib/state/AppStateContext";
+import { SCHOOL_PORTAL } from "@/lib/data/school-tuition-pages";
 import { EnrollmentEntry, EnrollmentNotice } from "@/lib/crawler/types";
 import { cn } from "@/lib/utils/cn";
 
@@ -28,7 +30,10 @@ interface NoticeResponse {
  * 시작하고, 지금 그 값이 mock으로 박혀 있어 실제 마감과 무관하다.
  */
 export default function NoticePage() {
-  const { t, lang } = useTranslation();
+  const { t, lang, tShared } = useTranslation();
+  const { state } = useAppState();
+  const school = state.profile.school;
+  const portalUrl = SCHOOL_PORTAL[school];
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [data, setData] = useState<NoticeResponse | null>(null);
   const [showAll, setShowAll] = useState(false);
@@ -79,10 +84,37 @@ export default function NoticePage() {
           </div>
         )}
 
+        {/*
+          공지를 읽어 오지 못하는 학교. "읽어올 수 없습니다"라고만 말하면
+          사용자는 여기서 막힌다 — 자기가 뭘 해야 하는지 모르는 채로.
+          로그인해서 볼 수 있는 곳으로 보낸다. 우리가 못 하는 일이라는
+          사실보다, 그 사람이 할 수 있는 일이 중요하다.
+        */}
         {status === "ready" && data && !data.supported && (
-          <Card className="text-[15px] leading-relaxed text-foreground-muted">
-            {t("notice.unsupported")}
-          </Card>
+          <div className="space-y-3">
+            <p className="text-[15px] leading-relaxed text-foreground-muted">
+              {t("notice.checkOnPortal")}
+            </p>
+            {portalUrl && (
+              <a
+                href={portalUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3.5 text-left"
+              >
+                <Link2 className="h-4 w-4 shrink-0 text-primary" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[15px] text-foreground">
+                    {t("notice.openPortal", { school: tShared("school", school) })}
+                  </span>
+                  <span className="mt-0.5 block text-[13px] leading-relaxed text-foreground-muted">
+                    {t("notice.portalHint")}
+                  </span>
+                </span>
+                <ExternalLink className="h-4 w-4 shrink-0 text-foreground-subtle" />
+              </a>
+            )}
+          </div>
         )}
 
         {notice && (

@@ -43,9 +43,11 @@ export function UploadStep({ onFileUploaded }: { onFileUploaded: (file: File) =>
 
         <UploadBox label={t("tuition.upload.boxLabel")} onFileSelected={onFileUploaded} />
 
-        <div>
-          <p className="mb-2 text-sm text-foreground-muted">{t("tuition.upload.orTitle")}</p>
-          {tuitionPage ? (
+        {/* 등록금 안내 주소를 아는 학교에만 띄운다. 모르는 학교에 "학교
+            홈페이지에서 찾아보세요"라고 적는 것은 안내가 아니라 빈말이다. */}
+        {tuitionPage && (
+          <div>
+            <p className="mb-2 text-sm text-foreground-muted">{t("tuition.upload.orTitle")}</p>
             <a
               href={tuitionPage}
               target="_blank"
@@ -65,12 +67,8 @@ export function UploadStep({ onFileUploaded }: { onFileUploaded: (file: File) =>
               </span>
               <ExternalLink className="h-4 w-4 shrink-0 text-foreground-subtle" />
             </a>
-          ) : (
-            <p className="rounded-xl border border-dashed border-border-strong px-4 py-3.5 text-[14px] leading-relaxed text-foreground-muted">
-              {t("tuition.upload.noPortalLink")}
-            </p>
-          )}
-        </div>
+          </div>
+        )}
       </div>
       <p className="flex items-center justify-center gap-1.5 px-5 pb-6 text-center text-xs text-foreground-subtle">
         <ShieldCheck className="h-3.5 w-3.5 shrink-0" /> {t("tuition.upload.footerNote")}
