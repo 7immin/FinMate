@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { AppShell } from "@/components/layout/AppShell";
+import { Logo } from "@/components/ui/Logo";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -52,9 +53,7 @@ export default function SignupPage() {
 
   return (
     <AppShell className="flex flex-col justify-center px-6">
-      <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-lg font-bold text-white">
-        F
-      </div>
+      <Logo height={26} glow className="mb-8 self-start" />
       <h1 className="text-[24px] font-bold text-foreground">회원가입</h1>
       <p className="mt-2 text-sm text-foreground-muted">
         이메일과 비밀번호만으로 FinMate를 시작할 수 있어요.

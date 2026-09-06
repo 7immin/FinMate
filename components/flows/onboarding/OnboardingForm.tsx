@@ -9,6 +9,7 @@ import { Chip } from "@/components/ui/Chip";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { translate, translateShared, LANGUAGE_NATIVE_NAME } from "@/lib/i18n";
 import { Language, NationalityId, SchoolId } from "@/lib/types";
+import { Logo } from "@/components/ui/Logo";
 
 const LANGUAGES: Language[] = ["ko", "en", "zh", "vi"];
 const NATIONALITIES: NationalityId[] = [
@@ -79,9 +80,7 @@ export function OnboardingForm() {
     return (
       <AppShell className="flex flex-col justify-between px-5 pb-6 pt-16">
         <div>
-          <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-lg font-bold text-white">
-            F
-          </div>
+          <Logo height={26} glow className="mb-8 self-start" />
           <h1 className="whitespace-pre-line text-[26px] font-bold leading-tight text-foreground">
             {t("onboarding.headline")}
           </h1>
