@@ -28,18 +28,11 @@ export default function PassportPage() {
   const nextLevelLabel = passport.level === "S4" ? null : LEVEL_ORDER[levelOrder];
   const firstPending = passport.nextLevelChecklist.find((item) => !item.done);
 
-  const accountActiveDays = passport.accountLinkedAt
-    ? Math.max(0, Math.floor((Date.now() - new Date(passport.accountLinkedAt).getTime()) / 86400000))
-    : 0;
-
   function rowLabel(itemId: string, done: boolean) {
     return (done ? tOpt(`passport.checklist.${itemId}.labelClear`) : undefined) ?? t(`passport.checklist.${itemId}.label`);
   }
 
   function rowHint(itemId: string, done: boolean) {
-    if (itemId === "account-active" && !done) {
-      return t("passport.accountActiveShortHint", { days: Math.min(accountActiveDays, 30) });
-    }
     if (isManualChecklistItem(itemId) || isDocumentVerifiedItem(itemId)) {
       return tOpt(`passport.checklist.${itemId}.hint`);
     }
@@ -72,16 +65,12 @@ export default function PassportPage() {
 
   const ctaLabel = isMature
     ? t(`passport.cta.${passport.level}`)
-    : firstPending?.id === "account-active"
-      ? t("passport.accountActiveHint", { days: Math.min(accountActiveDays, 30) })
-      : firstPending
-        ? t(`passport.checklist.${firstPending.id}.cta`)
-        : t(`passport.checklist.${passport.nextLevelChecklist[0]?.id}.cta`);
+    : firstPending
+      ? t(`passport.checklist.${firstPending.id}.cta`)
+      : t(`passport.checklist.${passport.nextLevelChecklist[0]?.id}.cta`);
 
   const ctaDisabled =
-    !isMature &&
-    firstPending !== undefined &&
-    (firstPending.id === "overdue-clear" || firstPending.id === "account-active");
+    !isMature && firstPending !== undefined && firstPending.id === "overdue-clear";
 
   if (viewingReport) {
     return (

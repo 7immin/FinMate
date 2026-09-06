@@ -55,8 +55,6 @@ export interface FinancialPassport {
   paymentHistory: PaymentRecord[];
   purposeCounts: Partial<Record<PurposeCategory, number>>;
   verificationCode: string;
-  /** When "korean-account" was verified; null until then. Drives account-active's 30-day auto-check. */
-  accountLinkedAt: string | null;
 }
 
 export interface DocumentFlags {

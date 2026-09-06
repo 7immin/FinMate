@@ -30,7 +30,6 @@ interface FullStateRow {
     payment_history: PaymentRecord[];
     purpose_counts: Partial<Record<PurposeCategory, number>>;
     verification_code: string;
-    account_linked_at: string | null;
   };
   documents: {
     has_passport: string;
@@ -60,11 +59,10 @@ export async function fetchAppState(): Promise<FetchResult> {
     .eq("user_id", data.passport.user_id)
     .is("read_at", null);
 
-  // Cascades a level-up if every item is now true purely from time passing
-  // (account-active's 30-day mark) with no other action to trigger it --
-  // the only path not already covered by an API route, since layout mounts
-  // read state straight from the RPC. user_id comes along for free since
-  // get_full_state() jsonb-ifies every column.
+  // 은행 승인이 다른 요청 안에서 이미 캐스케이드를 돌리지만, 레이아웃
+  // 마운트는 그 요청을 거치지 않고 RPC에서 바로 읽으므로 여기서도 한 번
+  // 더 확인해 둔다. user_id는 get_full_state()가 모든 컬럼을 jsonb로
+  // 내려 줄 때 같이 딸려 온다.
   const passportRow = data.passport as unknown as PassportRow;
   const passport = await applyLevelUpIfComplete(supabase, data.passport.user_id, passportRow);
 
@@ -80,9 +78,9 @@ export async function fetchAppState(): Promise<FetchResult> {
       notificationSettings: profile.notification_settings,
     },
     // 체크리스트는 저장된 값을 그대로 쓰지 않는다. "연체 정리"나 "목적
-    // 거래", "계좌 실사용 1개월"은 사실에서 판정되는 항목이라, 읽을 때마다
-    // 다시 계산해야 연체가 새로 생기거나 승인이 취소됐을 때 되돌아간다
-    // (deriveChecklist, toPassportState 안에서 호출됨).
+    // 거래"는 사실에서 판정되는 항목이라, 읽을 때마다 다시 계산해야 연체가
+    // 새로 생기거나 승인이 취소됐을 때 되돌아간다 (deriveChecklist,
+    // toPassportState 안에서 호출됨).
     passport: toPassportState(passport),
     documents: {
       hasPassport: documents.has_passport as AppState["documents"]["hasPassport"],

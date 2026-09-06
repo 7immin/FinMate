@@ -15,7 +15,6 @@ export interface PassportRow {
   payment_history: PaymentRecord[];
   purpose_counts: Partial<Record<PurposeCategory, number>>;
   verification_code: string;
-  account_linked_at: string | null;
 }
 
 type PassportPatch = Partial<{
@@ -24,10 +23,7 @@ type PassportPatch = Partial<{
   next_level_checklist: ChecklistItem[];
   payment_history: PaymentRecord[];
   purpose_counts: Partial<Record<PurposeCategory, number>>;
-  account_linked_at: string | null;
 }>;
-
-const ACCOUNT_ACTIVE_DAYS = 30;
 
 /**
  * 서류 업로드로 확인하는 항목. /api/passport/verify가 Gemini OCR로 실제
@@ -42,11 +38,11 @@ const DOCUMENT_VERIFIED_ITEMS = new Set(["passport-verify"]);
  * 끝난 것이고, 은행이 승인한 목적 거래가 두 건이면 "목적 거래 2회"도
  * 이미 끝난 것이다. 그런 항목까지 눌러서 켤 수 있게 두면 등급이 사실이
  * 아니라 자기 신고가 되고, 그러면 은행에 내미는 금융여권이 아무것도
- * 보증하지 못한다. phone-verify, korean-account는 예외로 남아 있다 --
- * 실제 SMS 인증과 계좌 실사용 조회 모두 유료 API나 은행 제휴가 있어야
- * 붙일 수 있어 아직은 버튼으로 대신한다.
+ * 보증하지 못한다. phone-verify, korean-account, account-active는
+ * 예외로 남아 있다 -- 실제 SMS 인증, 계좌 실사용 조회 모두 유료 API나
+ * 은행 제휴가 있어야 붙일 수 있어 아직은 버튼으로 대신한다.
  */
-const MANUAL_CHECKLIST_ITEMS = new Set(["phone-verify", "korean-account"]);
+const MANUAL_CHECKLIST_ITEMS = new Set(["phone-verify", "korean-account", "account-active"]);
 
 export function isManualChecklistItem(id: string): boolean {
   return MANUAL_CHECKLIST_ITEMS.has(id);
@@ -62,12 +58,6 @@ export function isDocumentVerifiedItem(id: string): boolean {
  * 저장된 값을 고치지 않고 읽을 때마다 다시 계산하는 이유: 연체가 새로
  * 생기거나 승인이 취소되면 그 항목은 다시 미완료로 돌아가야 한다. 한 번
  * 저장해 버리면 사실과 어긋난 채로 남는다.
- *
- * account-active만 규칙이 다르다 -- "지금 상태"가 아니라 "시점에서 얼마나
- * 지났는지"로 판정한다. account_linked_at(계좌 연결이 처음 확인된 시각)
- * 에서 30일이 지났는지를 매번 다시 계산한다. 레벨업 때 체크리스트 배열
- * 자체는 새로 만들어지지만, 이 시점은 별도 컬럼에 남아 있어 사라지지
- * 않는다.
  */
 export function deriveChecklist(row: PassportRow): ChecklistItem[] {
   const latePayments = row.payment_history.filter((record) => !record.onTime).length;
@@ -75,16 +65,11 @@ export function deriveChecklist(row: PassportRow): ChecklistItem[] {
     (sum, count) => sum + (count ?? 0),
     0
   );
-  const accountActiveDone = Boolean(
-    row.account_linked_at &&
-      (Date.now() - new Date(row.account_linked_at).getTime()) / 86400000 >= ACCOUNT_ACTIVE_DAYS
-  );
 
   return row.next_level_checklist.map((item) => {
     if (item.id === "overdue-clear") return { ...item, done: latePayments === 0 };
     if (item.id === "first-purpose-tx") return { ...item, done: approvedPurposeTx >= 1 };
     if (item.id === "purpose-tx-2") return { ...item, done: approvedPurposeTx >= 2 };
-    if (item.id === "account-active") return { ...item, done: item.done || accountActiveDone };
     return item;
   });
 }
@@ -97,7 +82,6 @@ export function toPassportState(row: PassportRow): FinancialPassport {
     paymentHistory: row.payment_history,
     purposeCounts: row.purpose_counts ?? {},
     verificationCode: row.verification_code,
-    accountLinkedAt: row.account_linked_at,
   };
 }
 
@@ -168,9 +152,8 @@ export async function completeDocumentVerifiedItem(
 }
 
 /**
- * 아직 실제 인증을 붙이지 못한 항목(phone-verify, korean-account)의 수동
- * 토글. korean-account가 처음 켜지는 순간을 account_linked_at에 남겨,
- * account-active의 30일 경과 판정이 여기서부터 시작하게 한다.
+ * 아직 실제 인증을 붙이지 못한 항목(phone-verify, korean-account,
+ * account-active)의 수동 토글.
  */
 export async function toggleManualChecklistItem(
   supabase: SupabaseClient,
@@ -181,11 +164,6 @@ export async function toggleManualChecklistItem(
   const checklist = row.next_level_checklist.map((item) =>
     item.id === itemId ? { ...item, done: !item.done } : item
   );
-  const patch: PassportPatch = { next_level_checklist: checklist };
-  const togglingOn = !row.next_level_checklist.find((item) => item.id === itemId)?.done;
-  if (itemId === "korean-account" && togglingOn && !row.account_linked_at) {
-    patch.account_linked_at = new Date().toISOString();
-  }
-  const saved = await savePassportRow(supabase, userId, patch);
+  const saved = await savePassportRow(supabase, userId, { next_level_checklist: checklist });
   return applyLevelUpIfComplete(supabase, userId, saved);
 }

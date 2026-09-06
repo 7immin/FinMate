@@ -163,8 +163,6 @@ const ko = {
       "purpose-tx-2": { label: "목적 거래 2건 완료", cta: "목적 거래 시작하기" },
       "overdue-clear": { label: "연체 정리하기", labelClear: "연체 없음", cta: "연체를 먼저 정리해 주세요" },
     },
-    accountActiveHint: "가입 후 {{days}}/30일 경과 · 자동으로 완료돼요",
-    accountActiveShortHint: "{{days}}/30일",
     verify: {
       passportVerify: {
         title: "여권 실물 확인",
@@ -757,8 +755,6 @@ const en: typeof ko = {
       "purpose-tx-2": { label: "2 purpose transactions done", cta: "Start a purpose transaction" },
       "overdue-clear": { label: "Clear your overdue payment", labelClear: "No overdue payments", cta: "Please clear the overdue payment first" },
     },
-    accountActiveHint: "{{days}}/30 days since linking · completes automatically",
-    accountActiveShortHint: "{{days}}/30 days",
     verify: {
       passportVerify: {
         title: "Verify physical passport",
@@ -1344,8 +1340,6 @@ const zh: typeof ko = {
       "purpose-tx-2": { label: "完成2笔用途交易", cta: "开始用途交易" },
       "overdue-clear": { label: "处理逾期款项", labelClear: "无逾期", cta: "请先处理逾期款项" },
     },
-    accountActiveHint: "绑定后已过 {{days}}/30 天 · 将自动完成",
-    accountActiveShortHint: "{{days}}/30 天",
     verify: {
       passportVerify: {
         title: "护照原件确认",
@@ -1933,8 +1927,6 @@ const vi: typeof ko = {
       "purpose-tx-2": { label: "Hoàn tất 2 giao dịch đúng mục đích", cta: "Bắt đầu giao dịch mục đích" },
       "overdue-clear": { label: "Xử lý khoản trễ hạn", labelClear: "Không có khoản trễ hạn", cta: "Vui lòng xử lý khoản trễ hạn trước" },
     },
-    accountActiveHint: "Đã qua {{days}}/30 ngày kể từ khi liên kết · sẽ tự động hoàn tất",
-    accountActiveShortHint: "{{days}}/30 ngày",
     verify: {
       passportVerify: {
         title: "Xác minh hộ chiếu thật",
