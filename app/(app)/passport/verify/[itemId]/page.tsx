@@ -120,7 +120,17 @@ export default function PassportVerifyPage() {
         ) : status === "failure" ? (
           <Card className="flex items-start gap-2.5 bg-warning-muted">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
-            <p className="text-sm leading-relaxed text-warning">{t("passport.verify.failure")}</p>
+            <div className="min-w-0">
+              <p className="text-sm leading-relaxed text-warning">{t("passport.verify.failure")}</p>
+              {/* 무엇을 보고 실패했는지 말한다. "인식하지 못했어요"만 띄우면
+                  사용자는 같은 사진을 몇 번이고 다시 올린다 — 다른 문서를
+                  올린 것인지 흐려서 못 읽은 것인지 알 방법이 없기 때문이다. */}
+              {result && (
+                <p className="mt-1.5 text-[13px] leading-relaxed text-foreground-muted">
+                  {t("passport.verify.failureHint")}
+                </p>
+              )}
+            </div>
           </Card>
         ) : null}
 
