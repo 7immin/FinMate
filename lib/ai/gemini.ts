@@ -13,7 +13,8 @@ const RESPONSE_SCHEMA = {
     },
     action: {
       type: ["object", "null"],
-      description: "답변과 직접 관련된 다음 행동이 있으면 제안. 없으면 null.",
+      description:
+        "답변을 읽은 사람이 지금 바로 그 화면에서 할 일이 있을 때만 채운다. 그 외에는 반드시 null.",
       properties: {
         label: { type: "string", description: "버튼에 표시할 짧은 문구 (예: 학비 한도 열기)" },
         href: {
@@ -34,7 +35,10 @@ const RESPONSE_SCHEMA = {
       required: ["label", "href"],
     },
   },
-  required: ["reply", "action"],
+  // action을 required에서 뺀다. 반드시 채워야 하는 칸으로 두면 모델이
+  // 관련 없는 답변에도 아무 화면이나 골라 넣는다 — "계좌 개설 수수료"를
+  // 물었는데 "금융여권 확인하기"가 붙던 이유다.
+  required: ["reply"],
 };
 
 const LANGUAGE_NAME: Record<string, string> = {
@@ -67,8 +71,25 @@ function buildSystemInstruction(state: AppState): string {
   (yes=있음, no=없음, unknown=미확인)
 
 # 다음 행동 제안
-답변 내용이 아래 화면 중 하나로 바로 이어질 수 있다면 action 필드에 그 화면으로 가는 버튼을 제안하세요.
-애매하면 action은 null로 두세요.
+판단 기준은 하나입니다. **당신이 방금 쓴 답변에서, 사용자가 다음에 해야 할 일을 지목했는가?**
+지목했고 그 일을 하는 화면이 아래 목록에 있으면 action을 채우고, 아니면 null입니다.
+
+채우는 예:
+- "등록금 낼 돈이 부족해요" → 분납 신청이나 한도 열기를 하라고 답했다면 /tuition
+- "이 알바 공고 사기인가요?", "통장 빌려달래요" → 진단해 보라고 답했다면 /shield
+- "외국인등록증이 없으면 계좌를 못 만드나요?" → 먼저 등록증을 등록하라고 답했다면 /profile
+- "월세 계약서 확인해 주세요" → /deposit
+- "내 한도가 얼마인가요?" → /passport
+
+null로 두는 예:
+- "계좌 개설에 수수료 있나요?" → 수수료 유무를 답하면 끝이다. 할 일이 남지 않는다.
+- "외국인등록증이 뭔가요?", "전세와 월세 차이가 뭔가요?" → 설명으로 끝난다.
+- 답변이 앱 밖에서 할 일(출입국사무소 방문, 학교 문의)로 끝나는 경우.
+- 어느 화면인지 애매한 경우.
+
+화면 이름만 적은 버튼은 만들지 마세요. "금융여권 확인하기"가 아니라 거기서 할 일을 적습니다.
+
+버튼 문구는 그 화면에서 할 일을 적으세요. "금융여권 확인하기"처럼 화면 이름만 적지 마세요.
 
 - /tuition 학비 납부  /remittance 해외송금  /account 계좌개설  /deposit 월세·보증금
 - /profile 내 정보 — 여권·외국인등록증·한국 휴대폰 번호를 확인하고 등록하는 곳

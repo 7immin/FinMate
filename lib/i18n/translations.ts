@@ -168,7 +168,7 @@ const ko = {
         title: "외국인등록증 확인",
         description: "외국인등록증 앞면을 올려주세요. FinMate가 직접 읽어서 확인합니다.",
         uploadLabel: "외국인등록증 사진 또는 스캔",
-        field: { name: "성명", registrationNumber: "외국인등록번호", visaStatus: "체류자격" },
+        field: { name: "성명", visaStatus: "체류자격", expiryDate: "체류기간 만료일" },
       },
       passportVerify: {
         title: "여권 실물 확인",
@@ -522,11 +522,14 @@ const ko = {
       description: "누른 대로 다음에 할 일이 바뀝니다.",
       passport: "여권",
       alienRegistration: "외국인등록증",
+      verifyCta: "사진 올려서 확인하기",
       koreanPhone: "한국 휴대폰 번호",
       submit: "내 상황에 맞는 순서 보기",
     },
     guidance: {
       topBarTitle: "지금 할 일",
+      needPhone: "한국 휴대폰 번호부터 만드세요",
+      needPhoneHint: "은행은 본인 확인에 한국 번호를 씁니다. 알뜰폰 허브(과학기술정보통신부)에서 유학생이 쓸 수 있는 선불 요금제를 비교해 고를 수 있어요.",
       orderTitle: "순서",
       followUpTitle: "이어서 물어보기",
       next: "갈 수 있는 지점 보기",
@@ -577,7 +580,8 @@ const ko = {
       tapWhenPacked: "챙겼으면 눌러서 표시하세요",
       limitWarning: "계좌 개설 후 첫 한 달은 하루 이체 한도가 30만 원입니다. 정상적인 절차입니다.",
       langToggle: { ko: "한국어로 보기", en: "영어로 보기", zh: "중국어로 보기", vi: "베트남어로 보기" },
-      complete: "개설 완료했어요",
+      atBranch: "{{branch}}에서 보여주세요",
+      getPhoneCta: "번호 만들러 가기",
       request: {
         ko: { title: "외국인 유학생 계좌 개설 요청", body: "여권으로 개설 가능한 유학생 계좌를 만들고 싶습니다. 학비 납부 용도입니다." },
         en: {
@@ -590,11 +594,6 @@ const ko = {
           body: "Tôi muốn mở tài khoản sinh viên bằng hộ chiếu. Mục đích là để đóng học phí.",
         },
       },
-    },
-    success: {
-      title: "방문 준비가 끝났어요",
-      description: "{{branch}}에서 위 화면을 보여주면 바로 창구 상담을 받을 수 있어요.",
-      branchFallback: "지점",
     },
   },
   deposit: {
@@ -769,7 +768,7 @@ const en: typeof ko = {
         title: "Alien Registration Card check",
         description: "Upload the front of your ARC. FinMate reads it to confirm.",
         uploadLabel: "ARC photo or scan",
-        field: { name: "Name", registrationNumber: "Registration number", visaStatus: "Visa status" },
+        field: { name: "Name", visaStatus: "Visa status", expiryDate: "Expiry date" },
       },
       passportVerify: {
         title: "Verify physical passport",
@@ -1119,11 +1118,14 @@ const en: typeof ko = {
       description: "What's next changes based on what you tap.",
       passport: "Passport",
       alienRegistration: "Alien Registration Card",
+      verifyCta: "Upload a photo to verify",
       koreanPhone: "Korean phone number",
       submit: "See the order that fits my situation",
     },
     guidance: {
       topBarTitle: "What to do now",
+      needPhone: "Get a Korean phone number first",
+      needPhoneHint: "Banks use a Korean number to verify your identity. Compare prepaid plans open to international students on MVNO Hub, run by the Ministry of Science and ICT.",
       orderTitle: "Steps",
       followUpTitle: "Follow-up questions",
       next: "See branches you can visit",
@@ -1174,7 +1176,8 @@ const en: typeof ko = {
       tapWhenPacked: "Tap once you have it with you",
       limitWarning: "The daily transfer limit is 300,000 KRW for the first month after opening. This is standard procedure.",
       langToggle: { ko: "View in Korean", en: "View in English", zh: "View in Chinese", vi: "View in Vietnamese" },
-      complete: "I've finished opening it",
+      atBranch: "Show this at {{branch}}",
+      getPhoneCta: "Get a number",
       request: {
         ko: { title: "외국인 유학생 계좌 개설 요청", body: "여권으로 개설 가능한 유학생 계좌를 만들고 싶습니다. 학비 납부 용도입니다." },
         en: {
@@ -1187,11 +1190,6 @@ const en: typeof ko = {
           body: "Tôi muốn mở tài khoản sinh viên bằng hộ chiếu. Mục đích là để đóng học phí.",
         },
       },
-    },
-    success: {
-      title: "You're ready for your visit",
-      description: "Show this screen at {{branch}} to get counter support right away.",
-      branchFallback: "the branch",
     },
   },
   deposit: {
@@ -1363,7 +1361,7 @@ const zh: typeof ko = {
         title: "外国人登录证核实",
         description: "请上传外国人登录证正面。FinMate会直接读取核实。",
         uploadLabel: "外国人登录证照片或扫描件",
-        field: { name: "姓名", registrationNumber: "外国人登录号", visaStatus: "居留资格" },
+        field: { name: "姓名", visaStatus: "居留资格", expiryDate: "居留期满日" },
       },
       passportVerify: {
         title: "护照原件确认",
@@ -1712,11 +1710,14 @@ const zh: typeof ko = {
       description: "根据您的选择，接下来的步骤会有所不同。",
       passport: "护照",
       alienRegistration: "外国人登录证",
+      verifyCta: "上传照片核实",
       koreanPhone: "韩国手机号",
       submit: "查看适合我情况的顺序",
     },
     guidance: {
       topBarTitle: "现在该做的事",
+      needPhone: "请先办理韩国手机号",
+      needPhoneHint: "银行用韩国号码进行本人确认。可在科学技术信息通信部运营的「알뜰폰 허브」比较适合留学生的预付费套餐。",
       orderTitle: "顺序",
       followUpTitle: "继续提问",
       next: "查看可前往的网点",
@@ -1767,7 +1768,8 @@ const zh: typeof ko = {
       tapWhenPacked: "带好后请点击标记",
       limitWarning: "开户后首月每日转账额度为30万韩元，这是正常流程。",
       langToggle: { ko: "查看韩语", en: "查看英语", zh: "查看中文", vi: "查看越南语" },
-      complete: "我已完成开户",
+      atBranch: "请在{{branch}}出示",
+      getPhoneCta: "去办理号码",
       request: {
         ko: { title: "외국인 유학생 계좌 개설 요청", body: "여권으로 개설 가능한 유학생 계좌를 만들고 싶습니다. 학비 납부 용도입니다." },
         en: {
@@ -1780,11 +1782,6 @@ const zh: typeof ko = {
           body: "Tôi muốn mở tài khoản sinh viên bằng hộ chiếu. Mục đích là để đóng học phí.",
         },
       },
-    },
-    success: {
-      title: "到访准备已完成",
-      description: "在{{branch}}出示此界面即可立即获得窗口咨询服务。",
-      branchFallback: "该网点",
     },
   },
   deposit: {
@@ -1959,7 +1956,7 @@ const vi: typeof ko = {
         title: "Xác minh thẻ đăng ký người nước ngoài",
         description: "Hãy tải lên mặt trước thẻ ARC. FinMate sẽ đọc để xác nhận.",
         uploadLabel: "Ảnh hoặc bản quét thẻ ARC",
-        field: { name: "Họ tên", registrationNumber: "Số đăng ký", visaStatus: "Tư cách lưu trú" },
+        field: { name: "Họ tên", visaStatus: "Tư cách lưu trú", expiryDate: "Ngày hết hạn" },
       },
       passportVerify: {
         title: "Xác minh hộ chiếu thật",
@@ -2309,11 +2306,14 @@ const vi: typeof ko = {
       description: "Bước tiếp theo sẽ thay đổi tùy theo lựa chọn của bạn.",
       passport: "Hộ chiếu",
       alienRegistration: "Thẻ đăng ký người nước ngoài",
+      verifyCta: "Tải ảnh lên để xác minh",
       koreanPhone: "Số điện thoại Hàn Quốc",
       submit: "Xem trình tự phù hợp với tình huống của tôi",
     },
     guidance: {
       topBarTitle: "Việc cần làm bây giờ",
+      needPhone: "Hãy làm số điện thoại Hàn Quốc trước",
+      needPhoneHint: "Ngân hàng dùng số Hàn Quốc để xác minh danh tính. Bạn có thể so sánh các gói trả trước dành cho du học sinh trên MVNO Hub do Bộ Khoa học và ICT vận hành.",
       orderTitle: "Trình tự",
       followUpTitle: "Hỏi thêm",
       next: "Xem các chi nhánh có thể đến",
@@ -2364,7 +2364,8 @@ const vi: typeof ko = {
       tapWhenPacked: "Nhấn khi bạn đã mang theo",
       limitWarning: "Hạn mức chuyển khoản hằng ngày trong tháng đầu sau khi mở tài khoản là 300,000 KRW. Đây là quy trình bình thường.",
       langToggle: { ko: "Xem tiếng Hàn", en: "Xem tiếng Anh", zh: "Xem tiếng Trung", vi: "Xem tiếng Việt" },
-      complete: "Tôi đã mở xong tài khoản",
+      atBranch: "Hãy xuất trình tại {{branch}}",
+      getPhoneCta: "Đi làm số",
       request: {
         ko: { title: "외국인 유학생 계좌 개설 요청", body: "여권으로 개설 가능한 유학생 계좌를 만들고 싶습니다. 학비 납부 용도입니다." },
         en: {
@@ -2377,11 +2378,6 @@ const vi: typeof ko = {
           body: "Tôi muốn mở tài khoản sinh viên bằng hộ chiếu. Mục đích là để đóng học phí.",
         },
       },
-    },
-    success: {
-      title: "Đã chuẩn bị xong cho chuyến thăm",
-      description: "Xuất trình màn hình này tại {{branch}} để được hỗ trợ tại quầy ngay lập tức.",
-      branchFallback: "chi nhánh",
     },
   },
   deposit: {
