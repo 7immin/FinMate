@@ -26,6 +26,7 @@ interface AppStateContextValue {
   pendingRequests: PendingRequest[];
   setLanguage: (language: Language) => void;
   setNotificationSettings: (settings: NotificationSettings) => void;
+  markNotificationsRead: () => void;
   signOut: () => Promise<void>;
 }
 
@@ -163,6 +164,13 @@ export function AppStateProvider({
             }
           }
         );
+      },
+      // 알림 목록을 열어 본 순간 배지를 지운다. 서버에도 같은 뜻으로
+      // 전부 읽음 처리하도록 알린다 -- 실패해도 다음에 다시 열면 또
+      // 시도되므로 응답을 기다리지 않는다.
+      markNotificationsRead: () => {
+        setState((prev) => ({ ...prev, unreadNotificationCount: 0 }));
+        postJson("/api/notifications/feed", {});
       },
       signOut: async () => {
         const supabase = createClient();

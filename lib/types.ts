@@ -69,6 +69,17 @@ export interface AppState {
   profile: UserProfile;
   passport: FinancialPassport;
   documents: DocumentFlags;
+  unreadNotificationCount: number;
+}
+
+export type NotificationType = "limit_approved";
+
+export interface AppNotification {
+  id: string;
+  type: NotificationType;
+  payload: { amount?: number; purpose?: PurposeCategory };
+  readAt: string | null;
+  createdAt: string;
 }
 
 /* ── 사기 진단 ──────────────────────────────────────────────────────── */

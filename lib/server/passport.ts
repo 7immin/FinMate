@@ -33,7 +33,7 @@ const ACCOUNT_ACTIVE_DAYS = 30;
  * 서류 업로드로 확인하는 항목. /api/passport/verify가 Gemini OCR로 실제
  * 내용을 읽어야만 완료 처리한다 -- 눌러서 바로 켤 수 없다.
  */
-const DOCUMENT_VERIFIED_ITEMS = new Set(["passport-verify", "korean-account"]);
+const DOCUMENT_VERIFIED_ITEMS = new Set(["passport-verify"]);
 
 /**
  * 클릭해서 표시하는 항목.
@@ -42,10 +42,11 @@ const DOCUMENT_VERIFIED_ITEMS = new Set(["passport-verify", "korean-account"]);
  * 끝난 것이고, 은행이 승인한 목적 거래가 두 건이면 "목적 거래 2회"도
  * 이미 끝난 것이다. 그런 항목까지 눌러서 켤 수 있게 두면 등급이 사실이
  * 아니라 자기 신고가 되고, 그러면 은행에 내미는 금융여권이 아무것도
- * 보증하지 못한다. phone-verify만 예외로 남아 있다 — 실제 SMS 인증에는
- * 유료 API와 신규 계정이 필요해 아직 붙이지 못했다.
+ * 보증하지 못한다. phone-verify, korean-account는 예외로 남아 있다 --
+ * 실제 SMS 인증과 계좌 실사용 조회 모두 유료 API나 은행 제휴가 있어야
+ * 붙일 수 있어 아직은 버튼으로 대신한다.
  */
-const MANUAL_CHECKLIST_ITEMS = new Set(["phone-verify"]);
+const MANUAL_CHECKLIST_ITEMS = new Set(["phone-verify", "korean-account"]);
 
 export function isManualChecklistItem(id: string): boolean {
   return MANUAL_CHECKLIST_ITEMS.has(id);
@@ -152,8 +153,6 @@ export async function savePassportRow(supabase: SupabaseClient, userId: string, 
 
 /**
  * 서류 업로드로 확인한 항목을 완료 처리한다 (/api/passport/verify).
- * korean-account가 처음 완료되는 순간을 account_linked_at에 남겨, 이후
- * account-active의 30일 경과 판정이 여기서부터 시작하게 한다.
  */
 export async function completeDocumentVerifiedItem(
   supabase: SupabaseClient,
@@ -164,16 +163,14 @@ export async function completeDocumentVerifiedItem(
   const checklist = row.next_level_checklist.map((item) =>
     item.id === itemId ? { ...item, done: true } : item
   );
-  const patch: PassportPatch = { next_level_checklist: checklist };
-  if (itemId === "korean-account" && !row.account_linked_at) {
-    patch.account_linked_at = new Date().toISOString();
-  }
-  const saved = await savePassportRow(supabase, userId, patch);
+  const saved = await savePassportRow(supabase, userId, { next_level_checklist: checklist });
   return applyLevelUpIfComplete(supabase, userId, saved);
 }
 
 /**
- * 아직 실제 인증을 붙이지 못한 항목(phone-verify)의 수동 토글.
+ * 아직 실제 인증을 붙이지 못한 항목(phone-verify, korean-account)의 수동
+ * 토글. korean-account가 처음 켜지는 순간을 account_linked_at에 남겨,
+ * account-active의 30일 경과 판정이 여기서부터 시작하게 한다.
  */
 export async function toggleManualChecklistItem(
   supabase: SupabaseClient,
@@ -184,6 +181,11 @@ export async function toggleManualChecklistItem(
   const checklist = row.next_level_checklist.map((item) =>
     item.id === itemId ? { ...item, done: !item.done } : item
   );
-  const saved = await savePassportRow(supabase, userId, { next_level_checklist: checklist });
+  const patch: PassportPatch = { next_level_checklist: checklist };
+  const togglingOn = !row.next_level_checklist.find((item) => item.id === itemId)?.done;
+  if (itemId === "korean-account" && togglingOn && !row.account_linked_at) {
+    patch.account_linked_at = new Date().toISOString();
+  }
+  const saved = await savePassportRow(supabase, userId, patch);
   return applyLevelUpIfComplete(supabase, userId, saved);
 }
