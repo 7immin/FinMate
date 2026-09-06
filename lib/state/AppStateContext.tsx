@@ -160,3 +160,14 @@ export function useAppState() {
   if (!ctx) throw new Error("useAppState must be used within AppStateProvider");
   return ctx;
 }
+
+/**
+ * 프로바이더 바깥에서도 부를 수 있는 판.
+ *
+ * 로그인 전 화면((app) 그룹 밖)에도 번역이 필요한데, useAppState는 없으면
+ * 던진다. 번역 훅이 "로그인 상태면 프로필 언어, 아니면 게스트 언어"를
+ * 고를 수 있도록 null을 돌려주는 문을 하나 낸다.
+ */
+export function useOptionalAppState() {
+  return useContext(AppStateContext);
+}

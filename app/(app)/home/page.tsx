@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/Card";
+import { Logo } from "@/components/ui/Logo";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
@@ -43,12 +44,7 @@ export default function HomePage() {
     <AppShell showNav>
       <div className="space-y-6 px-5 pb-10 pt-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white">
-              F
-            </span>
-            <span className="text-[15px] font-semibold text-foreground">FinMate</span>
-          </div>
+          <Logo height={20} />
           <button
             type="button"
             onClick={() => setLangSheetOpen(true)}
