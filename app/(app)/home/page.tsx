@@ -10,6 +10,7 @@ import {
   Home as HomeIcon,
   ArrowRight,
   Languages,
+  LogOut,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/Card";
@@ -22,11 +23,22 @@ import { LANGUAGE_NATIVE_NAME } from "@/lib/i18n";
 
 export default function HomePage() {
   const router = useRouter();
-  const { state } = useAppState();
+  const { state, signOut } = useAppState();
   const { t, lang } = useTranslation();
   const { profile, passport } = state;
   const [question, setQuestion] = useState("");
   const [langSheetOpen, setLangSheetOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    setSigningOut(true);
+    await signOut();
+    // 로그아웃하면 로그인 화면이 아니라 비로그인 홈으로 나온다. 이제
+    // 그쪽이 앱의 문이고, 나가자마자 다시 로그인을 요구받으면 "나갈 수
+    // 없는 앱"으로 읽힌다 — 로그아웃한 사람도 질문은 계속 할 수 있다.
+    router.replace("/");
+    router.refresh();
+  }
 
   const QUICK_ACTIONS = [
     { href: "/tuition", label: t("home.actionTuition"), icon: GraduationCap },
@@ -43,15 +55,25 @@ export default function HomePage() {
   return (
     <AppShell showNav>
       <div className="space-y-6 px-5 pb-10 pt-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <Logo height={20} />
-          <button
-            type="button"
-            onClick={() => setLangSheetOpen(true)}
-            className="flex items-center gap-1 rounded-full bg-white/[0.06] px-3 py-1.5 text-xs text-foreground-muted"
-          >
-            <Languages className="h-3.5 w-3.5" /> {LANGUAGE_NATIVE_NAME[lang]}
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={handleSignOut}
+              disabled={signingOut}
+              className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-border-strong px-3 py-1.5 text-[11px] text-foreground-muted disabled:opacity-50"
+            >
+              <LogOut className="h-3 w-3" /> {t("more.signOut")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setLangSheetOpen(true)}
+              className="flex items-center gap-1 rounded-full bg-white/[0.06] px-3 py-1.5 text-xs text-foreground-muted"
+            >
+              <Languages className="h-3.5 w-3.5" /> {LANGUAGE_NATIVE_NAME[lang]}
+            </button>
+          </div>
         </div>
 
         <div>

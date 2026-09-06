@@ -2,19 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Globe, Bell, FileText, LifeBuoy, LogOut, ChevronRight } from "lucide-react";
+import { Globe, Bell, FileText, LifeBuoy, ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/Card";
 import { LanguageSwitcherSheet } from "@/components/ui/LanguageSwitcherSheet";
-import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 
 export default function MorePage() {
   const router = useRouter();
-  const { signOut } = useAppState();
   const { t } = useTranslation();
   const [langSheetOpen, setLangSheetOpen] = useState(false);
-  const [signingOut, setSigningOut] = useState(false);
 
   const MENU = [
     { label: t("more.menu.language"), icon: Globe, onClick: () => setLangSheetOpen(true) },
@@ -22,16 +19,6 @@ export default function MorePage() {
     { label: t("more.menu.terms"), icon: FileText, onClick: () => router.push("/more/terms") },
     { label: t("more.menu.support"), icon: LifeBuoy, onClick: () => router.push("/more/support") },
   ];
-
-  async function handleSignOut() {
-    setSigningOut(true);
-    await signOut();
-    // 로그아웃하면 로그인 화면이 아니라 비로그인 홈으로 나온다. 이제
-    // 그쪽이 앱의 문이고, 나가자마자 다시 로그인을 요구받으면 "나갈 수
-    // 없는 앱"으로 읽힌다 — 로그아웃한 사람도 질문은 계속 할 수 있다.
-    router.replace("/");
-    router.refresh();
-  }
 
   return (
     <AppShell showNav>
@@ -52,16 +39,6 @@ export default function MorePage() {
             </button>
           ))}
         </Card>
-
-        <button
-          type="button"
-          onClick={handleSignOut}
-          disabled={signingOut}
-          className="flex w-full items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 text-left text-danger disabled:opacity-50"
-        >
-          <LogOut className="h-[18px] w-[18px]" />
-          <span className="text-[15px] font-medium">{t("more.signOut")}</span>
-        </button>
       </div>
 
       <LanguageSwitcherSheet open={langSheetOpen} onClose={() => setLangSheetOpen(false)} />
