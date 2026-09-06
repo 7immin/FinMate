@@ -17,6 +17,7 @@ interface AppStateContextValue {
   setDocumentFlag: (key: keyof DocumentFlags, value: "yes" | "no" | "unknown") => void;
   toggleChecklistItem: (id: string) => void;
   setPassportState: (passport: FinancialPassport) => void;
+  setDocumentsState: (documents: DocumentFlags) => void;
   requestLimit: (
     amount: number,
     purpose: PurposeCategory,
@@ -119,6 +120,12 @@ export function AppStateProvider({
       // response instead of guessing at an optimistic update client-side.
       setPassportState: (passport) => {
         setState((prev) => ({ ...prev, passport }));
+      },
+      // 여권 실물 확인(OCR)이 성공하면 내 정보 > 보유 서류의 자기 신고
+      // 값도 같이 옮겨야 한다 -- 서버가 이미 두 테이블을 다 갱신했으니
+      // 여기서는 그 결과를 그대로 반영하기만 한다.
+      setDocumentsState: (documents) => {
+        setState((prev) => ({ ...prev, documents }));
       },
       /**
        * 한도 열기 요청.

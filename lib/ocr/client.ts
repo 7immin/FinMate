@@ -1,4 +1,4 @@
-import { FinancialPassport } from "@/lib/types";
+import { DocumentFlags, FinancialPassport } from "@/lib/types";
 
 export const MAX_FILE_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 
@@ -61,6 +61,7 @@ export interface VerifyChecklistResult {
   ok: boolean;
   result: Record<string, unknown>;
   passport?: FinancialPassport;
+  documents?: DocumentFlags;
 }
 
 /**
