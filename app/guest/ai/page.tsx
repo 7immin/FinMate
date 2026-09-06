@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, LogIn, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { TopBar } from "@/components/layout/TopBar";
 import { Chip } from "@/components/ui/Chip";
@@ -83,9 +83,9 @@ function GuestAiContent() {
           <button
             type="button"
             onClick={() => router.push("/login")}
-            className="shrink-0 whitespace-nowrap rounded-full border border-primary/45 bg-primary/[0.12] px-3 py-1.5 text-[11.5px] font-medium text-primary"
+            className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-primary/45 bg-primary/[0.12] px-3 py-1.5 text-[11.5px] font-medium text-primary"
           >
-            {t("guest.login")}
+            <LogIn className="h-3 w-3" /> {t("guest.login")}
           </button>
         }
       />
