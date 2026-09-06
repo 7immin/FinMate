@@ -44,3 +44,4 @@ next-env.d.ts
 /supabase/.temp/
 /shots_profile/
 /shots_verify/
+/shots_aichat/

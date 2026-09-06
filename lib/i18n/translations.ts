@@ -200,50 +200,13 @@ const ko = {
     topBarTitle: "FinMate AI",
     landingHeadline: "무엇이든 물어보세요",
     landingDesc: "등록금, 송금, 계좌, 보증금까지 상황에 맞는 다음 행동을 알려드립니다.",
-    questionLabel: "질문",
     suggested: [
       "학비 낼 돈이 부족한데 어떻게 하죠?",
       "재학증명서 어디서 받나요?",
       "해외송금 한도를 열려면 뭘 내야 하나요?",
     ],
-    answers: {
-      tuitionShortage: {
-        reminder: "납부 기한 9월 11일까지 5일 남았습니다",
-        options: [
-          {
-            title: "등록금 납부",
-            badge: "가장 빠름",
-            amountLine: "1차 · 9/11  2,425,000        2차 · 10/15  2,425,000",
-            detail: "추가 이자 없음 · 학교 포털에서 바로 신청",
-          },
-          {
-            title: "교내 근로 (시간제 취업)",
-            badge: "월 최대 60만",
-            detail: "허가 심사 2주 · 주 25시간까지 · 근로계약서는 송금 한도 증빙으로도 쓰입니다",
-          },
-          {
-            title: "긴급 장학금",
-            badge: "9/8 마감",
-            detail: "한양대학교 국제처 · 최대 200만 원 · 성적 3.0 이상",
-          },
-        ],
-        warning: "사설 대출 광고는 안내하지 않습니다. 유학생 대상 고금리 사기가 많습니다.",
-        ctaLabel: "등록금 한도 열기",
-      },
-      remittanceProof: {
-        options: [
-          { title: "근로 계약서 · 급여 명세", amountLine: "+3,000,000원", detail: "교내 근로·시간제 취업 허가 포함" },
-          { title: "본국 송금 내역 (부모 지원)", amountLine: "+2,000,000원", detail: "최근 3개월 입금 내역이면 충분합니다" },
-          { title: "장학금 수여 증명", amountLine: "+1,500,000원", detail: "한양대학교 발급 서류" },
-        ],
-        warning: "셋 중 하나만 있으면 그만큼 송금 한도가 열립니다.",
-        ctaLabel: "송금 이어서 하기",
-      },
-      generic: {
-        options: [{ title: "관련 메뉴로 이동하기", detail: "질문 내용에 맞는 화면으로 바로 연결해 드릴게요." }],
-        ctaLabel: "홈으로 돌아가기",
-      },
-    },
+    thinking: "생각하고 있어요…",
+    errorMessage: "답변을 가져오지 못했어요. 잠시 후 다시 시도해주세요.",
   },
   tuition: {
     topBarTitle: "학비 한도 개방",
@@ -605,50 +568,13 @@ const en: typeof ko = {
     topBarTitle: "FinMate AI",
     landingHeadline: "Ask me anything",
     landingDesc: "From tuition to remittance, accounts, and deposits — I'll tell you the next best move.",
-    questionLabel: "Question",
     suggested: [
       "I'm short on tuition money, what do I do?",
       "Where do I get an enrollment certificate?",
       "What do I need to raise my remittance limit?",
     ],
-    answers: {
-      tuitionShortage: {
-        reminder: "5 days left until the Sep 11 payment deadline",
-        options: [
-          {
-            title: "Pay tuition",
-            badge: "Fastest",
-            amountLine: "1st · 9/11  2,425,000        2nd · 10/15  2,425,000",
-            detail: "No extra interest · apply directly on the school portal",
-          },
-          {
-            title: "On-campus work (part-time)",
-            badge: "Up to 600K/mo",
-            detail: "2-week permit review · up to 25 hrs/week · the contract also works as remittance proof",
-          },
-          {
-            title: "Emergency scholarship",
-            badge: "Due 9/8",
-            detail: "Hanyang Univ. Int'l Office · up to 2,000,000 KRW · GPA 3.0+",
-          },
-        ],
-        warning: "We never recommend private loan ads. High-interest scams targeting international students are common.",
-        ctaLabel: "Unlock tuition limit",
-      },
-      remittanceProof: {
-        options: [
-          { title: "Employment contract · pay stub", amountLine: "+3,000,000 KRW", detail: "Includes on-campus/part-time work permit" },
-          { title: "Home remittance history (from parents)", amountLine: "+2,000,000 KRW", detail: "3 months of deposit history is enough" },
-          { title: "Scholarship award certificate", amountLine: "+1,500,000 KRW", detail: "Document issued by Hanyang University" },
-        ],
-        warning: "Just one of these three is enough to unlock that much remittance limit.",
-        ctaLabel: "Continue remittance",
-      },
-      generic: {
-        options: [{ title: "Go to the relevant screen", detail: "We'll take you straight to the screen that matches your question." }],
-        ctaLabel: "Back to home",
-      },
-    },
+    thinking: "Thinking…",
+    errorMessage: "Couldn't get a response. Please try again in a moment.",
   },
   tuition: {
     topBarTitle: "Unlock tuition limit",
@@ -1007,50 +933,13 @@ const zh: typeof ko = {
     topBarTitle: "FinMate AI",
     landingHeadline: "有什么都可以问我",
     landingDesc: "从学费、汇款到开户、押金，我会告诉您下一步该怎么做。",
-    questionLabel: "提问",
     suggested: [
       "学费不够交怎么办？",
       "在哪里领取在学证明？",
       "要提高境外汇款额度需要提交什么？",
     ],
-    answers: {
-      tuitionShortage: {
-        reminder: "距缴费截止日9月11日还有5天",
-        options: [
-          {
-            title: "缴纳学费",
-            badge: "最快",
-            amountLine: "第1期 · 9/11  2,425,000        第2期 · 10/15  2,425,000",
-            detail: "无额外利息 · 可在学校门户网站直接申请",
-          },
-          {
-            title: "校内勤工俭学（兼职）",
-            badge: "每月最多60万",
-            detail: "许可审核2周 · 每周最多25小时 · 劳动合同也可作为汇款额度证明",
-          },
-          {
-            title: "紧急奖学金",
-            badge: "9/8截止",
-            detail: "汉阳大学国际处 · 最多200万韩元 · 成绩3.0以上",
-          },
-        ],
-        warning: "我们不会推荐私人贷款广告。针对留学生的高利贷诈骗很常见。",
-        ctaLabel: "开通学费额度",
-      },
-      remittanceProof: {
-        options: [
-          { title: "劳动合同 · 工资单", amountLine: "+3,000,000韩元", detail: "包含校内勤工俭学/兼职许可" },
-          { title: "本国汇款记录（父母资助）", amountLine: "+2,000,000韩元", detail: "近3个月的入账记录即可" },
-          { title: "奖学金授予证明", amountLine: "+1,500,000韩元", detail: "汉阳大学出具的文件" },
-        ],
-        warning: "三者中只需一项，即可开通相应额度。",
-        ctaLabel: "继续汇款",
-      },
-      generic: {
-        options: [{ title: "跳转到相关菜单", detail: "我会直接带您跳转到符合问题内容的界面。" }],
-        ctaLabel: "返回首页",
-      },
-    },
+    thinking: "正在思考…",
+    errorMessage: "未能获取回复，请稍后重试。",
   },
   tuition: {
     topBarTitle: "开通学费额度",
@@ -1412,50 +1301,13 @@ const vi: typeof ko = {
     topBarTitle: "FinMate AI",
     landingHeadline: "Hỏi tôi bất cứ điều gì",
     landingDesc: "Từ học phí, chuyển tiền, tài khoản đến tiền đặt cọc — tôi sẽ cho bạn biết bước tiếp theo phù hợp.",
-    questionLabel: "Câu hỏi",
     suggested: [
       "Tôi thiếu tiền đóng học phí thì phải làm sao?",
       "Lấy giấy xác nhận sinh viên ở đâu?",
       "Cần nộp gì để tăng hạn mức chuyển tiền ra nước ngoài?",
     ],
-    answers: {
-      tuitionShortage: {
-        reminder: "Còn 5 ngày nữa đến hạn đóng học phí 11/9",
-        options: [
-          {
-            title: "Đóng học phí",
-            badge: "Nhanh nhất",
-            amountLine: "Đợt 1 · 11/9  2,425,000        Đợt 2 · 15/10  2,425,000",
-            detail: "Không lãi suất thêm · đăng ký ngay trên cổng thông tin trường",
-          },
-          {
-            title: "Làm thêm trong trường (bán thời gian)",
-            badge: "Tối đa 600K/tháng",
-            detail: "Xét duyệt giấy phép 2 tuần · tối đa 25 giờ/tuần · hợp đồng lao động cũng dùng làm chứng từ hạn mức chuyển tiền",
-          },
-          {
-            title: "Học bổng khẩn cấp",
-            badge: "Hạn 8/9",
-            detail: "Phòng Quốc tế ĐH Hanyang · tối đa 2,000,000 KRW · GPA từ 3.0",
-          },
-        ],
-        warning: "Chúng tôi không bao giờ giới thiệu quảng cáo vay tư nhân. Lừa đảo lãi suất cao nhắm vào du học sinh rất phổ biến.",
-        ctaLabel: "Mở hạn mức học phí",
-      },
-      remittanceProof: {
-        options: [
-          { title: "Hợp đồng lao động · Phiếu lương", amountLine: "+3,000,000 KRW", detail: "Bao gồm giấy phép làm thêm trong trường" },
-          { title: "Lịch sử chuyển tiền từ quê nhà (bố mẹ hỗ trợ)", amountLine: "+2,000,000 KRW", detail: "Lịch sử nhận tiền 3 tháng gần nhất là đủ" },
-          { title: "Giấy chứng nhận học bổng", amountLine: "+1,500,000 KRW", detail: "Giấy tờ do Đại học Hanyang cấp" },
-        ],
-        warning: "Chỉ cần một trong ba loại này là đủ để mở hạn mức tương ứng.",
-        ctaLabel: "Tiếp tục chuyển tiền",
-      },
-      generic: {
-        options: [{ title: "Đi đến menu liên quan", detail: "Tôi sẽ đưa bạn thẳng đến màn hình phù hợp với câu hỏi." }],
-        ctaLabel: "Về trang chủ",
-      },
-    },
+    thinking: "Đang suy nghĩ…",
+    errorMessage: "Không thể lấy câu trả lời. Vui lòng thử lại sau.",
   },
   tuition: {
     topBarTitle: "Mở hạn mức học phí",

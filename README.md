@@ -14,6 +14,12 @@
   (`app/api/**/route.ts`). 클라이언트는 즉각적인 화면 반응을 위해 동일 로직을 낙관적으로
   미리 계산해 보여주고, 서버 응답이 도착하면 그 결과로 다시 맞춥니다.
 - **다국어**: 한국어/영어/중국어/베트남어 — `lib/i18n`의 번역 사전을 전 화면이 실시간으로 참조합니다.
+- **AI 상담(FinMate AI)**: Google Gemini(`gemini-3.8-flash`)가 실제로 응답합니다. 사용자의 실제
+  프로필·금융여권 등급·한도·보유 서류를 시스템 프롬프트에 넣어 개인화된 답변을 하고,
+  `previous_interaction_id`로 멀티턴 대화 맥락을 유지합니다 (`lib/ai/gemini.ts`,
+  `app/api/ai/chat/route.ts`).
+- **은행 제출용 리포트 검증**: 계정마다 고정 발급되는 검증코드로 로그인 없이도 조회 가능한 공개
+  페이지(`/verify/[code]`)가 있고, QR 코드는 이 페이지 링크를 실제로 인코딩합니다.
 
 **Mock으로 남겨둔 부분**: 고지서/계약서 OCR 판독, 은행 지점·환율·정부기관 연동은 실제 제휴 없이는
 구현이 불가능하므로 그럴듯한 지연시간과 결과로 흉내만 냅니다 (`lib/mock/*.ts`).
@@ -38,20 +44,29 @@
    - 실제 제출용으로는 켜두는 것을 권장합니다 (가입 후 메일함의 링크를 눌러야 로그인 가능).
 4. **Project Settings → API**에서 `Project URL`과 `anon public` 키를 복사합니다.
 
-### 2. 환경 변수 설정
+### 2. Gemini API 키 발급
+
+1. [aistudio.google.com/apikey](https://aistudio.google.com/apikey)에서 Google 계정으로 로그인 후
+   **Create API key**로 키를 발급받습니다 (무료 티어 있음).
+2. ⚠️ **무료 티어는 `gemini-3.8-flash` 기준 요청 수 제한(일일 한도)이 꽤 낮습니다.** 데모/발표 당일
+   많은 사람이 몰려서 테스트할 예정이라면, Google AI Studio에서 결제 계정을 연결해 유료 티어로
+   전환하는 것을 권장합니다 (요청당 비용은 매우 저렴합니다 — 입력 $0.75, 출력 $3.75 / 100만 토큰).
+
+### 3. 환경 변수 설정
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-`.env.local`을 열어 위에서 복사한 값을 채워 넣습니다.
+`.env.local`을 열어 위에서 발급받은 값들을 채워 넣습니다.
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
+GEMINI_API_KEY=your-gemini-api-key
 ```
 
-### 3. 실행
+### 4. 실행
 
 ```bash
 npm install
@@ -74,7 +89,8 @@ npm run dev
 | `/remittance` | 해외송금: 정보 입력 → 한도 점검 → (부족 시) 증빙 제출 → 채널 비교 → 전송 추적 |
 | `/account` | 계좌 개설: 보유 서류 체크 → 맞춤 안내 → 지점 찾기(Mock) → 창구 제시 카드 |
 | `/deposit` | 월세·보증금: 계약서 업로드 → 등기 검증(Mock) → 위험 경고 → 보증금 보호 체크리스트 |
-| `/ai` | FinMate AI — 카드형 답변 (질문 키워드 매칭, Mock) |
+| `/ai` | FinMate AI — Gemini 기반 실제 채팅 (하단 고정 입력창, 멀티턴) |
+| `/verify/[code]` | 은행 제출용 리포트의 공개 검증 페이지 (로그인 불필요) |
 | `/profile`, `/more` | 내 정보, 더보기 (언어 전환, 로그아웃) |
 | `POST /api/onboarding` | 프로필/금융여권(S1)/서류상태 row를 원자적으로 생성 |
 | `POST /api/documents` | 보유 서류 상태 갱신 |
@@ -82,6 +98,7 @@ npm run dev
 | `POST /api/passport/unlock` | 증빙 제출에 따른 한도 즉시 상향 |
 | `POST /api/passport/purpose-transaction` | 목적 거래 완료 반영 + 납부 기록 추가 |
 | `POST /api/language` | 언어 설정 저장 |
+| `POST /api/ai/chat` | Gemini 호출 — 사용자 실제 상태를 시스템 프롬프트에 주입해 개인화된 답변 생성 |
 
 ## 데이터베이스 구조
 
