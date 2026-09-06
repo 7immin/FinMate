@@ -26,8 +26,10 @@ export interface EnrollmentEntry {
 
 /** 납부 방법 안내에서 뽑아낸 제약 조건. */
 export interface PaymentTerms {
-  methods: string[];
-  virtualAccountBank: string | null;
+  /** 납부 수단. 한국어 원문과 번역을 함께 담는다. */
+  methods: LocalizedText[];
+  /** 가상계좌 은행. 은행명도 언어마다 통용 표기가 다르다(신한은행 / Shinhan Bank). */
+  virtualAccountBank: LocalizedText | null;
   /**
    * 분할 "송금" 허용 여부. 분할 "납부"와 헷갈리면 안 된다.
    *
@@ -55,8 +57,11 @@ export interface PaymentTerms {
 
 export interface EnrollmentNotice {
   schoolId: SchoolId;
-  academicYear: string;
-  semester: string;
+  /**
+   * 학기. "2026학년도 2학기"처럼 한국 학사 용어라 그대로 두면 번역이 빠진다.
+   * 화면에서 가장 먼저 읽히는 줄이라 특히 눈에 띈다.
+   */
+  term: LocalizedText;
   entries: EnrollmentEntry[];
   terms: PaymentTerms;
   /** 실시간 조회가 막혀 저장된 스냅샷으로 떨어졌는지. 화면에서 밝힌다. */

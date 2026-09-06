@@ -45,7 +45,9 @@ export async function POST(request: Request) {
   let publishedBank: string | null = null;
   try {
     const result = await getEnrollmentNotice(state.profile.school);
-    publishedBank = result?.notice.terms.virtualAccountBank?.trim() || null;
+    // 대조는 한국어 원문끼리 한다. 고지서가 한국어로 오므로 번역본과
+    // 맞추면 "신한은행"과 "Shinhan Bank"가 다른 값이 된다.
+    publishedBank = result?.notice.terms.virtualAccountBank?.ko?.trim() || null;
   } catch {
     // 공지를 못 읽어도 화면은 계속 간다. 그 항목만 unknown이 된다.
   }

@@ -31,8 +31,10 @@ const LOCALIZED = {
 const RESPONSE_SCHEMA = {
   type: "object",
   properties: {
-    academicYear: { type: "string", description: "예: 2026학년도" },
-    semester: { type: "string", description: "예: 2학기" },
+    term: {
+      ...LOCALIZED,
+      description: "학년도와 학기를 합친 한 줄. ko는 '2026학년도 2학기', en은 'Fall semester 2026'처럼.",
+    },
     entries: {
       type: "array",
       items: {
@@ -51,8 +53,11 @@ const RESPONSE_SCHEMA = {
         required: ["label", "kind", "installmentRound", "startDate", "endDate", "endTime"],
       },
     },
-    methods: { type: "array", items: { type: "string" } },
-    virtualAccountBank: { type: ["string", "null"] },
+    methods: { type: "array", items: LOCALIZED, description: "납부 수단. 각 항목을 네 언어로." },
+    virtualAccountBank: {
+      anyOf: [LOCALIZED, { type: "null" }],
+      description: "가상계좌 은행. 은행명은 언어별 통용 표기를 쓴다(신한은행 / Shinhan Bank / 新韩银行).",
+    },
     splitTransferAllowed: { type: "boolean" },
     splitTransferNote: {
       anyOf: [LOCALIZED, { type: "null" }],
@@ -62,8 +67,7 @@ const RESPONSE_SCHEMA = {
     notes: { type: "array", items: LOCALIZED },
   },
   required: [
-    "academicYear",
-    "semester",
+    "term",
     "entries",
     "methods",
     "virtualAccountBank",
@@ -97,6 +101,8 @@ const SYSTEM = `당신은 한국 대학의 등록금 관련 공지 원문을 읽
   원문 문장을 한 글자도 바꾸지 말고 ko에 그대로 옮긴다. 근거 문장을 찾을 수
   없으면 false로 두지 말고 true로 두어라 — 근거 없는 금지는 안내가 아니다.
 - notes에는 원문에 있는 제약 문장만 옮긴다. 요약하거나 새로 만들지 않는다.
+- 네 언어를 모두 채워야 하는 것: term, label, notes, methods, virtualAccountBank.
+  한국어만 채우고 나머지를 비우면 화면에서 그 줄만 한국어로 남는다.
 - label과 notes는 ko/en/zh/vi 네 언어를 모두 채운다. ko에는 공지 원문을 그대로
   두고, en·zh·vi에는 그 뜻을 옮긴다. 이 앱을 쓰는 사람은 한국어를 못 읽는
   유학생이라, 번역이 없으면 자기 납부 기간을 알 수 없다.
@@ -105,8 +111,8 @@ const SYSTEM = `당신은 한국 대학의 등록금 관련 공지 원문을 읽
 - 원문에 없는 값은 만들어내지 않는다. 모르면 배열은 비우고 null을 쓴다.`;
 
 type Extracted = Omit<EnrollmentNotice, "schoolId" | "fromSnapshot" | "sources" | "fetchedAt" | "terms"> & {
-  methods: string[];
-  virtualAccountBank: string | null;
+  methods: EnrollmentNotice["terms"]["methods"];
+  virtualAccountBank: EnrollmentNotice["terms"]["virtualAccountBank"];
   splitTransferAllowed: boolean;
   splitTransferNote: EnrollmentNotice["terms"]["splitTransferNote"];
   notes: EnrollmentNotice["terms"]["notes"];
@@ -145,8 +151,7 @@ export async function extractEnrollmentNotice(
 
   return {
     schoolId,
-    academicYear: extracted.academicYear,
-    semester: extracted.semester,
+    term: extracted.term,
     entries: extracted.entries,
     terms: {
       methods: extracted.methods,
