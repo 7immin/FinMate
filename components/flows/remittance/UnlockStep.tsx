@@ -16,6 +16,7 @@ import {
 import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { PROOF_OPTIONS, ProofOption } from "@/lib/mock/remittance";
 import { checkProofDocument, ProofCheckResult } from "@/lib/ocr/client";
@@ -33,7 +34,9 @@ export function UnlockStep({
 }: {
   onUnlocked: (option: ProofOption, fileName: string, evidencePath: string | null) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, tShared } = useTranslation();
+  const { state } = useAppState();
+  const schoolName = tShared("school", state.profile.school);
   const [selected, setSelected] = useState(PROOF_OPTIONS[0].id);
   // 서류를 실제로 붙여야 요청이 올라간다. 예전에는 증빙 종류만 고르면
   // 그대로 요청이 됐는데, 그러면 은행 담당자는 "근로계약서"라는 글자만
@@ -104,7 +107,7 @@ export function UnlockStep({
                     </span>
                   </div>
                   <p className="mt-1.5 pl-[30px] text-sm text-foreground-muted">
-                    {t(`remittance.proof.${option.id}.description`)}
+                    {t(`remittance.proof.${option.id}.description`, { school: schoolName })}
                   </p>
                 </Card>
               </button>
