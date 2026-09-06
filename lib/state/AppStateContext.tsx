@@ -16,6 +16,7 @@ interface AppStateContextValue {
   state: AppState;
   setDocumentFlag: (key: keyof DocumentFlags, value: "yes" | "no" | "unknown") => void;
   toggleChecklistItem: (id: string) => void;
+  setPassportState: (passport: FinancialPassport) => void;
   recordPurposeTransaction: (category: PurposeCategory) => void;
   requestLimit: (amount: number, purpose: PurposeCategory, evidence?: string) => void;
   pendingRequests: PendingRequest[];
@@ -98,6 +99,12 @@ export function AppStateProvider({
         }).then((data) => {
           if (data) setState((prev) => ({ ...prev, passport: data.passport }));
         });
+      },
+      // /api/passport/verify already did the real work (OCR + marking the
+      // item done) before this is called -- this just adopts the server's
+      // response instead of guessing at an optimistic update client-side.
+      setPassportState: (passport) => {
+        setState((prev) => ({ ...prev, passport }));
       },
       recordPurposeTransaction: (category) => {
         setState((prev) => {

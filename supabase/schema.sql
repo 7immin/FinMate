@@ -25,6 +25,7 @@ create table if not exists public.financial_passports (
   purpose_counts jsonb not null default '{}'::jsonb,
   verification_code text not null unique
     default upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 8)),
+  account_linked_at timestamptz,
   updated_at timestamptz not null default now()
 );
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Download } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { TopBar } from "@/components/layout/TopBar";
@@ -14,7 +15,16 @@ import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LEVEL_ORDER } from "@/lib/mock/passport-levels";
 
+// 항목마다 "완료"가 실제로 무슨 의미인지가 다르다:
+// - 문서 검증: 실물 서류를 올리면 OCR로 확인 → /passport/verify/[id]로 보낸다
+// - 수동 토글: 아직 실제 인증(SMS 등)을 붙이지 못해 탭하면 바로 완료 처리
+// - 자동: 사용자가 할 일이 없다. 시간이나 실거래가 쌓이면 저절로 체크된다
+const DOCUMENT_VERIFY_ITEMS = ["passport-verify", "korean-account", "overdue-clear"];
+const MANUAL_TOGGLE_ITEMS = ["phone-verify"];
+const TRANSACTION_ITEMS = ["first-purpose-tx", "purpose-tx-2"];
+
 export default function PassportPage() {
+  const router = useRouter();
   const { state, toggleChecklistItem, pendingRequests } = useAppState();
   const { t, tOpt, tShared, lang } = useTranslation();
   const { passport, profile } = state;
@@ -24,13 +34,39 @@ export default function PassportPage() {
   const isMature = passport.level === "S3" || passport.level === "S4";
   const nextLevelLabel = passport.level === "S4" ? null : LEVEL_ORDER[levelOrder];
   const firstPending = passport.nextLevelChecklist.find((item) => !item.done);
+  const isAutoPending = firstPending?.id === "account-active";
+
+  const accountActiveDays = passport.accountLinkedAt
+    ? Math.max(0, Math.floor((Date.now() - new Date(passport.accountLinkedAt).getTime()) / 86400000))
+    : 0;
+
+  function rowOnClick(itemId: string, done: boolean) {
+    if (done) return undefined;
+    if (DOCUMENT_VERIFY_ITEMS.includes(itemId)) return () => router.push(`/passport/verify/${itemId}`);
+    if (MANUAL_TOGGLE_ITEMS.includes(itemId)) return () => toggleChecklistItem(itemId);
+    return undefined;
+  }
+
+  function rowHint(itemId: string, done: boolean) {
+    if (itemId === "account-active" && !done) {
+      return t("passport.accountActiveShortHint", { days: Math.min(accountActiveDays, 30) });
+    }
+    return tOpt(`passport.checklist.${itemId}.hint`);
+  }
 
   function handleCta() {
     if (isMature) {
       setViewingReport(true);
       return;
     }
-    if (firstPending) toggleChecklistItem(firstPending.id);
+    if (!firstPending) return;
+    if (DOCUMENT_VERIFY_ITEMS.includes(firstPending.id)) {
+      router.push(`/passport/verify/${firstPending.id}`);
+    } else if (MANUAL_TOGGLE_ITEMS.includes(firstPending.id)) {
+      toggleChecklistItem(firstPending.id);
+    } else if (TRANSACTION_ITEMS.includes(firstPending.id)) {
+      router.push("/home");
+    }
   }
 
   const ctaLabel = isMature
@@ -124,12 +160,17 @@ export default function PassportPage() {
                   <ChecklistRow
                     status={item.done ? "done" : "pending"}
                     label={t(`passport.checklist.${item.id}.label`)}
-                    hint={tOpt(`passport.checklist.${item.id}.hint`)}
-                    onClick={() => toggleChecklistItem(item.id)}
+                    hint={rowHint(item.id, item.done)}
+                    onClick={rowOnClick(item.id, item.done)}
                   />
                 </div>
               ))}
             </Card>
+            {firstPending && TRANSACTION_ITEMS.includes(firstPending.id) && (
+              <p className="mt-2 text-xs leading-relaxed text-foreground-subtle">
+                {t("passport.transactionHint")}
+              </p>
+            )}
           </div>
         )}
 
@@ -143,10 +184,16 @@ export default function PassportPage() {
           {t("passport.disclaimer")}
         </Card>
 
-        <Button onClick={handleCta} className="gap-2">
-          {isMature && <Download className="h-4 w-4" />}
-          {ctaLabel}
-        </Button>
+        {isAutoPending ? (
+          <Card className="text-center text-sm text-foreground-muted">
+            {t("passport.accountActiveHint", { days: Math.min(accountActiveDays, 30) })}
+          </Card>
+        ) : (
+          <Button onClick={handleCta} className="gap-2">
+            {isMature && <Download className="h-4 w-4" />}
+            {ctaLabel}
+          </Button>
+        )}
       </div>
     </AppShell>
   );

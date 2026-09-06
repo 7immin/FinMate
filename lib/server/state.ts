@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { AppState, ChecklistItem, PaymentRecord, PurposeCategory } from "@/lib/types";
+import { autoAdvanceAccountActive, PassportRow } from "@/lib/server/passport";
 
 interface FetchResult {
   onboarded: boolean;
@@ -22,12 +23,14 @@ interface FullStateRow {
     };
   };
   passport: {
+    user_id: string;
     level: string;
     current_limit: number;
     next_level_checklist: ChecklistItem[];
     payment_history: PaymentRecord[];
     purpose_counts: Partial<Record<PurposeCategory, number>>;
     verification_code: string;
+    account_linked_at: string | null;
   };
   documents: {
     has_passport: string;
@@ -47,7 +50,18 @@ export async function fetchAppState(): Promise<FetchResult> {
 
   if (!data) return { onboarded: false, state: null };
 
-  const { profile, passport, documents } = data;
+  const { profile, documents } = data;
+
+  // Self-heals "account-active" (and cascades a level-up) if 30 real days
+  // have passed since the account was linked -- this is the only path that
+  // isn't already covered by an API route, since layout mounts read state
+  // straight from the RPC rather than through getPassportRow(). user_id
+  // comes along for free since get_full_state() jsonb-ifies every column.
+  const passport = await autoAdvanceAccountActive(
+    supabase,
+    data.passport.user_id,
+    data.passport as unknown as PassportRow
+  );
 
   const state: AppState = {
     profile: {
@@ -67,6 +81,7 @@ export async function fetchAppState(): Promise<FetchResult> {
       paymentHistory: passport.payment_history,
       purposeCounts: passport.purpose_counts ?? {},
       verificationCode: passport.verification_code,
+      accountLinkedAt: passport.account_linked_at,
     },
     documents: {
       hasPassport: documents.has_passport as AppState["documents"]["hasPassport"],

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getPassportRow, savePassportRow, toPassportState } from "@/lib/server/passport";
+import { applyChecklistPatch, getPassportRow, savePassportRow, toPassportState } from "@/lib/server/passport";
 import { PurposeCategory } from "@/lib/types";
 
 export async function POST(request: Request) {
@@ -32,8 +32,14 @@ export async function POST(request: Request) {
     purposeCounts[category] = (purposeCounts[category] ?? 0) + 1;
   }
 
+  // A completed purpose transaction can be the last item needed for a
+  // level-up (e.g. "first-purpose-tx" at S2) -- run it through the same
+  // cascade check every other completion path uses, instead of only ever
+  // saving the checklist as-is.
+  const checklistPatch = applyChecklistPatch(row, checklist);
+
   const updated = await savePassportRow(supabase, user.id, {
-    next_level_checklist: checklist,
+    ...checklistPatch,
     payment_history: [...row.payment_history, { month, onTime: true }],
     purpose_counts: purposeCounts,
   });
