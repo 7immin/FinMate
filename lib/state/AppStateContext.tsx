@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 import {
   AppState,
   DocumentFlags,
@@ -36,7 +36,7 @@ export interface PendingRequest {
   id: string;
   amount: number;
   purpose: PurposeCategory;
-  status: "pending";
+  status: "pending" | "approved" | "rejected";
 }
 
 const AppStateContext = createContext<AppStateContextValue | null>(null);
@@ -82,9 +82,35 @@ export function AppStateProvider({
   children: ReactNode;
 }) {
   const [state, setState] = useState<AppState>(initialState);
-  // 이번 세션에 올린 요청. 승인 여부는 은행이 정하므로 여기서는 "올렸다"는
-  // 사실만 들고 있다가 화면에 되돌려 준다.
+  // 올린 한도 요청.
+  //
+  // 예전에는 이번 세션에 올린 것만 메모리에 들고 있었다. 그래서 새로고침
+  // 한 번이면 "승인 대기" 줄이 통째로 사라졌다 — 사용자는 요청이 없어진
+  // 줄 안다. DB에서 읽어 오고, 승인·거절 결과까지 함께 보여준다.
   const [pending, setPending] = useState<PendingRequest[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/limit-requests")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.requests) return;
+        setPending(
+          data.requests.map((r: { id: string; amount: number; purpose: PurposeCategory; status: PendingRequest["status"] }) => ({
+            id: r.id,
+            amount: r.amount,
+            purpose: r.purpose,
+            status: r.status,
+          }))
+        );
+      })
+      .catch(() => {
+        // 못 읽으면 빈 목록으로 둔다. 요청 자체는 서버에 남아 있다.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const value = useMemo<AppStateContextValue>(
     () => ({

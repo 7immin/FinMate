@@ -161,7 +161,16 @@ export async function POST(request: Request) {
     purposeCounts[purpose] = (purposeCounts[purpose] ?? 0) + 1;
 
     const saved = await savePassportRow(admin, existing.user_id, {
-      current_limit: row.current_limit + existing.amount,
+      // 더하지 않고 올린다.
+      //
+      // 학생이 요청하는 것은 "420만 원을 낼 수 있게 해달라"이지 "지금
+      // 한도에 420만 원을 더해달라"가 아니다. 더하면 200만 한도에서
+      // 620만이 되어, 학생이 부탁한 적 없는 400만 원어치 여유가 생긴다.
+      // 목적을 증명한 만큼만 열어야 이 서비스의 말이 지켜진다.
+      //
+      // 이미 그보다 큰 한도가 열려 있으면 깎지 않는다 — 다른 목적으로
+      // 받아 둔 한도를 이번 승인이 되돌릴 이유가 없다.
+      current_limit: Math.max(row.current_limit, existing.amount),
       purpose_counts: purposeCounts,
       payment_history: [...row.payment_history, { month, onTime: true }],
     });

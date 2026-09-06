@@ -4,7 +4,8 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { CountrySearchSheet } from "@/components/ui/CountrySearchSheet";
-import { REMITTANCE_COUNTRIES, findCountry } from "@/lib/remittance/countries";
+import { COUNTRY_CODES } from "@/lib/data/countries";
+import { currencyOf } from "@/lib/data/country-currency";
 import { cn } from "@/lib/utils/cn";
 
 /**
@@ -19,6 +20,12 @@ import { cn } from "@/lib/utils/cn";
  * 양쪽에 걸리게 한다 — 한국어 화면을 쓰면서 "Vietnam"이라고 치는 사람이
  * 있고, 그 반대도 있다.
  */
+/**
+ * 밖에 펴 두는 넷.
+ *
+ * 국내 체류 유학생이 가장 많이 보내는 나라다. 나머지는 검색으로 찾는다 —
+ * 250개를 다 펼치면 자기 나라를 찾는 데 오히려 오래 걸린다.
+ */
 const QUICK_CODES = ["VN", "CN", "MN", "NP"];
 
 export function CountryPicker({
@@ -32,7 +39,6 @@ export function CountryPicker({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
 
-  const selected = findCountry(value);
   const selectedIsQuick = QUICK_CODES.includes(value);
 
   return (
@@ -68,7 +74,7 @@ export function CountryPicker({
               : "border-border text-foreground-muted hover:border-border-strong"
           )}
         >
-          {!selectedIsQuick && selected
+          {!selectedIsQuick && value
             ? tShared("country", value)
             : t("remittance.input.otherCountry")}
           <ChevronDown className="h-3.5 w-3.5" />
@@ -78,13 +84,13 @@ export function CountryPicker({
       <CountrySearchSheet
         open={open}
         onClose={() => setOpen(false)}
-        codes={REMITTANCE_COUNTRIES.map((c) => c.code)}
+        codes={COUNTRY_CODES}
         value={value}
         onSelect={onChange}
         title={t("remittance.input.countryLabel")}
         renderMeta={(code) => (
           <span className="shrink-0 font-mono text-[12px] text-foreground-muted">
-            {findCountry(code)?.currency}
+            {currencyOf(code)}
           </span>
         )}
       />

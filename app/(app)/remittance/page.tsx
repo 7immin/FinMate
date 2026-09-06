@@ -20,7 +20,12 @@ export default function RemittancePage() {
   const { state, requestLimit } = useAppState();
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>("input");
-  const [country, setCountry] = useState<NationalityId>(DEFAULT_COUNTRY_CODE);
+  // 받는 나라의 기본값은 본인 국적이다. 유학생이 송금하는 곳은 대개
+  // 본국이라, 매번 같은 나라를 다시 고르게 할 이유가 없다. 국적을 아직
+  // 모르면(가입 직후 등) 베트남으로 둔다.
+  const [country, setCountry] = useState<NationalityId>(
+    state.profile.nationalityCode || DEFAULT_COUNTRY_CODE
+  );
   const [recipient, setRecipient] = useState("NGUYEN VAN MINH");
   const [reason, setReason] = useState<ReasonId>("living");
   const [amount, setAmount] = useState(1800000);
