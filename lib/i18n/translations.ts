@@ -81,7 +81,14 @@ const shared = {
 };
 
 const ko = {
-  common: { back: "뒤로가기", sendQuestion: "질문 보내기", goHome: "홈으로" },
+  common: {
+    back: "뒤로가기",
+    sendQuestion: "질문 보내기",
+    goHome: "홈으로",
+    uploadComplete: "업로드 완료",
+    takePhoto: "촬영",
+    chooseFile: "파일 선택",
+  },
   nav: { home: "홈", ai: "AI", profile: "내 정보", more: "더보기" },
   onboarding: {
     headline: "목적을 증명하면\n한도가 열립니다",
@@ -451,7 +458,14 @@ const ko = {
 };
 
 const en: typeof ko = {
-  common: { back: "Back", sendQuestion: "Send question", goHome: "Go home" },
+  common: {
+    back: "Back",
+    sendQuestion: "Send question",
+    goHome: "Go home",
+    uploadComplete: "Upload complete",
+    takePhoto: "Take photo",
+    chooseFile: "Choose file",
+  },
   nav: { home: "Home", ai: "AI", profile: "Profile", more: "More" },
   onboarding: {
     headline: "Prove your purpose,\nunlock your limit",
@@ -823,7 +837,14 @@ const en: typeof ko = {
 };
 
 const zh: typeof ko = {
-  common: { back: "返回", sendQuestion: "发送提问", goHome: "返回首页" },
+  common: {
+    back: "返回",
+    sendQuestion: "发送提问",
+    goHome: "返回首页",
+    uploadComplete: "上传完成",
+    takePhoto: "拍照",
+    chooseFile: "选择文件",
+  },
   nav: { home: "首页", ai: "AI", profile: "我的", more: "更多" },
   onboarding: {
     headline: "证明用途，\n即可开通额度",
@@ -1192,7 +1213,14 @@ const zh: typeof ko = {
 };
 
 const vi: typeof ko = {
-  common: { back: "Quay lại", sendQuestion: "Gửi câu hỏi", goHome: "Về trang chủ" },
+  common: {
+    back: "Quay lại",
+    sendQuestion: "Gửi câu hỏi",
+    goHome: "Về trang chủ",
+    uploadComplete: "Đã tải lên xong",
+    takePhoto: "Chụp ảnh",
+    chooseFile: "Chọn tệp",
+  },
   nav: { home: "Trang chủ", ai: "AI", profile: "Của tôi", more: "Thêm" },
   onboarding: {
     headline: "Chứng minh mục đích,\nhạn mức sẽ được mở",

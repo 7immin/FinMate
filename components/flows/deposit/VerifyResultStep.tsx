@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ChecklistRow } from "@/components/ui/Checklist";
-import { LEASE_CONTRACT, REGISTRY_CHECKS } from "@/lib/mock/deposit";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { LEASE_CONTRACT, REGISTRY_CHECK_IDS } from "@/lib/mock/deposit";
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
@@ -23,41 +24,45 @@ export function VerifyResultStep({
   onReduceRisk: () => void;
   onAbandon: () => void;
 }) {
-  const warningCount = REGISTRY_CHECKS.filter((c) => c.status === "warning").length;
+  const { t } = useTranslation();
+  const warningCount = REGISTRY_CHECK_IDS.filter((c) => c.status === "warning").length;
 
   return (
     <div className="flex flex-1 flex-col">
-      <TopBar title="검증 결과" />
+      <TopBar title={t("deposit.verify.topBarTitle")} />
       <div className="flex-1 space-y-5 px-5 pb-6 pt-2">
-        <Badge tone="warning">주의 {warningCount}건</Badge>
+        <Badge tone="warning">{t("deposit.verify.warningBadge", { count: warningCount })}</Badge>
 
-        <h1 className="text-[22px] font-bold leading-snug text-foreground">
-          보증금을 보내기 전에
-          <br />
-          확인이 필요합니다
+        <h1 className="whitespace-pre-line text-[22px] font-bold leading-snug text-foreground">
+          {t("deposit.verify.headline")}
         </h1>
 
         <Card className="divide-y divide-border">
-          <InfoRow label="주소" value={LEASE_CONTRACT.address} />
-          <InfoRow label="보증금" value={`${LEASE_CONTRACT.deposit.toLocaleString()} KRW`} />
-          <InfoRow label="월세" value={`${LEASE_CONTRACT.rent.toLocaleString()} KRW · ${LEASE_CONTRACT.rentDay}`} />
-          <InfoRow label="계약 기간" value={LEASE_CONTRACT.period} />
+          <InfoRow label={t("deposit.verify.address")} value={LEASE_CONTRACT.address} />
+          <InfoRow label={t("deposit.verify.deposit")} value={`${LEASE_CONTRACT.deposit.toLocaleString()} KRW`} />
+          <InfoRow
+            label={t("deposit.verify.rent")}
+            value={`${LEASE_CONTRACT.rent.toLocaleString()} KRW · ${LEASE_CONTRACT.rentDay}`}
+          />
+          <InfoRow label={t("deposit.verify.period")} value={LEASE_CONTRACT.period} />
         </Card>
 
         <div className="space-y-1">
-          {REGISTRY_CHECKS.map((check) => (
+          {REGISTRY_CHECK_IDS.map((check) => (
             <Card key={check.id} className={check.status === "warning" ? "bg-warning-muted" : undefined}>
-              <ChecklistRow status={check.status} label={check.label} />
-              <p className="pl-8 text-sm leading-relaxed text-foreground-muted">{check.detail}</p>
+              <ChecklistRow status={check.status} label={t(`deposit.registry.${check.id}.label`)} />
+              <p className="pl-8 text-sm leading-relaxed text-foreground-muted">
+                {t(`deposit.registry.${check.id}.detail`)}
+              </p>
             </Card>
           ))}
         </div>
       </div>
 
       <div className="space-y-3 px-5 pb-6">
-        <Button onClick={onReduceRisk}>위험 줄이는 방법 보기 →</Button>
+        <Button onClick={onReduceRisk}>{t("deposit.verify.reduceRisk")}</Button>
         <button type="button" onClick={onAbandon} className="w-full text-center text-sm text-foreground-muted">
-          이 집은 포기할게요
+          {t("deposit.verify.abandon")}
         </button>
       </div>
     </div>

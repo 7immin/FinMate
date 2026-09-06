@@ -6,14 +6,16 @@ import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ChecklistRow } from "@/components/ui/Checklist";
-import { DocumentFlags } from "@/lib/types";
-import { REQUEST_PHRASE } from "@/lib/mock/account";
+import { DocumentFlags, Language } from "@/lib/types";
+import { translateNode } from "@/lib/i18n";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
-const LANG_CYCLE: { code: keyof typeof REQUEST_PHRASE; nextLabel: string }[] = [
-  { code: "ko", nextLabel: "베트남어로 보기" },
-  { code: "vi", nextLabel: "영어로 보기" },
-  { code: "en", nextLabel: "한국어로 보기" },
-];
+const PHRASE_LANG_CYCLE: Language[] = ["ko", "en", "zh", "vi"];
+
+interface RequestPhrase {
+  title: string;
+  body: string;
+}
 
 export function PrepCardStep({
   documents,
@@ -22,15 +24,17 @@ export function PrepCardStep({
   documents: DocumentFlags;
   onComplete: () => void;
 }) {
-  const [langIdx, setLangIdx] = useState(0);
-  const lang = LANG_CYCLE[langIdx];
-  const phrase = REQUEST_PHRASE[lang.code];
+  const { t, lang } = useTranslation();
+  const [langIdx, setLangIdx] = useState(() => Math.max(0, PHRASE_LANG_CYCLE.indexOf(lang)));
+  const phraseLang = PHRASE_LANG_CYCLE[langIdx];
+  const nextLang = PHRASE_LANG_CYCLE[(langIdx + 1) % PHRASE_LANG_CYCLE.length];
+  const phrase = translateNode<RequestPhrase>(phraseLang, "account.prep.request." + phraseLang);
 
   return (
     <div className="flex flex-1 flex-col">
-      <TopBar title="창구에서 보여주기" />
+      <TopBar title={t("account.prep.topBarTitle")} />
       <div className="flex-1 space-y-5 px-5 pb-6 pt-2">
-        <h1 className="text-[22px] font-bold text-foreground">이 화면을 직원에게 보여주세요</h1>
+        <h1 className="text-[22px] font-bold text-foreground">{t("account.prep.headline")}</h1>
 
         <Card raised className="space-y-2">
           <p className="text-sm font-medium text-foreground-muted">{phrase.title}</p>
@@ -38,43 +42,41 @@ export function PrepCardStep({
         </Card>
 
         <div>
-          <p className="mb-2 text-sm font-medium text-foreground-muted">가져갈 서류</p>
+          <p className="mb-2 text-sm font-medium text-foreground-muted">{t("account.prep.docsTitle")}</p>
           <Card className="divide-y divide-border">
             <ChecklistRow
               status={documents.hasPassport === "yes" ? "done" : "pending"}
-              label="여권 원본"
+              label={t("account.prep.docPassportOriginal")}
             />
-            <ChecklistRow status="done" label="재학증명서 (3개월 이내)" />
+            <ChecklistRow status="done" label={t("account.prep.docEnrollment")} />
             <ChecklistRow
               status={documents.hasKoreanPhone === "yes" ? "done" : "pending"}
-              label="한국 휴대폰 번호"
+              label={t("account.prep.docKoreanPhone")}
             />
-            <ChecklistRow status="pending" label="기숙사 거주 확인서 (권장)" />
+            <ChecklistRow status="pending" label={t("account.prep.docDorm")} />
           </Card>
         </div>
 
         <Card className="flex gap-2.5 bg-warning-muted">
           <AlertTriangle className="h-4 w-4 shrink-0 text-warning" />
-          <p className="text-sm leading-relaxed text-warning">
-            계좌 개설 후 첫 한 달은 하루 이체 한도가 30만 원입니다. 정상적인 절차입니다.
-          </p>
+          <p className="text-sm leading-relaxed text-warning">{t("account.prep.limitWarning")}</p>
         </Card>
       </div>
 
       <div className="space-y-3 px-5 pb-6">
         <Button
           variant="outline"
-          onClick={() => setLangIdx((i) => (i + 1) % LANG_CYCLE.length)}
+          onClick={() => setLangIdx((i) => (i + 1) % PHRASE_LANG_CYCLE.length)}
           className="gap-2"
         >
-          <Languages className="h-4 w-4" /> {lang.nextLabel}
+          <Languages className="h-4 w-4" /> {t(`account.prep.langToggle.${nextLang}`)}
         </Button>
         <button
           type="button"
           onClick={onComplete}
           className="w-full text-center text-sm text-foreground-muted"
         >
-          개설 완료했어요
+          {t("account.prep.complete")}
         </button>
       </div>
     </div>

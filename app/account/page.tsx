@@ -9,17 +9,18 @@ import { BranchFinderStep } from "@/components/flows/account/BranchFinderStep";
 import { PrepCardStep } from "@/components/flows/account/PrepCardStep";
 import { FlowSuccess } from "@/components/flows/FlowSuccess";
 import { useAppState } from "@/lib/state/AppStateContext";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { DocumentFlags } from "@/lib/types";
-import { Branch } from "@/lib/mock/account";
 
 type Step = "documents" | "guidance" | "branch" | "prep" | "success";
 
 export default function AccountOpeningPage() {
   const router = useRouter();
   const { setDocumentFlag } = useAppState();
+  const { t } = useTranslation();
   const [step, setStep] = useState<Step>("documents");
   const [documents, setDocuments] = useState<DocumentFlags | null>(null);
-  const [branch, setBranch] = useState<Branch | null>(null);
+  const [branchName, setBranchName] = useState<string | null>(null);
 
   function handleDocumentsSubmit(flags: DocumentFlags) {
     setDocuments(flags);
@@ -37,8 +38,8 @@ export default function AccountOpeningPage() {
       )}
       {step === "branch" && (
         <BranchFinderStep
-          onSelect={(b) => {
-            setBranch(b);
+          onSelect={(name) => {
+            setBranchName(name);
             setStep("prep");
           }}
         />
@@ -48,10 +49,11 @@ export default function AccountOpeningPage() {
       )}
       {step === "success" && (
         <FlowSuccess
-          topBarTitle="계좌 개설"
-          title="방문 준비가 끝났어요"
-          description={`${branch?.name ?? "지점"}에서 위 화면을 보여주면 바로 창구 상담을 받을 수 있어요.`}
-          doneLabel="홈으로"
+          topBarTitle={t("account.topBarTitle")}
+          title={t("account.success.title")}
+          description={t("account.success.description", {
+            branch: branchName ?? t("account.success.branchFallback"),
+          })}
           onDone={() => router.push("/home")}
         />
       )}

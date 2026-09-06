@@ -7,14 +7,9 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { DocumentFlags } from "@/lib/types";
 import { cn } from "@/lib/utils/cn";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 type Flag = "unknown" | "yes" | "no";
-
-const OPTIONS: { value: Flag; label: string }[] = [
-  { value: "unknown", label: "잘 모름" },
-  { value: "yes", label: "있음" },
-  { value: "no", label: "없음" },
-];
 
 function DocRow({
   icon: Icon,
@@ -27,6 +22,12 @@ function DocRow({
   value: Flag;
   onChange: (v: Flag) => void;
 }) {
+  const { tShared } = useTranslation();
+  const options: { value: Flag; label: string }[] = [
+    { value: "unknown", label: tShared("status", "unknownShort") },
+    { value: "yes", label: tShared("status", "yes") },
+    { value: "no", label: tShared("status", "no") },
+  ];
   return (
     <Card className="space-y-3">
       <div className="flex items-center gap-2">
@@ -34,7 +35,7 @@ function DocRow({
         <span className="text-[15px] font-medium text-foreground">{label}</span>
       </div>
       <div className="grid grid-cols-3 gap-2">
-        {OPTIONS.map((opt) => {
+        {options.map((opt) => {
           const active = value === opt.value;
           return (
             <button
@@ -58,38 +59,42 @@ function DocRow({
 }
 
 export function DocumentsStep({ onSubmit }: { onSubmit: (flags: DocumentFlags) => void }) {
+  const { t } = useTranslation();
   const [hasPassport, setHasPassport] = useState<Flag>("yes");
   const [hasAlienRegistration, setHasAlienRegistration] = useState<Flag>("no");
   const [hasKoreanPhone, setHasKoreanPhone] = useState<Flag>("yes");
 
   return (
     <div className="flex flex-1 flex-col">
-      <TopBar title="계좌 개설" />
+      <TopBar title={t("account.topBarTitle")} />
       <div className="flex-1 space-y-5 px-5 pb-6 pt-2">
         <div>
-          <h1 className="text-[22px] font-bold text-foreground">가진 것만 눌러주세요</h1>
-          <p className="mt-2 text-[15px] text-foreground-muted">
-            누른 대로 다음에 할 일이 바뀝니다.
-          </p>
+          <h1 className="text-[22px] font-bold text-foreground">{t("account.documents.headline")}</h1>
+          <p className="mt-2 text-[15px] text-foreground-muted">{t("account.documents.description")}</p>
         </div>
 
-        <DocRow icon={IdCard} label="여권" value={hasPassport} onChange={setHasPassport} />
+        <DocRow
+          icon={IdCard}
+          label={t("account.documents.passport")}
+          value={hasPassport}
+          onChange={setHasPassport}
+        />
         <DocRow
           icon={FileBadge2}
-          label="외국인등록증"
+          label={t("account.documents.alienRegistration")}
           value={hasAlienRegistration}
           onChange={setHasAlienRegistration}
         />
         <DocRow
           icon={Smartphone}
-          label="한국 휴대폰 번호"
+          label={t("account.documents.koreanPhone")}
           value={hasKoreanPhone}
           onChange={setHasKoreanPhone}
         />
       </div>
       <div className="px-5 pb-6">
         <Button onClick={() => onSubmit({ hasPassport, hasAlienRegistration, hasKoreanPhone })}>
-          내 상황에 맞는 순서 보기
+          {t("account.documents.submit")}
         </Button>
       </div>
     </div>

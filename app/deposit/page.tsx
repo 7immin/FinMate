@@ -8,6 +8,7 @@ import { VerifyResultStep } from "@/components/flows/deposit/VerifyResultStep";
 import { ProtectionStep } from "@/components/flows/deposit/ProtectionStep";
 import { FlowSuccess } from "@/components/flows/FlowSuccess";
 import { useAppState } from "@/lib/state/AppStateContext";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LEASE_CONTRACT } from "@/lib/mock/deposit";
 
 type Step = "upload" | "verify" | "protection" | "success";
@@ -15,6 +16,7 @@ type Step = "upload" | "verify" | "protection" | "success";
 export default function DepositPage() {
   const router = useRouter();
   const { recordPurposeTransaction } = useAppState();
+  const { t } = useTranslation();
   const [step, setStep] = useState<Step>("upload");
 
   function handleConfirm() {
@@ -34,10 +36,12 @@ export default function DepositPage() {
       {step === "protection" && <ProtectionStep onConfirm={handleConfirm} />}
       {step === "success" && (
         <FlowSuccess
-          topBarTitle="월세·보증금"
-          title="보증금 이체 한도가 열렸어요"
-          description={`${LEASE_CONTRACT.address} 임대인 계좌로만 ${LEASE_CONTRACT.deposit.toLocaleString()}원 송금이 가능합니다. 전입신고 일정도 캘린더에 등록했어요.`}
-          doneLabel="홈으로"
+          topBarTitle={t("deposit.topBarTitle")}
+          title={t("deposit.success.title")}
+          description={t("deposit.success.description", {
+            address: LEASE_CONTRACT.address,
+            amount: LEASE_CONTRACT.deposit.toLocaleString(),
+          })}
           onDone={() => router.push("/home")}
         />
       )}

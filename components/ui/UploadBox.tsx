@@ -3,6 +3,7 @@
 import { ChangeEvent, useRef } from "react";
 import { FileText, Camera, FolderOpen } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 export function UploadBox({
   label,
@@ -15,6 +16,7 @@ export function UploadBox({
   onFileSelected: (name: string) => void;
   className?: string;
 }) {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
@@ -33,7 +35,7 @@ export function UploadBox({
           <FileText className="h-5 w-5" />
         </span>
         <span className="text-[15px] font-medium text-foreground">{fileName ?? label}</span>
-        {fileName && <span className="text-xs text-foreground-subtle">업로드 완료</span>}
+        {fileName && <span className="text-xs text-foreground-subtle">{t("common.uploadComplete")}</span>}
       </button>
       <input ref={inputRef} type="file" className="hidden" onChange={handleChange} accept="image/*,application/pdf" />
       <div className="flex gap-3">
@@ -42,14 +44,14 @@ export function UploadBox({
           onClick={() => onFileSelected("camera-capture.jpg")}
           className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-white/[0.06] text-sm font-medium text-foreground"
         >
-          <Camera className="h-4 w-4" /> 촬영
+          <Camera className="h-4 w-4" /> {t("common.takePhoto")}
         </button>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
           className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-white/[0.06] text-sm font-medium text-foreground"
         >
-          <FolderOpen className="h-4 w-4" /> 파일 선택
+          <FolderOpen className="h-4 w-4" /> {t("common.chooseFile")}
         </button>
       </div>
     </div>
