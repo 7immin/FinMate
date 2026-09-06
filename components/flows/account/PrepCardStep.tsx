@@ -26,6 +26,13 @@ export function PrepCardStep({
 }) {
   const { t, lang } = useTranslation();
   const [langIdx, setLangIdx] = useState(() => Math.max(0, PHRASE_LANG_CYCLE.indexOf(lang)));
+  // 우리가 알 수 없는 서류. 학생이 챙기면서 스스로 표시한다.
+  const [packed, setPacked] = useState({ enrollment: false, dorm: false });
+
+  function togglePacked(key: "enrollment" | "dorm") {
+    setPacked((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
+
   const phraseLang = PHRASE_LANG_CYCLE[langIdx];
   const nextLang = PHRASE_LANG_CYCLE[(langIdx + 1) % PHRASE_LANG_CYCLE.length];
   const phrase = translateNode<RequestPhrase>(phraseLang, "account.prep.request." + phraseLang);
@@ -41,6 +48,16 @@ export function PrepCardStep({
           <p className="text-[15px] leading-relaxed text-foreground">{phrase.body}</p>
         </Card>
 
+        {/*
+          창구에 가져갈 것들. 재학증명서가 조건 없이 체크된 채로 있었다 —
+          내신 적도 없는 서류를 챙긴 것처럼 보여주면, 학생은 그것 없이
+          창구까지 갔다가 되돌아온다.
+
+          우리가 아는 것(여권·휴대폰: 내 정보에서 본인이 답한 값)과 모르는
+          것(재학증명서·기숙사 확인서)을 나눈다. 모르는 것은 단정하지 않고
+          학생이 챙기면서 직접 표시하는 칸으로 둔다 — 이 목록의 쓸모는
+          "다 됐다"고 말해 주는 것이 아니라 빠뜨리지 않게 하는 것이다.
+        */}
         <div>
           <p className="mb-2 text-sm font-medium text-foreground-muted">{t("account.prep.docsTitle")}</p>
           <Card className="divide-y divide-border">
@@ -48,12 +65,22 @@ export function PrepCardStep({
               status={documents.hasPassport === "yes" ? "done" : "pending"}
               label={t("account.prep.docPassportOriginal")}
             />
-            <ChecklistRow status="done" label={t("account.prep.docEnrollment")} />
+            <ChecklistRow
+              status={packed.enrollment ? "done" : "pending"}
+              label={t("account.prep.docEnrollment")}
+              hint={packed.enrollment ? undefined : t("account.prep.tapWhenPacked")}
+              onClick={() => togglePacked("enrollment")}
+            />
             <ChecklistRow
               status={documents.hasKoreanPhone === "yes" ? "done" : "pending"}
               label={t("account.prep.docKoreanPhone")}
             />
-            <ChecklistRow status="pending" label={t("account.prep.docDorm")} />
+            <ChecklistRow
+              status={packed.dorm ? "done" : "pending"}
+              label={t("account.prep.docDorm")}
+              hint={packed.dorm ? undefined : t("account.prep.tapWhenPacked")}
+              onClick={() => togglePacked("dorm")}
+            />
           </Card>
         </div>
 
