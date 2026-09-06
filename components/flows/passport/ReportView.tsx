@@ -13,11 +13,11 @@ function verificationCode(seed: string, nationalityCode: string) {
   return `FM-${hash.toString(36).toUpperCase().padStart(4, "0").slice(0, 4)}-${nationalityCode}`;
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function DocRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
-      <span className="text-sm text-foreground-muted">{label}</span>
-      <span className="text-[15px] font-medium text-foreground">{value}</span>
+      <span className="text-sm text-neutral-500">{label}</span>
+      <span className="text-[15px] font-medium text-neutral-900">{value}</span>
     </div>
   );
 }
@@ -65,6 +65,7 @@ export function ReportView({
   const total = passport.paymentHistory.length;
   const firstMonth = passport.paymentHistory[0]?.month;
   const lastMonth = passport.paymentHistory[passport.paymentHistory.length - 1]?.month;
+  const periodValue = firstMonth && lastMonth ? `${firstMonth} - ${lastMonth}` : t("passport.report.noHistory");
 
   const code = useMemo(
     () => verificationCode(profile.name + passport.level, profile.nationalityCode),
@@ -87,48 +88,45 @@ export function ReportView({
     <div className="flex flex-1 flex-col">
       <TopBar title={t("passport.report.title")} closeIcon onBack={onClose} />
       <div className="flex-1 space-y-5 px-5 pb-6 pt-2">
-        <Card raised className="space-y-4">
+        <div className="space-y-4 rounded-2xl bg-white p-5 shadow-card">
           <div className="flex items-start justify-between">
-            <p className="text-xs font-medium tracking-wide text-foreground-subtle">
+            <p className="text-xs font-medium tracking-wide text-neutral-400">
               {t("passport.report.masthead")}
             </p>
             <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-xs font-bold text-white">
               F
             </span>
           </div>
-          <p className="text-lg font-semibold text-foreground">{profile.name}</p>
-          <p className="-mt-3 text-sm text-foreground-muted">
-            {profile.visaStatus} · {profile.nationalityCode} · {tShared("school", profile.school)}
-          </p>
+          <div>
+            <p className="text-lg font-semibold text-neutral-900">{profile.name}</p>
+            <p className="text-sm text-neutral-500">
+              {profile.visaStatus} · {profile.nationalityCode} · {tShared("school", profile.school)}
+            </p>
+          </div>
 
-          <div className="divide-y divide-border border-t border-border pt-1">
-            <InfoRow
+          <div className="divide-y divide-neutral-200 border-t border-neutral-200 pt-1">
+            <DocRow
               label={t("passport.report.levelLabel")}
               value={`${passport.level} · ${t(`passport.badge.${passport.level}`)}`}
             />
-            <InfoRow
+            <DocRow
               label={t("passport.report.onTimeLabel")}
               value={t("passport.report.onTimeValue", { onTime: onTimeCount, total })}
             />
-            <InfoRow
+            <DocRow
               label={t("passport.report.purposeLabel")}
               value={purposeEntries.length ? purposeEntries.join(" · ") : t("passport.report.noPurposeTx")}
             />
-            {firstMonth && lastMonth && (
-              <InfoRow
-                label={t("passport.report.periodLabel")}
-                value={`${firstMonth} - ${lastMonth}`}
-              />
-            )}
+            <DocRow label={t("passport.report.periodLabel")} value={periodValue} />
           </div>
-        </Card>
 
-        <p className="text-xs leading-relaxed text-foreground-subtle">
-          {t("passport.report.disclaimer", { date: issueDate, code })}
-        </p>
+          <p className="border-t border-neutral-200 pt-3 text-xs leading-relaxed text-neutral-400">
+            {t("passport.report.disclaimer", { date: issueDate, code })}
+          </p>
+        </div>
 
         {showQr && (
-          <Card raised className="flex flex-col items-center gap-3 py-6">
+          <div className="flex flex-col items-center gap-3 rounded-2xl bg-white p-6 shadow-card">
             <div className="grid h-40 w-40 grid-cols-5 grid-rows-5 gap-1 rounded-lg bg-white p-3">
               {Array.from({ length: 25 }).map((_, i) => (
                 <div
@@ -137,8 +135,8 @@ export function ReportView({
                 />
               ))}
             </div>
-            <p className="text-xs text-foreground-muted">{t("passport.report.qrCaption")}</p>
-          </Card>
+            <p className="text-xs text-neutral-500">{t("passport.report.qrCaption")}</p>
+          </div>
         )}
 
         <Card className="divide-y divide-border">

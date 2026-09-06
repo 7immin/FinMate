@@ -37,6 +37,7 @@ next-env.d.ts
 /shots_i18n/
 /shots_supabase/
 /shots_report/
+/shots_report2/
 
 # supabase CLI local cache
 /supabase/.temp/

@@ -151,6 +151,7 @@ const ko = {
       category: { tuition: "학비", deposit: "주거", remittance: "송금", account: "계좌" },
       categoryCount: "{{label}} {{count}}건",
       noPurposeTx: "아직 목적 검증 거래가 없습니다",
+      noHistory: "아직 없음",
     },
     cta: {
       S1: "여권 확인부터 하기",
@@ -550,6 +551,7 @@ const en: typeof ko = {
       category: { tuition: "Tuition", deposit: "Housing", remittance: "Remittance", account: "Account" },
       categoryCount: "{{label}} ×{{count}}",
       noPurposeTx: "No verified purpose transactions yet",
+      noHistory: "None yet",
     },
     cta: {
       S1: "Start passport verification",
@@ -946,6 +948,7 @@ const zh: typeof ko = {
       category: { tuition: "学费", deposit: "住房", remittance: "汇款", account: "账户" },
       categoryCount: "{{label}} {{count}}次",
       noPurposeTx: "暂无已验证的用途交易",
+      noHistory: "暂无",
     },
     cta: {
       S1: "先完成护照验证",
@@ -1345,6 +1348,7 @@ const vi: typeof ko = {
       category: { tuition: "Học phí", deposit: "Nhà ở", remittance: "Chuyển tiền", account: "Tài khoản" },
       categoryCount: "{{label}} ×{{count}}",
       noPurposeTx: "Chưa có giao dịch đúng mục đích nào được xác minh",
+      noHistory: "Chưa có",
     },
     cta: {
       S1: "Bắt đầu xác minh hộ chiếu",
