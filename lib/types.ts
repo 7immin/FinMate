@@ -73,3 +73,26 @@ export interface AppState {
   passport: FinancialPassport;
   documents: DocumentFlags;
 }
+
+/* ── 사기 진단 ──────────────────────────────────────────────────────── */
+
+export type ThreatRisk = "critical" | "high" | "caution" | "safe";
+
+export type ThreatType =
+  | "account_rental" // 통장·체크카드 양도 유인
+  | "cash_courier" // 현금 수거책 알바
+  | "unregistered_remittance" // 무등록 환전(환치기)
+  | "impersonation" // 수사기관·기관 사칭
+  | "investment_fraud" // 원금 보장 고수익
+  | "phishing_link" // 악성 링크·앱 설치 유도
+  | "none";
+
+export interface ThreatScanResult {
+  risk: ThreatRisk;
+  types: ThreatType[];
+  /** 원문에 실제로 등장한 위험 구절. 원문 언어 그대로다. */
+  highlights: string[];
+  explanation: string;
+  consequences: string[];
+  actions: string[];
+}

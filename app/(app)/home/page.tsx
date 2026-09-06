@@ -11,6 +11,7 @@ import {
   ArrowRight,
   Languages,
   LogOut,
+  ShieldAlert,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/Card";
@@ -40,11 +41,16 @@ export default function HomePage() {
     router.refresh();
   }
 
+  // 사기 진단을 다섯 번째로 둔다. 앞의 넷은 "돈을 보내는 일"이고 이것만
+  // "보내지 말아야 할 곳을 가려내는 일"이라 성격이 다르지만, 유학생을 노린
+  // 통장 대여·수거책 제안은 예고 없이 오고 그때 찾을 수 있어야 한다.
+  // 더보기 안에 넣어 두면 정작 필요한 순간에 아무도 못 찾는다.
   const QUICK_ACTIONS = [
     { href: "/tuition", label: t("home.actionTuition"), icon: GraduationCap },
     { href: "/remittance", label: t("home.actionRemittance"), icon: Send },
     { href: "/account", label: t("home.actionAccount"), icon: Landmark },
     { href: "/deposit", label: t("home.actionDeposit"), icon: HomeIcon },
+    { href: "/shield", label: t("shield.menuLabel"), icon: ShieldAlert },
   ];
 
   function askAgent() {

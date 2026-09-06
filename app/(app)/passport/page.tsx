@@ -15,7 +15,7 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LEVEL_ORDER } from "@/lib/mock/passport-levels";
 
 export default function PassportPage() {
-  const { state, toggleChecklistItem } = useAppState();
+  const { state, toggleChecklistItem, pendingRequests } = useAppState();
   const { t, tOpt, tShared, lang } = useTranslation();
   const { passport, profile } = state;
   const [viewingReport, setViewingReport] = useState(false);
@@ -83,6 +83,35 @@ export default function PassportPage() {
             </p>
           </div>
         </Card>
+
+        {/*
+          올려 둔 한도 요청. 한도가 즉시 열리지 않으므로, 요청이 어디까지
+          갔는지 볼 자리가 없으면 사용자는 "눌렀는데 아무 일도 안 일어났다"고
+          느낀다. 승인 여부는 은행이 정하고 결과는 위 한도 숫자에 반영된다.
+        */}
+        {pendingRequests.length > 0 && (
+          <div>
+            <p className="mb-2 text-sm font-medium text-foreground-muted">
+              {t("passport.pendingRequests")}
+            </p>
+            <Card className="space-y-2.5">
+              {pendingRequests.map((req) => (
+                <div key={req.id} className="flex items-center justify-between gap-3">
+                  <span className="min-w-0 flex-1 truncate text-[14px] text-foreground">
+                    {t(`passport.report.category.${req.purpose}`)} · +
+                    {req.amount.toLocaleString()} KRW
+                  </span>
+                  <span className="shrink-0 rounded-md bg-warning-muted px-2 py-0.5 text-[11px] font-medium text-warning">
+                    {t("passport.requestPending")}
+                  </span>
+                </div>
+              ))}
+              <p className="pt-1 text-[12px] leading-relaxed text-foreground-subtle">
+                {t("passport.requestHint")}
+              </p>
+            </Card>
+          </div>
+        )}
 
         {nextLevelLabel && (
           <div>

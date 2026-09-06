@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -144,6 +145,24 @@ export function GuestHome() {
           {t("guest.loginCta")}
           <ArrowRight className="h-[15px] w-[15px] text-primary" />
         </Button>
+
+        {/*
+          은행 담당자용 창구 화면으로 가는 문.
+
+          유학생 앱 안(더보기)에 두면 안 된다. 학생에게는 평생 쓸 일이 없는
+          화면이고, 자기 메뉴에 "은행 담당자용"이 섞여 있으면 이 앱이
+          누구를 위한 것인지 흐려진다.
+
+          로그인 전 화면 맨 아래가 맞는 자리다. 창구 직원은 이 앱의 계정이
+          없어 항상 이 화면부터 만나고, 학생은 이미 로그인해 지나친 자리라
+          눈에 걸리지 않는다. 작게 두는 것도 같은 이유다.
+        */}
+        <Link
+          href="/bank"
+          className="mt-5 text-center text-[11px] text-foreground-subtle underline underline-offset-4 hover:text-foreground-muted"
+        >
+          {t("guest.bankEntry")}
+        </Link>
       </div>
 
       <LanguageSwitcherSheet open={langSheetOpen} onClose={() => setLangSheetOpen(false)} />

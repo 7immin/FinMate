@@ -17,7 +17,7 @@ type Step = "upload" | "scanning" | "result" | "edit" | "success";
 
 export default function TuitionPage() {
   const router = useRouter();
-  const { state, recordPurposeTransaction } = useAppState();
+  const { state, recordPurposeTransaction, requestLimit } = useAppState();
   const { t, tShared } = useTranslation();
   const [step, setStep] = useState<Step>("upload");
   const [invoice, setInvoice] = useState<TuitionInvoice>(() => ({
@@ -59,6 +59,10 @@ export default function TuitionPage() {
   }
 
   function handleConfirm() {
+    // 고지서로 목적이 확인됐으니 그 금액만큼 한도를 열어 달라고 요청한다.
+    // 여는 것은 은행이다 — 여기서 한도를 올려 버리면 화면에서만 열리고
+    // 정작 은행 앱에서는 막혀 있어, 사용자가 마감 당일에야 그 사실을 안다.
+    requestLimit(invoice.amount, "tuition", "tuition-invoice");
     recordPurposeTransaction("tuition");
     setStep("success");
   }
