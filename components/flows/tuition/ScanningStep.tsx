@@ -5,9 +5,10 @@ import { Sparkles, ShieldCheck } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { ChecklistRow } from "@/components/ui/Checklist";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { SCANNING_STEP_IDS, TUITION_INVOICE } from "@/lib/mock/tuition";
+import { SCANNING_STEP_IDS } from "@/lib/mock/tuition";
+import { SchoolId } from "@/lib/types";
 
-export function ScanningStep({ onComplete }: { onComplete: () => void }) {
+export function ScanningStep({ school, onComplete }: { school: SchoolId; onComplete: () => void }) {
   const { t, tShared } = useTranslation();
   const [doneCount, setDoneCount] = useState(0);
 
@@ -40,7 +41,7 @@ export function ScanningStep({ onComplete }: { onComplete: () => void }) {
             <ChecklistRow
               key={id}
               status={idx < doneCount ? "done" : idx === doneCount ? "active" : "pending"}
-              label={t(`tuition.scanning.steps.${id}`, { school: tShared("school", TUITION_INVOICE.recipient) })}
+              label={t(`tuition.scanning.steps.${id}`, { school: tShared("school", school) })}
             />
           ))}
         </div>

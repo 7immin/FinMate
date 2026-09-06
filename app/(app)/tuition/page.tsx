@@ -17,10 +17,13 @@ type Step = "upload" | "scanning" | "result" | "edit" | "success";
 
 export default function TuitionPage() {
   const router = useRouter();
-  const { recordPurposeTransaction } = useAppState();
+  const { state, recordPurposeTransaction } = useAppState();
   const { t, tShared } = useTranslation();
   const [step, setStep] = useState<Step>("upload");
-  const [invoice, setInvoice] = useState<TuitionInvoice>(TUITION_INVOICE);
+  const [invoice, setInvoice] = useState<TuitionInvoice>(() => ({
+    ...TUITION_INVOICE,
+    recipient: state.profile.school,
+  }));
   const [ocrFailed, setOcrFailed] = useState(false);
   const ocrPromiseRef = useRef<Promise<TuitionOcrResult | null>>(Promise.resolve(null));
 
@@ -65,7 +68,7 @@ export default function TuitionPage() {
       {step === "upload" && (
         <UploadStep onFileUploaded={handleFileUploaded} onMockSourceSelected={handleMockSourceSelected} />
       )}
-      {step === "scanning" && <ScanningStep onComplete={handleScanComplete} />}
+      {step === "scanning" && <ScanningStep school={invoice.recipient} onComplete={handleScanComplete} />}
       {step === "result" && (
         <ResultStep
           invoice={invoice}
