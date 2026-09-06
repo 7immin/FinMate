@@ -129,8 +129,20 @@ export default function PassportPage() {
                     {t(`passport.report.category.${req.purpose}`)} · +
                     {req.amount.toLocaleString()} KRW
                   </span>
-                  <span className="shrink-0 rounded-md bg-warning-muted px-2 py-0.5 text-[11px] font-medium text-warning">
-                    {t("passport.requestPending")}
+                  {/* 승인·거절 결과까지 보여준다. 대기 중인 것만 띄우면,
+                      은행이 처리한 뒤 그 줄이 소리 없이 사라져 사용자는
+                      어떻게 됐는지 알 수 없다. */}
+                  <span
+                    className={
+                      "shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium " +
+                      (req.status === "approved"
+                        ? "bg-success-muted text-success"
+                        : req.status === "rejected"
+                          ? "bg-danger-muted text-danger"
+                          : "bg-warning-muted text-warning")
+                    }
+                  >
+                    {t(`passport.requestStatus.${req.status}`)}
                   </span>
                 </div>
               ))}
