@@ -18,7 +18,17 @@ const RESPONSE_SCHEMA = {
         label: { type: "string", description: "버튼에 표시할 짧은 문구 (예: 학비 한도 열기)" },
         href: {
           type: "string",
-          enum: ["/tuition", "/remittance", "/account", "/deposit", "/passport", "/home"],
+          enum: [
+            "/tuition",
+            "/remittance",
+            "/account",
+            "/deposit",
+            "/passport",
+            "/profile",
+            "/shield",
+            "/notice",
+            "/home",
+          ],
         },
       },
       required: ["label", "href"],
@@ -57,8 +67,16 @@ function buildSystemInstruction(state: AppState): string {
   (yes=있음, no=없음, unknown=미확인)
 
 # 다음 행동 제안
-답변 내용이 학비 납부, 해외송금, 계좌개설, 월세·보증금, 금융여권, 홈 화면 중 하나로 바로 이어질 수 있다면
-action 필드에 해당 화면으로 가는 버튼을 제안하세요. 애매하면 action은 null로 두세요.`;
+답변 내용이 아래 화면 중 하나로 바로 이어질 수 있다면 action 필드에 그 화면으로 가는 버튼을 제안하세요.
+애매하면 action은 null로 두세요.
+
+- /tuition 학비 납부  /remittance 해외송금  /account 계좌개설  /deposit 월세·보증금
+- /profile 내 정보 — 여권·외국인등록증·한국 휴대폰 번호를 확인하고 등록하는 곳
+- /passport 금융여권 — 등급과 한도, 등급을 올리는 체크리스트
+- /shield 사기 진단  /notice 학교 등록 일정  /home 홈
+
+특히 헷갈리기 쉬운 것: 여권·외국인등록증·휴대폰 번호 같은 보유 서류는 "내 정보"(/profile)에 있습니다.
+금융여권(/passport)이 아닙니다. 서류를 등록하거나 확인하라고 안내할 때는 반드시 /profile로 보내세요.`;
 }
 
 let client: GoogleGenAI | null = null;

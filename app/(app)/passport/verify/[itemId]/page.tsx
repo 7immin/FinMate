@@ -33,6 +33,16 @@ const ITEM_CONFIG: Record<string, ItemConfig> = {
       { key: "expiryDate", labelKey: "expiryDate" },
     ],
   },
+  // 외국인등록증. 여권과 같은 흐름을 쓴다 — 사진을 올리면 읽어서 확인하고,
+  // 성공하면 "내 정보"의 보유 서류가 있음으로 바뀐다.
+  "arc-verify": {
+    i18nKey: "arcVerify",
+    fields: [
+      { key: "name", labelKey: "name" },
+      { key: "registrationNumber", labelKey: "registrationNumber" },
+      { key: "visaStatus", labelKey: "visaStatus" },
+    ],
+  },
 };
 
 type Status = "idle" | "submitting" | "success" | "failure";

@@ -164,6 +164,12 @@ const ko = {
       "overdue-clear": { label: "연체 정리하기", labelClear: "연체 없음", cta: "연체를 먼저 정리해 주세요" },
     },
     verify: {
+      arcVerify: {
+        title: "외국인등록증 확인",
+        description: "외국인등록증 앞면을 올려주세요. FinMate가 직접 읽어서 확인합니다.",
+        uploadLabel: "외국인등록증 사진 또는 스캔",
+        field: { name: "성명", registrationNumber: "외국인등록번호", visaStatus: "체류자격" },
+      },
       passportVerify: {
         title: "여권 실물 확인",
         description: "여권 정보면(사진이 있는 신원정보 페이지)을 올려주세요. FinMate가 직접 읽어서 확인합니다.",
@@ -182,6 +188,8 @@ const ko = {
   profile: {
     passportRow: "금융여권",
     documentsTitle: "보유 서류",
+    verifyCta: "사진 올려서 확인하기",
+    markHaveCta: "있음으로 표시하기",
     doc: { passport: "여권", alienRegistration: "외국인등록증", koreanPhone: "한국 휴대폰 번호" },
   },
   shield: {
@@ -757,6 +765,12 @@ const en: typeof ko = {
       "overdue-clear": { label: "Clear your overdue payment", labelClear: "No overdue payments", cta: "Please clear the overdue payment first" },
     },
     verify: {
+      arcVerify: {
+        title: "Alien Registration Card check",
+        description: "Upload the front of your ARC. FinMate reads it to confirm.",
+        uploadLabel: "ARC photo or scan",
+        field: { name: "Name", registrationNumber: "Registration number", visaStatus: "Visa status" },
+      },
       passportVerify: {
         title: "Verify physical passport",
         description: "Upload the passport's photo/ID page. FinMate reads it directly to verify.",
@@ -775,6 +789,8 @@ const en: typeof ko = {
   profile: {
     passportRow: "Financial Passport",
     documentsTitle: "Documents on hand",
+    verifyCta: "Upload a photo to verify",
+    markHaveCta: "Mark as have",
     doc: { passport: "Passport", alienRegistration: "Alien Registration Card", koreanPhone: "Korean phone number" },
   },
   shield: {
@@ -1343,6 +1359,12 @@ const zh: typeof ko = {
       "overdue-clear": { label: "处理逾期款项", labelClear: "无逾期", cta: "请先处理逾期款项" },
     },
     verify: {
+      arcVerify: {
+        title: "外国人登录证核实",
+        description: "请上传外国人登录证正面。FinMate会直接读取核实。",
+        uploadLabel: "外国人登录证照片或扫描件",
+        field: { name: "姓名", registrationNumber: "外国人登录号", visaStatus: "居留资格" },
+      },
       passportVerify: {
         title: "护照原件确认",
         description: "请上传护照的照片信息页。FinMate 会直接读取并确认。",
@@ -1361,6 +1383,8 @@ const zh: typeof ko = {
   profile: {
     passportRow: "金融护照",
     documentsTitle: "持有证件",
+    verifyCta: "上传照片核实",
+    markHaveCta: "标记为已有",
     doc: { passport: "护照", alienRegistration: "外国人登录证", koreanPhone: "韩国手机号" },
   },
   shield: {
@@ -1931,6 +1955,12 @@ const vi: typeof ko = {
       "overdue-clear": { label: "Xử lý khoản trễ hạn", labelClear: "Không có khoản trễ hạn", cta: "Vui lòng xử lý khoản trễ hạn trước" },
     },
     verify: {
+      arcVerify: {
+        title: "Xác minh thẻ đăng ký người nước ngoài",
+        description: "Hãy tải lên mặt trước thẻ ARC. FinMate sẽ đọc để xác nhận.",
+        uploadLabel: "Ảnh hoặc bản quét thẻ ARC",
+        field: { name: "Họ tên", registrationNumber: "Số đăng ký", visaStatus: "Tư cách lưu trú" },
+      },
       passportVerify: {
         title: "Xác minh hộ chiếu thật",
         description: "Tải lên trang thông tin (có ảnh) của hộ chiếu. FinMate sẽ đọc trực tiếp để xác minh.",
@@ -1949,6 +1979,8 @@ const vi: typeof ko = {
   profile: {
     passportRow: "Hộ chiếu tài chính",
     documentsTitle: "Giấy tờ đang có",
+    verifyCta: "Tải ảnh lên để xác minh",
+    markHaveCta: "Đánh dấu là đã có",
     doc: { passport: "Hộ chiếu", alienRegistration: "Thẻ đăng ký người nước ngoài", koreanPhone: "Số điện thoại Hàn Quốc" },
   },
   shield: {
