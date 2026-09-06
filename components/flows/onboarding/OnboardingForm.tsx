@@ -16,7 +16,7 @@ import { Logo } from "@/components/ui/Logo";
 
 const LANGUAGES: Language[] = ["ko", "en", "zh", "vi"];
 const VISA_TYPES = ["D-2", "D-4", "other"] as const;
-const SCHOOLS: SchoolId[] = ["hanyang", "snu", "yonsei", "korea", "skk"];
+const SCHOOLS: SchoolId[] = ["hanyang", "snu", "yonsei", "korea", "skk", "ewha"];
 
 export function OnboardingForm() {
   const router = useRouter();
