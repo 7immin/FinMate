@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { AppState } from "@/lib/types";
 import { LEVEL_ORDER } from "@/lib/mock/passport-levels";
 
-const MODEL = "gemini-3.8-flash";
+const MODEL = "gemini-3.1-flash-lite";
 
 const RESPONSE_SCHEMA = {
   type: "object",

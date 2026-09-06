@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { Language } from "@/lib/types";
 
-const MODEL = "gemini-3.8-flash";
+const MODEL = "gemini-3.1-flash-lite";
 
 const LANGUAGE_NAME: Record<string, string> = {
   ko: "한국어",

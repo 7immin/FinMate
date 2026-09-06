@@ -14,7 +14,7 @@
   (`app/api/**/route.ts`). 클라이언트는 즉각적인 화면 반응을 위해 동일 로직을 낙관적으로
   미리 계산해 보여주고, 서버 응답이 도착하면 그 결과로 다시 맞춥니다.
 - **다국어**: 한국어/영어/중국어/베트남어 — `lib/i18n`의 번역 사전을 전 화면이 실시간으로 참조합니다.
-- **AI 상담(FinMate AI)**: Google Gemini(`gemini-3.8-flash`)가 실제로 응답합니다. 사용자의 실제
+- **AI 상담(FinMate AI)**: Google Gemini(`gemini-3.1-flash-lite`)가 실제로 응답합니다. 사용자의 실제
   프로필·금융여권 등급·한도·보유 서류를 시스템 프롬프트에 넣어 개인화된 답변을 하고,
   `previous_interaction_id`로 멀티턴 대화 맥락을 유지합니다 (`lib/ai/gemini.ts`,
   `app/api/ai/chat/route.ts`).
@@ -48,7 +48,7 @@
 
 1. [aistudio.google.com/apikey](https://aistudio.google.com/apikey)에서 Google 계정으로 로그인 후
    **Create API key**로 키를 발급받습니다 (무료 티어 있음).
-2. ⚠️ **무료 티어는 `gemini-3.8-flash` 기준 요청 수 제한(일일 한도)이 꽤 낮습니다.** 데모/발표 당일
+2. ⚠️ **무료 티어는 `gemini-3.1-flash-lite` 기준 요청 수 제한(일일 한도)이 꽤 낮습니다.** 데모/발표 당일
    많은 사람이 몰려서 테스트할 예정이라면, Google AI Studio에서 결제 계정을 연결해 유료 티어로
    전환하는 것을 권장합니다 (요청당 비용은 매우 저렴합니다 — 입력 $0.75, 출력 $3.75 / 100만 토큰).
 
