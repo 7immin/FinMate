@@ -494,7 +494,7 @@ const ko = {
     proof: {
       employment: { label: "근로 계약서 · 급여 명세", description: "교내 근로·시간제 취업 허가 포함", cta: "근로계약서 올리기" },
       homeRemittance: { label: "본국 송금 내역 (부모 지원)", description: "최근 3개월 입금 내역이면 충분합니다", cta: "송금 내역 올리기" },
-      scholarship: { label: "장학금 수여 증명", description: "한양대학교 발급 서류", cta: "장학금 증명 올리기" },
+      scholarship: { label: "장학금 수여 증명", description: "{{school}} 발급 서류", cta: "장학금 증명 올리기" },
     },
     channel: {
       topBarTitle: "채널 비교",
@@ -1090,7 +1090,7 @@ const en: typeof ko = {
     proof: {
       employment: { label: "Employment contract · pay stub", description: "Includes on-campus/part-time work permit", cta: "Upload employment contract" },
       homeRemittance: { label: "Home remittance history (from parents)", description: "3 months of deposit history is enough", cta: "Upload remittance history" },
-      scholarship: { label: "Scholarship award certificate", description: "Document issued by Hanyang University", cta: "Upload scholarship certificate" },
+      scholarship: { label: "Scholarship award certificate", description: "Document issued by {{school}}", cta: "Upload scholarship certificate" },
     },
     channel: {
       topBarTitle: "Compare channels",
@@ -1682,7 +1682,7 @@ const zh: typeof ko = {
     proof: {
       employment: { label: "劳动合同 · 工资单", description: "包含校内勤工俭学/兼职许可", cta: "上传劳动合同" },
       homeRemittance: { label: "本国汇款记录（父母资助）", description: "近3个月的入账记录即可", cta: "上传汇款记录" },
-      scholarship: { label: "奖学金授予证明", description: "汉阳大学出具的文件", cta: "上传奖学金证明" },
+      scholarship: { label: "奖学金授予证明", description: "{{school}}出具的文件", cta: "上传奖学金证明" },
     },
     channel: {
       topBarTitle: "比较汇款渠道",
@@ -2278,7 +2278,7 @@ const vi: typeof ko = {
     proof: {
       employment: { label: "Hợp đồng lao động · Phiếu lương", description: "Bao gồm giấy phép làm thêm trong trường", cta: "Tải lên hợp đồng lao động" },
       homeRemittance: { label: "Lịch sử chuyển tiền từ quê nhà (bố mẹ hỗ trợ)", description: "Lịch sử nhận tiền 3 tháng gần nhất là đủ", cta: "Tải lên lịch sử chuyển tiền" },
-      scholarship: { label: "Giấy chứng nhận học bổng", description: "Giấy tờ do Đại học Hanyang cấp", cta: "Tải lên giấy chứng nhận học bổng" },
+      scholarship: { label: "Giấy chứng nhận học bổng", description: "Giấy tờ do {{school}} cấp", cta: "Tải lên giấy chứng nhận học bổng" },
     },
     channel: {
       topBarTitle: "So sánh kênh chuyển tiền",
