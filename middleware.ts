@@ -17,8 +17,12 @@ const PUBLIC_PATHS = ["/", "/login", "/signup", "/bank"];
  * "/bank"도 공개다. 그 화면을 쓰는 사람은 학생이 아니라 은행 직원이고,
  * 창구에서 계정을 만들라고 하면 아무도 쓰지 않는다. 노출 범위는 이미
  * 공개인 /verify/[code]와 같다 — 학생이 건넨 코드가 있어야만 조회된다.
+ *
+ * "/bank/"로 시작하는 하위 경로도 같은 이유로 공개다. 예를 들어
+ * /bank/evidence(증빙 서류 링크 안내 화면)를 막아 두면, 담당자가 그 화면을
+ * 열자마자 로그인 화면으로 튕겨 나간다 — 애초에 이 앱 계정이 없는 사람인데.
  */
-const PUBLIC_PREFIXES = ["/guest/"];
+const PUBLIC_PREFIXES = ["/guest/", "/bank/"];
 
 /**
  * 인증 없이 부를 수 있는 API.

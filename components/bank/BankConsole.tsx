@@ -302,7 +302,7 @@ function RequestQueue({ accessCode, onSignOut }: { accessCode: string; onSignOut
             */}
             {req.evidenceUrl ? (
               <a
-                href={req.evidenceUrl}
+                href={`/bank/evidence?url=${encodeURIComponent(req.evidenceUrl)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-2 rounded-xl border border-primary/50 px-4 py-2.5 text-[14px] font-medium text-primary hover:bg-primary/10"

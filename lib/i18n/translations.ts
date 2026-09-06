@@ -310,6 +310,10 @@ const ko = {
     notFound: "그런 코드가 없습니다. 학생 화면의 코드를 다시 확인해 주세요.",
     error: "처리하지 못했습니다. 잠시 후 다시 시도해 주세요.",
     studentApp: "유학생용 앱으로",
+    evidenceChecking: "서류를 불러오는 중…",
+    evidenceExpiredTitle: "서류 링크가 만료됐어요",
+    evidenceExpiredDesc: "보안을 위해 서류 링크는 5분만 유효합니다. 목록으로 돌아가 서류를 다시 열어주세요.",
+    evidenceBackToQueue: "요청 목록으로 돌아가기",
   },
   more: {
     title: "더보기",
@@ -909,6 +913,10 @@ const en: typeof ko = {
     notFound: "No such code. Please check the code on the student's screen.",
     error: "Something went wrong. Please try again in a moment.",
     studentApp: "Go to the student app",
+    evidenceChecking: "Loading the document…",
+    evidenceExpiredTitle: "This document link has expired",
+    evidenceExpiredDesc: "For security, document links are valid for only 5 minutes. Please go back to the queue and open it again.",
+    evidenceBackToQueue: "Back to the request queue",
   },
   more: {
     title: "More",
@@ -1505,6 +1513,10 @@ const zh: typeof ko = {
     notFound: "没有这个验证码，请再次确认学生屏幕上的代码。",
     error: "处理失败，请稍后再试。",
     studentApp: "前往留学生应用",
+    evidenceChecking: "正在加载材料…",
+    evidenceExpiredTitle: "该材料链接已过期",
+    evidenceExpiredDesc: "出于安全考虑，材料链接仅在5分钟内有效。请返回列表重新打开。",
+    evidenceBackToQueue: "返回申请列表",
   },
   more: {
     title: "更多",
@@ -2103,6 +2115,10 @@ const vi: typeof ko = {
     notFound: "Không có mã này. Vui lòng kiểm tra lại mã trên màn hình của sinh viên.",
     error: "Xử lý thất bại. Vui lòng thử lại sau giây lát.",
     studentApp: "Đến ứng dụng cho du học sinh",
+    evidenceChecking: "Đang tải tài liệu…",
+    evidenceExpiredTitle: "Liên kết tài liệu đã hết hạn",
+    evidenceExpiredDesc: "Vì lý do bảo mật, liên kết tài liệu chỉ có hiệu lực trong 5 phút. Vui lòng quay lại danh sách và mở lại.",
+    evidenceBackToQueue: "Quay lại danh sách yêu cầu",
   },
   more: {
     title: "Thêm",
