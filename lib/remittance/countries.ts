@@ -49,25 +49,31 @@ export function formatReceived(
 /**
  * 참고 환율 한 줄.
  *
- * 언제나 "1 KRW = N"으로 적는다. 통화에 따라 방향을 뒤집으면 중국만
- * "1 CNY = 202 KRW"처럼 혼자 다르게 나와, 나라를 바꿔 가며 비교하는
- * 사람이 매번 어느 쪽 기준인지 다시 읽어야 한다.
+ * 방향을 통화마다 뒤집지 않는다. 예전에는 값이 작으면 뒤집어서, 중국만
+ * "1 CNY = 202 KRW"처럼 혼자 다르게 나왔다. 그렇다고 전부 원화 기준으로
+ * 통일하면 "1 KRW = 0.000741 USD"가 되어 자릿수를 세게 된다.
  *
- * 작은 값은 유효숫자로 자른다. 0.000741을 그대로 쓰면 자릿수를 세게 되고,
- * 반올림해서 0으로 만들면 아무 뜻이 없다.
+ * 그래서 국내 은행 고시판과 같은 방식을 쓴다 — 언제나 외화가 왼쪽이고,
+ * 1단위 값이 1원에 못 미치는 통화(동, 루피아, 원화 대비 아주 작은 단위)는
+ * 100단위로 묶는다. 방향이 늘 같으면서 자릿수도 읽을 만해진다.
+ *
+ *   1 USD = 1,349 KRW
+ *   1 CNY = 202 KRW
+ *   100 VND = 5.19 KRW
  */
 export function formatRate(countryCode: string, fx: FxRates | null): string | null {
   const currency = currencyOf(countryCode);
   if (!currency || !fx) return null;
   const rate = fx.rates[currency];
-  if (typeof rate !== "number") return null;
+  if (typeof rate !== "number" || rate <= 0) return null;
 
-  const shown =
-    rate >= 1
-      ? rate.toFixed(2).replace(/\.00$/, "")
-      : rate.toPrecision(3).replace(/0+$/, "").replace(/\.$/, "");
+  // rate는 1 KRW가 몇 외화인지다. 뒤집으면 1 외화가 몇 원인지가 된다.
+  const krwPerUnit = 1 / rate;
+  const unit = krwPerUnit < 1 ? 100 : 1;
+  const value = krwPerUnit * unit;
 
-  return `1 KRW = ${shown} ${currency}`;
+  const shown = value >= 100 ? Math.round(value).toLocaleString() : value.toFixed(2);
+  return `${unit === 1 ? "1" : "100"} ${currency} = ${shown} KRW`;
 }
 
 /** 그 나라 통화를 아는지. 모르면 화면이 "환율 정보 없음"이라고 말한다. */
