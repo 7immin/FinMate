@@ -7,12 +7,15 @@ import { AppShell } from "@/components/layout/AppShell";
 import { TopBar } from "@/components/layout/TopBar";
 import { Chip } from "@/components/ui/Chip";
 import { AnswerCard } from "@/components/flows/ai/AnswerCard";
-import { getAiAnswer, SUGGESTED_QUESTIONS } from "@/lib/mock/ai-responses";
+import { resolveAiAnswerKind } from "@/lib/mock/ai-responses";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 function AiPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const question = searchParams.get("q");
+  const { t, tNode } = useTranslation();
+  const suggested = tNode<string[]>("ai.suggested");
   const [draft, setDraft] = useState("");
 
   function ask(q: string) {
@@ -23,10 +26,10 @@ function AiPageContent() {
 
   return (
     <AppShell className="flex flex-col">
-      <TopBar title="FinMate AI" />
+      <TopBar title={t("ai.topBarTitle")} />
       <div className="flex-1 px-5 pb-6 pt-2">
         {question ? (
-          <AnswerCard question={question} answer={getAiAnswer(question)} />
+          <AnswerCard question={question} kind={resolveAiAnswerKind(question)} />
         ) : (
           <div className="flex h-full flex-col justify-between">
             <div>
@@ -34,13 +37,11 @@ function AiPageContent() {
                 <Sparkles className="h-5 w-5" />
               </span>
               <h1 className="mt-4 text-[22px] font-bold text-foreground">
-                무엇이든 물어보세요
+                {t("ai.landingHeadline")}
               </h1>
-              <p className="mt-2 text-[15px] text-foreground-muted">
-                등록금, 송금, 계좌, 보증금까지 상황에 맞는 다음 행동을 알려드립니다.
-              </p>
+              <p className="mt-2 text-[15px] text-foreground-muted">{t("ai.landingDesc")}</p>
               <div className="mt-5 flex flex-wrap gap-2">
-                {SUGGESTED_QUESTIONS.map((q) => (
+                {suggested.map((q) => (
                   <Chip key={q} onClick={() => ask(q)}>
                     {q}
                   </Chip>
@@ -55,10 +56,10 @@ function AiPageContent() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") ask(draft);
                 }}
-                placeholder="직접 물어보기"
+                placeholder={t("home.askPlaceholder")}
                 className="w-full bg-transparent text-[15px] text-foreground outline-none placeholder:text-foreground-muted"
               />
-              <button type="button" onClick={() => ask(draft)} aria-label="질문 보내기">
+              <button type="button" onClick={() => ask(draft)} aria-label={t("common.sendQuestion")}>
                 <ArrowRight className="h-4 w-4 shrink-0 text-foreground-muted" />
               </button>
             </div>

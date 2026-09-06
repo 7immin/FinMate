@@ -15,19 +15,24 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { useAppState } from "@/lib/state/AppStateContext";
-
-const QUICK_ACTIONS = [
-  { href: "/tuition", label: "학비 납부", icon: GraduationCap },
-  { href: "/remittance", label: "해외 송금", icon: Send },
-  { href: "/account", label: "계좌 개설", icon: Landmark },
-  { href: "/deposit", label: "월세·보증금", icon: HomeIcon },
-];
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { LanguageSwitcherSheet } from "@/components/ui/LanguageSwitcherSheet";
+import { LANGUAGE_NATIVE_NAME } from "@/lib/i18n";
 
 export default function HomePage() {
   const router = useRouter();
   const { state } = useAppState();
+  const { t, lang } = useTranslation();
   const { profile, passport } = state;
   const [question, setQuestion] = useState("");
+  const [langSheetOpen, setLangSheetOpen] = useState(false);
+
+  const QUICK_ACTIONS = [
+    { href: "/tuition", label: t("home.actionTuition"), icon: GraduationCap },
+    { href: "/remittance", label: t("home.actionRemittance"), icon: Send },
+    { href: "/account", label: t("home.actionAccount"), icon: Landmark },
+    { href: "/deposit", label: t("home.actionDeposit"), icon: HomeIcon },
+  ];
 
   function askAgent() {
     const q = question.trim();
@@ -44,19 +49,25 @@ export default function HomePage() {
             </span>
             <span className="text-[15px] font-semibold text-foreground">FinMate</span>
           </div>
-          <span className="flex items-center gap-1 rounded-full bg-white/[0.06] px-3 py-1.5 text-xs text-foreground-muted">
-            <Languages className="h-3.5 w-3.5" /> 한국어
-          </span>
+          <button
+            type="button"
+            onClick={() => setLangSheetOpen(true)}
+            className="flex items-center gap-1 rounded-full bg-white/[0.06] px-3 py-1.5 text-xs text-foreground-muted"
+          >
+            <Languages className="h-3.5 w-3.5" /> {LANGUAGE_NATIVE_NAME[lang]}
+          </button>
         </div>
 
         <div>
-          <p className="text-[15px] text-foreground-muted">{profile.name} 님, 안녕하세요</p>
-          <h1 className="mt-1 text-[26px] font-bold text-foreground">무엇을 도와드릴까요?</h1>
+          <p className="text-[15px] text-foreground-muted">
+            {t("home.greeting", { name: profile.name })}
+          </p>
+          <h1 className="mt-1 text-[26px] font-bold text-foreground">{t("home.headline")}</h1>
         </div>
 
         <Card raised className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-foreground-muted">현재 이체 한도</p>
+            <p className="text-sm text-foreground-muted">{t("home.currentLimit")}</p>
             <span className="rounded-md bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary">
               {passport.level}
             </span>
@@ -66,13 +77,11 @@ export default function HomePage() {
             <span className="text-sm font-normal text-foreground-muted">KRW</span>
           </p>
           <ProgressBar value={(passport.currentLimit / 2000000) * 100} />
-          <p className="text-xs text-foreground-subtle">
-            목적을 증명하면 항목별로 한도가 열립니다
-          </p>
+          <p className="text-xs text-foreground-subtle">{t("home.limitNote")}</p>
         </Card>
 
         <div>
-          <p className="mb-3 text-sm font-medium text-foreground-muted">바로 하기</p>
+          <p className="mb-3 text-sm font-medium text-foreground-muted">{t("home.quickActions")}</p>
           <div className="grid grid-cols-2 gap-3">
             {QUICK_ACTIONS.map(({ href, label, icon: Icon }) => (
               <Link key={href} href={href}>
@@ -97,12 +106,14 @@ export default function HomePage() {
             onKeyDown={(e) => {
               if (e.key === "Enter") askAgent();
             }}
-            placeholder="직접 물어보기"
+            placeholder={t("home.askPlaceholder")}
             className="w-full bg-transparent text-[15px] text-foreground outline-none placeholder:text-foreground-muted"
           />
           <ArrowRight className="h-4 w-4 shrink-0 text-foreground-muted" />
         </button>
       </div>
+
+      <LanguageSwitcherSheet open={langSheetOpen} onClose={() => setLangSheetOpen(false)} />
     </AppShell>
   );
 }

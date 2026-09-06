@@ -3,12 +3,13 @@
 import { CheckCircle2 } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { Button } from "@/components/ui/Button";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 export function FlowSuccess({
   topBarTitle,
   title,
   description,
-  doneLabel = "홈으로",
+  doneLabel,
   onDone,
 }: {
   topBarTitle: string;
@@ -17,6 +18,7 @@ export function FlowSuccess({
   doneLabel?: string;
   onDone: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-1 flex-col">
       <TopBar title={topBarTitle} closeIcon onBack={onDone} />
@@ -28,7 +30,7 @@ export function FlowSuccess({
         <p className="text-[15px] leading-relaxed text-foreground-muted">{description}</p>
       </div>
       <div className="px-5 pb-6">
-        <Button onClick={onDone}>{doneLabel}</Button>
+        <Button onClick={onDone}>{doneLabel ?? t("common.goHome")}</Button>
       </div>
     </div>
   );

@@ -1,26 +1,30 @@
+"use client";
+
 import { PaymentRecord } from "@/lib/types";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const HEIGHT_SEED = [62, 78, 46, 70, 58, 88, 66, 94];
 
 export function PaymentHistoryChart({ records }: { records: PaymentRecord[] }) {
+  const { t } = useTranslation();
   const onTimeCount = records.filter((r) => r.onTime).length;
   const overdueCount = records.length - onTimeCount;
 
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-sm font-medium text-foreground">납부 기록</span>
+        <span className="text-sm font-medium text-foreground">{t("passport.paymentHistory")}</span>
         <span className="text-xs text-foreground-muted">
-          정시 {onTimeCount} · 연체 {overdueCount}
+          {t("passport.paymentSummary", { onTime: onTimeCount, overdue: overdueCount })}
         </span>
       </div>
-      <div className="flex h-24 items-end gap-2" role="img" aria-label="월별 납부 기록 막대그래프">
+      <div className="flex h-24 items-end gap-2" role="img" aria-label={t("passport.chartAriaLabel")}>
         {records.map((record, idx) => {
           const height = HEIGHT_SEED[idx % HEIGHT_SEED.length];
           return (
             <div
               key={`${record.month}-${idx}`}
-              title={`${record.month} · ${record.onTime ? "정시 납부" : "연체"}`}
+              title={`${record.month} · ${record.onTime ? t("passport.onTimePayment") : t("passport.overduePayment")}`}
               className="relative flex-1 rounded-t-md bg-primary"
               style={{ height: `${height}%` }}
             >

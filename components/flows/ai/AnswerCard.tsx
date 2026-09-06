@@ -5,13 +5,32 @@ import { Clock, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { AiAnswer } from "@/lib/mock/ai-responses";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { AI_ANSWER_CONFIG, AiAnswerKind } from "@/lib/mock/ai-responses";
 
-export function AnswerCard({ question, answer }: { question: string; answer: AiAnswer }) {
+interface AnswerOption {
+  title: string;
+  badge?: string;
+  amountLine?: string;
+  detail: string;
+}
+
+interface AnswerContent {
+  reminder?: string;
+  options: AnswerOption[];
+  warning?: string;
+  ctaLabel: string;
+}
+
+export function AnswerCard({ question, kind }: { question: string; kind: AiAnswerKind }) {
+  const { t, tNode } = useTranslation();
+  const answer = tNode<AnswerContent>(`ai.answers.${kind}`);
+  const { icons, ctaHref } = AI_ANSWER_CONFIG[kind];
+
   return (
     <div className="space-y-5">
       <div>
-        <p className="mb-1 text-sm text-foreground-subtle">질문</p>
+        <p className="mb-1 text-sm text-foreground-subtle">{t("ai.questionLabel")}</p>
         <p className="text-[19px] font-bold leading-snug text-foreground">{question}</p>
       </div>
 
@@ -22,8 +41,8 @@ export function AnswerCard({ question, answer }: { question: string; answer: AiA
       )}
 
       <div className="space-y-3">
-        {answer.options.map((option) => {
-          const Icon = option.icon;
+        {answer.options.map((option, idx) => {
+          const Icon = icons[idx % icons.length];
           return (
             <Card key={option.title}>
               <div className="flex items-start justify-between gap-2">
@@ -53,7 +72,7 @@ export function AnswerCard({ question, answer }: { question: string; answer: AiA
         </Card>
       )}
 
-      <Link href={answer.ctaHref}>
+      <Link href={ctaHref}>
         <Button>{answer.ctaLabel}</Button>
       </Link>
     </div>

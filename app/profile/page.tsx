@@ -6,15 +6,18 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { useAppState } from "@/lib/state/AppStateContext";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { DocumentFlags } from "@/lib/types";
 
-const DOC_LABELS: { key: "hasPassport" | "hasAlienRegistration" | "hasKoreanPhone"; label: string; icon: typeof IdCard }[] = [
-  { key: "hasPassport", label: "여권", icon: IdCard },
-  { key: "hasAlienRegistration", label: "외국인등록증", icon: FileBadge2 },
-  { key: "hasKoreanPhone", label: "한국 휴대폰 번호", icon: Smartphone },
+const DOC_ROWS: { key: keyof DocumentFlags; labelKey: string; icon: typeof IdCard }[] = [
+  { key: "hasPassport", labelKey: "profile.doc.passport", icon: IdCard },
+  { key: "hasAlienRegistration", labelKey: "profile.doc.alienRegistration", icon: FileBadge2 },
+  { key: "hasKoreanPhone", labelKey: "profile.doc.koreanPhone", icon: Smartphone },
 ];
 
 export default function ProfilePage() {
   const { state } = useAppState();
+  const { t, tShared } = useTranslation();
   const { profile, passport, documents } = state;
 
   return (
@@ -27,7 +30,8 @@ export default function ProfilePage() {
           <div>
             <p className="text-lg font-semibold text-foreground">{profile.name}</p>
             <p className="text-sm text-foreground-muted">
-              {profile.visaStatus} · {profile.nationality} · {profile.school}
+              {profile.visaStatus} · {tShared("country", profile.nationality)} ·{" "}
+              {tShared("school", profile.school)}
             </p>
           </div>
         </div>
@@ -35,9 +39,9 @@ export default function ProfilePage() {
         <Link href="/passport">
           <Card raised className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-foreground-muted">금융여권</p>
+              <p className="text-sm text-foreground-muted">{t("profile.passportRow")}</p>
               <p className="mt-1 text-[15px] font-medium text-foreground">
-                {passport.level} · {passport.badgeLabel}
+                {passport.level} · {t(`passport.badge.${passport.level}`)}
               </p>
             </div>
             <ChevronRight className="h-5 w-5 text-foreground-muted" />
@@ -45,16 +49,16 @@ export default function ProfilePage() {
         </Link>
 
         <div>
-          <p className="mb-2 text-sm font-medium text-foreground-muted">보유 서류</p>
+          <p className="mb-2 text-sm font-medium text-foreground-muted">{t("profile.documentsTitle")}</p>
           <Card className="divide-y divide-border">
-            {DOC_LABELS.map(({ key, label, icon: Icon }) => {
+            {DOC_ROWS.map(({ key, labelKey, icon: Icon }) => {
               const value = documents[key];
               return (
                 <div key={key} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
                   <Icon className="h-[18px] w-[18px] text-foreground-muted" />
-                  <span className="flex-1 text-[15px] text-foreground">{label}</span>
+                  <span className="flex-1 text-[15px] text-foreground">{t(labelKey)}</span>
                   <Badge tone={value === "yes" ? "success" : value === "no" ? "neutral" : "warning"}>
-                    {value === "yes" ? "있음" : value === "no" ? "없음" : "확인 필요"}
+                    {tShared("status", value === "yes" ? "yes" : value === "no" ? "no" : "unknown")}
                   </Badge>
                 </div>
               );

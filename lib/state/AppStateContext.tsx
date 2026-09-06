@@ -8,7 +8,7 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { AppState, DocumentFlags, UserProfile } from "@/lib/types";
+import { AppState, DocumentFlags, Language, UserProfile } from "@/lib/types";
 import { initialAppState } from "@/lib/mock/initial-state";
 import { LEVEL_CONFIG, cloneChecklist, nextLevel } from "@/lib/mock/passport-levels";
 
@@ -22,6 +22,7 @@ interface AppStateContextValue {
   toggleChecklistItem: (id: string) => void;
   recordPurposeTransaction: () => void;
   unlockLimit: (amount: number) => void;
+  setLanguage: (language: Language) => void;
   resetDemo: () => void;
 }
 
@@ -81,7 +82,6 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
               ...prev.passport,
               level: upgraded,
               currentLimit: config.limit,
-              badgeLabel: config.badgeLabel,
               nextLevelChecklist: cloneChecklist(upgraded),
             },
           };
@@ -101,7 +101,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
               ...prev.passport,
               paymentHistory: [
                 ...prev.passport.paymentHistory,
-                { month: "이번 달", onTime: true },
+                { month: "2026.09", onTime: true },
               ],
               nextLevelChecklist: checklist,
             },
@@ -112,6 +112,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
           ...prev,
           passport: { ...prev.passport, currentLimit: prev.passport.currentLimit + amount },
         })),
+      setLanguage: (language) =>
+        setState((prev) => ({ ...prev, profile: { ...prev.profile, language } })),
       resetDemo: () => setState(initialAppState),
     }),
     [state, hydrated]

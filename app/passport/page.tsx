@@ -10,17 +10,12 @@ import { SegmentedProgress } from "@/components/ui/ProgressBar";
 import { ChecklistRow } from "@/components/ui/Checklist";
 import { PaymentHistoryChart } from "@/components/ui/PaymentHistoryChart";
 import { useAppState } from "@/lib/state/AppStateContext";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LEVEL_ORDER } from "@/lib/mock/passport-levels";
-
-const CTA_LABEL: Record<string, string> = {
-  S1: "여권 확인부터 하기",
-  S2: "계좌 인증하러 가기",
-  S3: "은행 제출용 리포트",
-  S4: "은행 제출용 리포트",
-};
 
 export default function PassportPage() {
   const { state, toggleChecklistItem } = useAppState();
+  const { t, tOpt, tShared } = useTranslation();
   const { passport, profile } = state;
   const [reportGenerated, setReportGenerated] = useState(false);
 
@@ -39,18 +34,18 @@ export default function PassportPage() {
 
   return (
     <AppShell showNav>
-      <TopBar title="금융여권" />
+      <TopBar title={t("passport.title")} />
       <div className="space-y-6 px-5 pb-10 pt-2">
         <Card raised className="space-y-4">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-medium tracking-wide text-foreground-subtle">
-                FINANCIAL PASSPORT
+                {t("passport.label")}
               </p>
               <p className="mt-1 text-lg font-semibold text-foreground">{profile.name}</p>
               <p className="mt-0.5 text-sm text-foreground-muted">
                 {profile.visaStatus} · {profile.nationalityCode} ·{" "}
-                {passport.level === "S1" ? profile.arrivalLabel : profile.school}
+                {passport.level === "S1" ? profile.arrivalLabel : tShared("school", profile.school)}
               </p>
             </div>
             <span className="rounded-lg bg-primary/15 px-2.5 py-1 text-sm font-bold text-primary">
@@ -61,7 +56,7 @@ export default function PassportPage() {
           <SegmentedProgress segments={4} active={levelOrder} />
 
           <div>
-            <p className="text-sm text-foreground-muted">기본 이체 한도</p>
+            <p className="text-sm text-foreground-muted">{t("passport.baseLimit")}</p>
             <p className="text-2xl font-bold text-foreground">
               {passport.currentLimit.toLocaleString()}{" "}
               <span className="text-sm font-normal text-foreground-muted">KRW</span>
@@ -72,15 +67,15 @@ export default function PassportPage() {
         {nextLevelLabel && (
           <div>
             <p className="mb-2 text-sm font-medium text-foreground-muted">
-              {nextLevelLabel}까지 남은 것
+              {t("passport.nextLevelChecklist", { level: nextLevelLabel })}
             </p>
             <Card className="divide-y divide-border">
               {passport.nextLevelChecklist.map((item) => (
                 <div key={item.id} className="first:pt-0 last:pb-0">
                   <ChecklistRow
                     status={item.done ? "done" : "pending"}
-                    label={item.label}
-                    hint={item.hint}
+                    label={t(`passport.checklist.${item.id}.label`)}
+                    hint={tOpt(`passport.checklist.${item.id}.hint`)}
                     onClick={() => toggleChecklistItem(item.id)}
                   />
                 </div>
@@ -96,13 +91,12 @@ export default function PassportPage() {
         )}
 
         <Card className="bg-surface-sunken text-sm leading-relaxed text-foreground-muted">
-          등급은 신용 점수가 아닙니다. 실제로 확인된 사실과 정시 납부 기록만 쌓입니다. 은행에는
-          등급만 공개되고 상세 점수는 공개되지 않습니다.
+          {t("passport.disclaimer")}
         </Card>
 
         <Button onClick={handleCta} className="gap-2">
           {isMature && <Download className="h-4 w-4" />}
-          {reportGenerated ? "리포트가 준비됐어요 · 다시 받기" : CTA_LABEL[passport.level]}
+          {reportGenerated ? t("passport.reportReady") : t(`passport.cta.${passport.level}`)}
         </Button>
       </div>
     </AppShell>

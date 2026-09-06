@@ -4,19 +4,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Sparkles, UserRound, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const items = [
-  { href: "/home", label: "홈", icon: Home },
-  { href: "/ai", label: "AI", icon: Sparkles },
-  { href: "/profile", label: "내 정보", icon: UserRound },
-  { href: "/more", label: "더보기", icon: MoreHorizontal },
+  { href: "/home", key: "nav.home", icon: Home },
+  { href: "/ai", key: "nav.ai", icon: Sparkles },
+  { href: "/profile", key: "nav.profile", icon: UserRound },
+  { href: "/more", key: "nav.more", icon: MoreHorizontal },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { t } = useTranslation();
   return (
     <nav className="sticky bottom-0 z-10 flex shrink-0 items-stretch border-t border-border bg-background/95 backdrop-blur">
-      {items.map(({ href, label, icon: Icon }) => {
+      {items.map(({ href, key, icon: Icon }) => {
         const active = pathname === href || pathname.startsWith(href + "/");
         return (
           <Link
@@ -34,7 +36,7 @@ export function BottomNav() {
                 active ? "font-medium text-primary" : "text-foreground-subtle"
               )}
             >
-              {label}
+              {t(key)}
             </span>
           </Link>
         );

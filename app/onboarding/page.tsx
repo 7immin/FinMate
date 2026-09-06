@@ -8,36 +8,47 @@ import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { useAppState } from "@/lib/state/AppStateContext";
-import { Language } from "@/lib/types";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { LANGUAGE_NATIVE_NAME } from "@/lib/i18n";
+import { Language, NationalityId, SchoolId } from "@/lib/types";
 
-const LANGUAGES: { code: Language; label: string }[] = [
-  { code: "ko", label: "한국어" },
-  { code: "en", label: "English" },
-  { code: "zh", label: "中文" },
-  { code: "vi", label: "Tiếng Việt" },
+const LANGUAGES: Language[] = ["ko", "en", "zh", "vi"];
+const NATIONALITIES: NationalityId[] = [
+  "vietnam",
+  "china",
+  "mongolia",
+  "nepal",
+  "uzbekistan",
+  "myanmar",
 ];
-
-const NATIONALITIES = ["베트남", "중국", "몽골", "네팔", "우즈베키스탄", "미얀마"];
-const VISA_TYPES = ["D-2", "D-4", "기타"];
-const SCHOOLS = ["한양대학교", "서울대학교", "연세대학교", "고려대학교", "성균관대학교"];
+const VISA_TYPES = ["D-2", "D-4", "other"] as const;
+const SCHOOLS: SchoolId[] = ["hanyang", "snu", "yonsei", "korea", "skk"];
+const NATIONALITY_CODE: Record<NationalityId, string> = {
+  vietnam: "VNM",
+  china: "CHN",
+  mongolia: "MNG",
+  nepal: "NPL",
+  myanmar: "MMR",
+  uzbekistan: "UZB",
+  cambodia: "KHM",
+};
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { completeOnboarding } = useAppState();
+  const { t, tShared, lang, setLanguage } = useTranslation();
   const [step, setStep] = useState<1 | 2>(1);
-  const [language, setLanguage] = useState<Language>("ko");
   const [name, setName] = useState("응우옌 티 흐엉");
-  const [nationality, setNationality] = useState("베트남");
-  const [visaStatus, setVisaStatus] = useState("D-2");
-  const [school, setSchool] = useState("한양대학교");
+  const [nationality, setNationality] = useState<NationalityId>("vietnam");
+  const [visaStatus, setVisaStatus] = useState<(typeof VISA_TYPES)[number]>("D-2");
+  const [school, setSchool] = useState<SchoolId>("hanyang");
   const [arrivalLabel, setArrivalLabel] = useState("2026년 3월");
 
   function handleSubmit() {
     completeOnboarding({
-      language,
       name,
       nationality,
-      nationalityCode: nationality === "베트남" ? "VNM" : "OTH",
+      nationalityCode: NATIONALITY_CODE[nationality],
       visaStatus,
       school,
       arrivalLabel,
@@ -52,34 +63,28 @@ export default function OnboardingPage() {
           <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-lg font-bold text-white">
             F
           </div>
-          <h1 className="text-[26px] font-bold leading-tight text-foreground">
-            목적을 증명하면
-            <br />
-            한도가 열립니다
+          <h1 className="whitespace-pre-line text-[26px] font-bold leading-tight text-foreground">
+            {t("onboarding.headline")}
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground-muted">
-            등록금·월세 같은 실제 지출을 FinMate가 직접 확인하고, 그 목적에만 이체 한도를 엽니다.
+            {t("onboarding.description")}
           </p>
         </div>
 
         <div className="space-y-4">
           <div>
-            <p className="mb-2 text-sm text-foreground-muted">언어 선택</p>
+            <p className="mb-2 text-sm text-foreground-muted">{t("onboarding.languageLabel")}</p>
             <div className="flex flex-wrap gap-2">
-              {LANGUAGES.map((lang) => (
-                <Chip
-                  key={lang.code}
-                  selected={language === lang.code}
-                  onClick={() => setLanguage(lang.code)}
-                >
-                  {lang.label}
+              {LANGUAGES.map((code) => (
+                <Chip key={code} selected={lang === code} onClick={() => setLanguage(code)}>
+                  {LANGUAGE_NATIVE_NAME[code]}
                 </Chip>
               ))}
             </div>
           </div>
-          <Button onClick={() => setStep(2)}>시작하기 →</Button>
+          <Button onClick={() => setStep(2)}>{t("onboarding.start")}</Button>
           <p className="flex items-center justify-center gap-1.5 text-xs text-foreground-subtle">
-            <ShieldCheck className="h-3.5 w-3.5" /> FinMate는 은행 비밀번호를 절대 묻지 않습니다.
+            <ShieldCheck className="h-3.5 w-3.5" /> {t("onboarding.footerNote")}
           </p>
         </div>
       </AppShell>
@@ -93,13 +98,11 @@ export default function OnboardingPage() {
         <ProgressBar value={66} />
       </div>
 
-      <h1 className="text-[22px] font-bold text-foreground">기본 정보만 알려주세요</h1>
-      <p className="mt-2 text-sm text-foreground-muted">
-        여기 적은 내용에 따라 답변과 한도가 달라집니다.
-      </p>
+      <h1 className="text-[22px] font-bold text-foreground">{t("onboarding.step2Title")}</h1>
+      <p className="mt-2 text-sm text-foreground-muted">{t("onboarding.step2Desc")}</p>
 
       <div className="mt-6 flex-1 space-y-5">
-        <Field label="이름 (여권 표기)">
+        <Field label={t("onboarding.fieldName")}>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -107,21 +110,21 @@ export default function OnboardingPage() {
           />
         </Field>
 
-        <Field label="국적">
+        <Field label={t("onboarding.fieldNationality")}>
           <select
             value={nationality}
-            onChange={(e) => setNationality(e.target.value)}
+            onChange={(e) => setNationality(e.target.value as NationalityId)}
             className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-foreground outline-none focus:border-primary"
           >
             {NATIONALITIES.map((n) => (
               <option key={n} value={n}>
-                {n}
+                {tShared("country", n)}
               </option>
             ))}
           </select>
         </Field>
 
-        <Field label="체류 자격">
+        <Field label={t("onboarding.fieldVisa")}>
           <div className="flex gap-3">
             {VISA_TYPES.map((visa) => (
               <button
@@ -134,27 +137,27 @@ export default function OnboardingPage() {
                     : "border-border text-foreground-muted"
                 }`}
               >
-                {visa}
+                {visa === "other" ? t("onboarding.visaOther") : visa}
               </button>
             ))}
           </div>
         </Field>
 
-        <Field label="학교">
+        <Field label={t("onboarding.fieldSchool")}>
           <select
             value={school}
-            onChange={(e) => setSchool(e.target.value)}
+            onChange={(e) => setSchool(e.target.value as SchoolId)}
             className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-foreground outline-none focus:border-primary"
           >
             {SCHOOLS.map((s) => (
               <option key={s} value={s}>
-                {s}
+                {tShared("school", s)}
               </option>
             ))}
           </select>
         </Field>
 
-        <Field label="입국 시점">
+        <Field label={t("onboarding.fieldArrival")}>
           <input
             value={arrivalLabel}
             onChange={(e) => setArrivalLabel(e.target.value)}
@@ -164,7 +167,7 @@ export default function OnboardingPage() {
       </div>
 
       <Button onClick={handleSubmit} className="mt-6">
-        다음
+        {t("onboarding.next")}
       </Button>
     </AppShell>
   );

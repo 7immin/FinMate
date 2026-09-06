@@ -4,17 +4,26 @@ export type Language = "ko" | "en" | "zh" | "vi";
 
 export interface ChecklistItem {
   id: string;
-  label: string;
   done: boolean;
-  hint?: string;
 }
+
+export type NationalityId =
+  | "vietnam"
+  | "china"
+  | "mongolia"
+  | "nepal"
+  | "myanmar"
+  | "uzbekistan"
+  | "cambodia";
+
+export type SchoolId = "hanyang" | "snu" | "yonsei" | "korea" | "skk";
 
 export interface UserProfile {
   name: string;
-  nationality: string;
+  nationality: NationalityId;
   nationalityCode: string;
   visaStatus: string;
-  school: string;
+  school: SchoolId;
   arrivalLabel: string;
   language: Language;
 }
@@ -27,7 +36,6 @@ export interface PaymentRecord {
 export interface FinancialPassport {
   level: PassportLevel;
   currentLimit: number;
-  badgeLabel: string;
   nextLevelChecklist: ChecklistItem[];
   paymentHistory: PaymentRecord[];
 }
