@@ -1,15 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { Lock } from "lucide-react";
+import { Loader2, Lock } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { UploadBox } from "@/components/ui/UploadBox";
 import { Chip } from "@/components/ui/Chip";
 import { Button } from "@/components/ui/Button";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { CONTRACT_TYPE_IDS, ContractTypeId, LEASE_CONTRACT } from "@/lib/mock/deposit";
+import { CONTRACT_TYPE_IDS, ContractTypeId } from "@/lib/mock/deposit";
 
-export function ContractUploadStep({ onVerify }: { onVerify: () => void }) {
+export function ContractUploadStep({
+  processing,
+  onFileSelected,
+  onVerify,
+}: {
+  processing: boolean;
+  onFileSelected: (file: File) => void;
+  onVerify: () => void;
+}) {
   const { t } = useTranslation();
   const [fileName, setFileName] = useState<string | null>(null);
   const [contractType, setContractType] = useState<ContractTypeId>(CONTRACT_TYPE_IDS[0]);
@@ -28,7 +36,10 @@ export function ContractUploadStep({ onVerify }: { onVerify: () => void }) {
         <UploadBox
           label={t("deposit.upload.boxLabel")}
           fileName={fileName ?? undefined}
-          onFileSelected={() => setFileName(`${LEASE_CONTRACT.fileName} · ${LEASE_CONTRACT.pages} pages`)}
+          onFileSelected={(file) => {
+            setFileName(file.name);
+            onFileSelected(file);
+          }}
         />
 
         <div>
@@ -48,7 +59,8 @@ export function ContractUploadStep({ onVerify }: { onVerify: () => void }) {
         </div>
       </div>
       <div className="px-5 pb-6">
-        <Button onClick={onVerify} disabled={!fileName}>
+        <Button onClick={onVerify} disabled={!fileName || processing} className="gap-2">
+          {processing && <Loader2 className="h-4 w-4 animate-spin" />}
           {t("deposit.upload.submit")}
         </Button>
       </div>

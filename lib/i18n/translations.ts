@@ -242,6 +242,8 @@ const ko = {
       },
       confirm: "맞습니다, 한도 열기 →",
       retry: "내용이 달라요",
+      ocrFailedWarning:
+        "자동 인식에 실패했어요. 아래 내용을 직접 확인하고 다르면 '내용이 달라요'로 수정해주세요.",
     },
     edit: {
       title: "정보 수정",
@@ -422,6 +424,7 @@ const ko = {
       period: "계약 기간",
       reduceRisk: "위험 줄이는 방법 보기 →",
       abandon: "이 집은 포기할게요",
+      ocrFailedWarning: "자동 인식에 실패해서 기본 값으로 표시했어요. 실제 계약서 내용과 다르면 주의해주세요.",
     },
     registry: {
       ownerMatch: { label: "등기부상 소유자와 임대인 일치", detail: "김OO · 단독 소유" },
@@ -614,6 +617,8 @@ const en: typeof ko = {
       },
       confirm: "Correct, unlock limit →",
       retry: "Something's off",
+      ocrFailedWarning:
+        "Automatic reading failed. Please double-check the details below and use \"Something's off\" to correct them.",
     },
     edit: {
       title: "Edit details",
@@ -794,6 +799,7 @@ const en: typeof ko = {
       period: "Contract period",
       reduceRisk: "See how to reduce risk →",
       abandon: "I'll pass on this place",
+      ocrFailedWarning: "Automatic reading failed, so default values are shown. Please double-check against the real contract.",
     },
     registry: {
       ownerMatch: { label: "Registry owner matches the landlord", detail: "Kim OO · sole owner" },
@@ -983,6 +989,7 @@ const zh: typeof ko = {
       },
       confirm: "确认无误，开通额度 →",
       retry: "信息有误",
+      ocrFailedWarning: "自动识别失败，请核对以下内容，如有不符请点击「信息有误」进行修改。",
     },
     edit: {
       title: "修改信息",
@@ -1163,6 +1170,7 @@ const zh: typeof ko = {
       period: "合同期限",
       reduceRisk: "查看降低风险的方法 →",
       abandon: "放弃这套房子",
+      ocrFailedWarning: "自动识别失败，已显示默认值，请与实际合同核对。",
     },
     registry: {
       ownerMatch: { label: "登记簿所有者与房东一致", detail: "金OO · 单独所有" },
@@ -1355,6 +1363,8 @@ const vi: typeof ko = {
       },
       confirm: "Đúng rồi, mở hạn mức →",
       retry: "Thông tin không đúng",
+      ocrFailedWarning:
+        "Tự động nhận diện thất bại. Vui lòng kiểm tra lại thông tin bên dưới và dùng \"Thông tin không đúng\" để sửa nếu cần.",
     },
     edit: {
       title: "Chỉnh sửa thông tin",
@@ -1535,6 +1545,7 @@ const vi: typeof ko = {
       period: "Thời hạn hợp đồng",
       reduceRisk: "Xem cách giảm rủi ro →",
       abandon: "Tôi sẽ bỏ qua căn nhà này",
+      ocrFailedWarning: "Tự động nhận diện thất bại nên đang hiển thị giá trị mặc định. Vui lòng đối chiếu với hợp đồng thật.",
     },
     registry: {
       ownerMatch: { label: "Chủ sở hữu trong sổ đăng ký khớp với chủ nhà", detail: "Kim OO · sở hữu duy nhất" },

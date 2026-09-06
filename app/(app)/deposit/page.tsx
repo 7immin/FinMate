@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { ContractUploadStep } from "@/components/flows/deposit/ContractUploadStep";
@@ -9,15 +9,41 @@ import { ProtectionStep } from "@/components/flows/deposit/ProtectionStep";
 import { FlowSuccess } from "@/components/flows/FlowSuccess";
 import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { LEASE_CONTRACT } from "@/lib/mock/deposit";
+import { LEASE_CONTRACT, LeaseContract } from "@/lib/mock/deposit";
+import { readLeaseContract } from "@/lib/ocr/client";
 
-type Step = "upload" | "verify" | "protection" | "success";
+type Step = "upload" | "verifying" | "verify" | "protection" | "success";
 
 export default function DepositPage() {
   const router = useRouter();
   const { recordPurposeTransaction } = useAppState();
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>("upload");
+  const [contract, setContract] = useState<LeaseContract>(LEASE_CONTRACT);
+  const [ocrFailed, setOcrFailed] = useState(false);
+  const fileRef = useRef<File | null>(null);
+
+  async function handleVerify() {
+    const file = fileRef.current;
+    if (!file) return;
+    setStep("verifying");
+    try {
+      const result = await readLeaseContract(file);
+      setContract((prev) => ({
+        ...prev,
+        fileName: file.name,
+        address: result.address || prev.address,
+        deposit: result.deposit || prev.deposit,
+        rent: result.rent ?? prev.rent,
+        rentDay: result.rentDay || prev.rentDay,
+        period: result.period || prev.period,
+      }));
+      setOcrFailed(false);
+    } catch {
+      setOcrFailed(true);
+    }
+    setStep("verify");
+  }
 
   function handleConfirm() {
     recordPurposeTransaction("deposit");
@@ -26,9 +52,19 @@ export default function DepositPage() {
 
   return (
     <AppShell className="flex flex-col">
-      {step === "upload" && <ContractUploadStep onVerify={() => setStep("verify")} />}
+      {(step === "upload" || step === "verifying") && (
+        <ContractUploadStep
+          processing={step === "verifying"}
+          onFileSelected={(file) => {
+            fileRef.current = file;
+          }}
+          onVerify={handleVerify}
+        />
+      )}
       {step === "verify" && (
         <VerifyResultStep
+          contract={contract}
+          ocrFailed={ocrFailed}
           onReduceRisk={() => setStep("protection")}
           onAbandon={() => router.push("/home")}
         />
@@ -39,8 +75,8 @@ export default function DepositPage() {
           topBarTitle={t("deposit.topBarTitle")}
           title={t("deposit.success.title")}
           description={t("deposit.success.description", {
-            address: LEASE_CONTRACT.address,
-            amount: LEASE_CONTRACT.deposit.toLocaleString(),
+            address: contract.address,
+            amount: contract.deposit.toLocaleString(),
           })}
           onDone={() => router.push("/home")}
         />

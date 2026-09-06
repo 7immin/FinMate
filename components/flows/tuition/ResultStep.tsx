@@ -1,6 +1,6 @@
 "use client";
 
-import { ShieldCheck } from "lucide-react";
+import { AlertTriangle, ShieldCheck } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
@@ -20,10 +20,12 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 
 export function ResultStep({
   invoice,
+  ocrFailed,
   onConfirm,
   onRetry,
 }: {
   invoice: TuitionInvoice;
+  ocrFailed?: boolean;
   onConfirm: () => void;
   onRetry: () => void;
 }) {
@@ -32,9 +34,16 @@ export function ResultStep({
     <div className="flex flex-1 flex-col">
       <TopBar title={t("tuition.result.topBarTitle")} />
       <div className="flex-1 space-y-5 px-5 pb-6 pt-2">
-        <Badge tone="success" icon={<ShieldCheck className="h-3.5 w-3.5" />}>
-          {t("tuition.result.verifiedBadge")}
-        </Badge>
+        {ocrFailed ? (
+          <Card className="flex gap-2.5 bg-warning-muted">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-warning" />
+            <p className="text-sm leading-relaxed text-warning">{t("tuition.result.ocrFailedWarning")}</p>
+          </Card>
+        ) : (
+          <Badge tone="success" icon={<ShieldCheck className="h-3.5 w-3.5" />}>
+            {t("tuition.result.verifiedBadge")}
+          </Badge>
+        )}
 
         <h1 className="text-[22px] font-bold text-foreground">{invoice.title}</h1>
 

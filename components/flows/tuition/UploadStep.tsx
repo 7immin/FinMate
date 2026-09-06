@@ -6,7 +6,13 @@ import { UploadBox } from "@/components/ui/UploadBox";
 import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 
-export function UploadStep({ onUploaded }: { onUploaded: () => void }) {
+export function UploadStep({
+  onFileUploaded,
+  onMockSourceSelected,
+}: {
+  onFileUploaded: (file: File) => void;
+  onMockSourceSelected: () => void;
+}) {
   const { state } = useAppState();
   const { t, tShared } = useTranslation();
 
@@ -23,14 +29,14 @@ export function UploadStep({ onUploaded }: { onUploaded: () => void }) {
           </p>
         </div>
 
-        <UploadBox label={t("tuition.upload.boxLabel")} onFileSelected={() => onUploaded()} />
+        <UploadBox label={t("tuition.upload.boxLabel")} onFileSelected={onFileUploaded} />
 
         <div>
           <p className="mb-2 text-sm text-foreground-muted">{t("tuition.upload.orTitle")}</p>
           <div className="space-y-2">
             <button
               type="button"
-              onClick={onUploaded}
+              onClick={onMockSourceSelected}
               className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3.5 text-left"
             >
               <Link2 className="h-4 w-4 text-foreground-muted" />
@@ -41,7 +47,7 @@ export function UploadStep({ onUploaded }: { onUploaded: () => void }) {
             </button>
             <button
               type="button"
-              onClick={onUploaded}
+              onClick={onMockSourceSelected}
               className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3.5 text-left"
             >
               <Mail className="h-4 w-4 text-foreground-muted" />

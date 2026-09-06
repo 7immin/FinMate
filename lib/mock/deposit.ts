@@ -1,9 +1,17 @@
 export const CONTRACT_TYPE_IDS = ["monthly", "jeonse", "goshiwon"] as const;
 export type ContractTypeId = (typeof CONTRACT_TYPE_IDS)[number];
 
-export const LEASE_CONTRACT = {
+export interface LeaseContract {
+  fileName: string;
+  address: string;
+  deposit: number;
+  rent: number;
+  rentDay: string;
+  period: string;
+}
+
+export const LEASE_CONTRACT: LeaseContract = {
   fileName: "lease-2026.pdf",
-  pages: 3,
   address: "성동구 마조로 12, 3층",
   deposit: 5000000,
   rent: 620000,

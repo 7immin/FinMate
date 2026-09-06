@@ -1,12 +1,13 @@
 "use client";
 
+import { AlertTriangle } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ChecklistRow } from "@/components/ui/Checklist";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { LEASE_CONTRACT, REGISTRY_CHECK_IDS } from "@/lib/mock/deposit";
+import { LeaseContract, REGISTRY_CHECK_IDS } from "@/lib/mock/deposit";
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
@@ -18,9 +19,13 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 export function VerifyResultStep({
+  contract,
+  ocrFailed,
   onReduceRisk,
   onAbandon,
 }: {
+  contract: LeaseContract;
+  ocrFailed?: boolean;
   onReduceRisk: () => void;
   onAbandon: () => void;
 }) {
@@ -37,14 +42,21 @@ export function VerifyResultStep({
           {t("deposit.verify.headline")}
         </h1>
 
+        {ocrFailed && (
+          <Card className="flex gap-2.5 bg-warning-muted">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-warning" />
+            <p className="text-sm leading-relaxed text-warning">{t("deposit.verify.ocrFailedWarning")}</p>
+          </Card>
+        )}
+
         <Card className="divide-y divide-border">
-          <InfoRow label={t("deposit.verify.address")} value={LEASE_CONTRACT.address} />
-          <InfoRow label={t("deposit.verify.deposit")} value={`${LEASE_CONTRACT.deposit.toLocaleString()} KRW`} />
+          <InfoRow label={t("deposit.verify.address")} value={contract.address} />
+          <InfoRow label={t("deposit.verify.deposit")} value={`${contract.deposit.toLocaleString()} KRW`} />
           <InfoRow
             label={t("deposit.verify.rent")}
-            value={`${LEASE_CONTRACT.rent.toLocaleString()} KRW · ${LEASE_CONTRACT.rentDay}`}
+            value={`${contract.rent.toLocaleString()} KRW · ${contract.rentDay}`}
           />
-          <InfoRow label={t("deposit.verify.period")} value={LEASE_CONTRACT.period} />
+          <InfoRow label={t("deposit.verify.period")} value={contract.period} />
         </Card>
 
         <div className="space-y-1">
