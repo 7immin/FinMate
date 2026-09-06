@@ -166,6 +166,15 @@ export async function POST(request: Request) {
       payment_history: [...row.payment_history, { month, onTime: true }],
     });
     await applyLevelUpIfComplete(admin, existing.user_id, saved);
+
+    // 승인은 학생이 모르는 사이(이 화면에서) 일어난다. 여기 남겨 두지
+    // 않으면 다음에 앱을 열어 직접 확인하기 전까지는 한도가 언제
+    // 열렸는지 알 길이 없다.
+    await admin.from("notifications").insert({
+      user_id: existing.user_id,
+      type: "limit_approved",
+      payload: { amount: existing.amount, purpose: existing.purpose },
+    });
   }
 
   const { error } = await admin

@@ -52,6 +52,14 @@ export async function fetchAppState(): Promise<FetchResult> {
 
   const { profile, documents } = data;
 
+  // A count-only query (head: true) never transfers row data, so this stays
+  // cheap even as the notification history grows.
+  const { count: unreadNotificationCount } = await supabase
+    .from("notifications")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", data.passport.user_id)
+    .is("read_at", null);
+
   // Cascades a level-up if every item is now true purely from time passing
   // (account-active's 30-day mark) with no other action to trigger it --
   // the only path not already covered by an API route, since layout mounts
@@ -81,6 +89,7 @@ export async function fetchAppState(): Promise<FetchResult> {
       hasAlienRegistration: documents.has_alien_registration as AppState["documents"]["hasAlienRegistration"],
       hasKoreanPhone: documents.has_korean_phone as AppState["documents"]["hasKoreanPhone"],
     },
+    unreadNotificationCount: unreadNotificationCount ?? 0,
   };
 
   return { onboarded: true, state };

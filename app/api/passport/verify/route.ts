@@ -25,20 +25,6 @@ const VERIFIERS: Record<string, Verifier> = {
       "이 이미지는 여권 정보면(사진이 있는 신원정보 페이지)입니다. 성명(영문 표기), 여권번호, 국적, 만료일(YYYY.MM.DD)을 추출하세요. 읽을 수 없는 항목은 빈 문자열로 채우세요. 절대 추측해서 지어내지 마세요.",
     isMeaningful: (r) => Boolean(r.name) && Boolean(r.passportNumber),
   },
-  "korean-account": {
-    schema: {
-      type: "object",
-      properties: {
-        bankName: { type: "string", description: "은행명" },
-        accountNumber: { type: "string", description: "계좌번호" },
-        accountHolder: { type: "string", description: "예금주명" },
-      },
-      required: ["bankName", "accountNumber", "accountHolder"],
-    },
-    prompt:
-      "이 이미지는 한국 은행 통장 사본이거나 은행 앱의 계좌 정보 화면입니다. 은행명, 계좌번호, 예금주명을 추출하세요. 읽을 수 없는 항목은 빈 문자열로 채우세요. 절대 추측해서 지어내지 마세요.",
-    isMeaningful: (r) => Boolean(r.bankName) && Boolean(r.accountNumber),
-  },
 };
 
 export async function POST(request: Request) {

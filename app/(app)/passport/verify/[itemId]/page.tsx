@@ -33,14 +33,6 @@ const ITEM_CONFIG: Record<string, ItemConfig> = {
       { key: "expiryDate", labelKey: "expiryDate" },
     ],
   },
-  "korean-account": {
-    i18nKey: "koreanAccount",
-    fields: [
-      { key: "bankName", labelKey: "bankName" },
-      { key: "accountNumber", labelKey: "accountNumber" },
-      { key: "accountHolder", labelKey: "accountHolder" },
-    ],
-  },
 };
 
 type Status = "idle" | "submitting" | "success" | "failure";

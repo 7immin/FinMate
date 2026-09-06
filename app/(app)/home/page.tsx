@@ -12,6 +12,7 @@ import {
   Languages,
   LogOut,
   ShieldAlert,
+  Bell,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/Card";
@@ -26,7 +27,7 @@ export default function HomePage() {
   const router = useRouter();
   const { state, signOut } = useAppState();
   const { t, lang } = useTranslation();
-  const { profile, passport } = state;
+  const { profile, passport, unreadNotificationCount } = state;
   const [question, setQuestion] = useState("");
   const [langSheetOpen, setLangSheetOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
@@ -64,6 +65,17 @@ export default function HomePage() {
         <div className="flex items-center justify-between gap-3">
           <Logo height={20} />
           <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => router.push("/notifications")}
+              aria-label={t("notifications.title")}
+              className="relative flex h-7 w-7 items-center justify-center rounded-full bg-white/[0.06] text-foreground-muted"
+            >
+              <Bell className="h-3.5 w-3.5" />
+              {unreadNotificationCount > 0 && (
+                <span className="absolute right-0.5 top-0.5 h-2 w-2 rounded-full bg-danger" />
+              )}
+            </button>
             <button
               type="button"
               onClick={handleSignOut}

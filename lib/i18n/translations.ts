@@ -172,12 +172,6 @@ const ko = {
         uploadLabel: "여권 사진 또는 스캔",
         field: { name: "성명", passportNumber: "여권번호", nationality: "국적", expiryDate: "만료일" },
       },
-      koreanAccount: {
-        title: "한국 계좌 1개 연결",
-        description: "통장 사본이나 은행 앱의 계좌 정보 화면을 올려주세요.",
-        uploadLabel: "통장 사본 또는 계좌 화면",
-        field: { bankName: "은행", accountNumber: "계좌번호", accountHolder: "예금주" },
-      },
       submit: "확인 요청",
       submitting: "확인하는 중...",
       success: "확인됐어요.",
@@ -270,6 +264,11 @@ const ko = {
       freshman: "신입생",
       other: "기타",
     },
+  },
+  notifications: {
+    title: "알림",
+    empty: "아직 온 알림이 없어요.",
+    limitApproved: "{{purpose}} 한도 {{amount}}원 요청이 승인됐어요.",
   },
   bank: {
     title: "창구 확인",
@@ -767,12 +766,6 @@ const en: typeof ko = {
         uploadLabel: "Passport photo or scan",
         field: { name: "Name", passportNumber: "Passport No.", nationality: "Nationality", expiryDate: "Expiry" },
       },
-      koreanAccount: {
-        title: "Link 1 Korean bank account",
-        description: "Upload a photo of your bankbook or a screenshot of your account info in your banking app.",
-        uploadLabel: "Bankbook or account screen",
-        field: { bankName: "Bank", accountNumber: "Account No.", accountHolder: "Account holder" },
-      },
       submit: "Submit for verification",
       submitting: "Verifying...",
       success: "Verified.",
@@ -861,6 +854,11 @@ const en: typeof ko = {
       freshman: "Freshman",
       other: "Other",
     },
+  },
+  notifications: {
+    title: "Notifications",
+    empty: "No notifications yet.",
+    limitApproved: "Your {{purpose}} limit request for {{amount}} KRW was approved.",
   },
   bank: {
     title: "Counter console",
@@ -1355,12 +1353,6 @@ const zh: typeof ko = {
         uploadLabel: "护照照片或扫描件",
         field: { name: "姓名", passportNumber: "护照号码", nationality: "国籍", expiryDate: "有效期至" },
       },
-      koreanAccount: {
-        title: "绑定1个韩国账户",
-        description: "请上传存折照片或银行应用中的账户信息截图。",
-        uploadLabel: "存折或账户信息截图",
-        field: { bankName: "银行", accountNumber: "账号", accountHolder: "户名" },
-      },
       submit: "提交确认",
       submitting: "确认中...",
       success: "已确认。",
@@ -1449,6 +1441,11 @@ const zh: typeof ko = {
       freshman: "新生",
       other: "其他",
     },
+  },
+  notifications: {
+    title: "通知",
+    empty: "还没有收到通知。",
+    limitApproved: "您申请的{{purpose}}额度 {{amount}} 韩元已获批准。",
   },
   bank: {
     title: "柜台控制台",
@@ -1945,12 +1942,6 @@ const vi: typeof ko = {
         uploadLabel: "Ảnh hoặc bản scan hộ chiếu",
         field: { name: "Họ tên", passportNumber: "Số hộ chiếu", nationality: "Quốc tịch", expiryDate: "Ngày hết hạn" },
       },
-      koreanAccount: {
-        title: "Liên kết 1 tài khoản Hàn Quốc",
-        description: "Tải lên ảnh sổ tài khoản hoặc ảnh chụp màn hình thông tin tài khoản trong ứng dụng ngân hàng.",
-        uploadLabel: "Sổ tài khoản hoặc ảnh chụp màn hình",
-        field: { bankName: "Ngân hàng", accountNumber: "Số tài khoản", accountHolder: "Chủ tài khoản" },
-      },
       submit: "Gửi để xác minh",
       submitting: "Đang xác minh...",
       success: "Đã xác minh.",
@@ -2039,6 +2030,11 @@ const vi: typeof ko = {
       freshman: "Tân sinh viên",
       other: "Khác",
     },
+  },
+  notifications: {
+    title: "Thông báo",
+    empty: "Chưa có thông báo nào.",
+    limitApproved: "Yêu cầu hạn mức {{purpose}} {{amount}} KRW của bạn đã được duyệt.",
   },
   bank: {
     title: "Bảng điều khiển tại quầy",
