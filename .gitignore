@@ -35,6 +35,7 @@ next-env.d.ts
 # local smoke-test screenshots
 /shots/
 /shots_i18n/
+/shots_supabase/
 
 # supabase CLI local cache
 /supabase/.temp/
