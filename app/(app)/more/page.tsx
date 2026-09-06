@@ -26,7 +26,10 @@ export default function MorePage() {
   async function handleSignOut() {
     setSigningOut(true);
     await signOut();
-    router.replace("/login");
+    // 로그아웃하면 로그인 화면이 아니라 비로그인 홈으로 나온다. 이제
+    // 그쪽이 앱의 문이고, 나가자마자 다시 로그인을 요구받으면 "나갈 수
+    // 없는 앱"으로 읽힌다 — 로그아웃한 사람도 질문은 계속 할 수 있다.
+    router.replace("/");
     router.refresh();
   }
 

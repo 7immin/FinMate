@@ -80,12 +80,9 @@ export function GuestHome() {
           </div>
         </div>
 
-        <div className="mt-7">
-          <p className="text-[13px] text-foreground-muted">{t("guest.noLoginNote")}</p>
-          <h1 className="mt-1.5 text-balance text-[25px] font-bold leading-[1.35] tracking-[-0.4px] text-foreground">
-            {t("home.headline")}
-          </h1>
-        </div>
+        <h1 className="mt-7 text-balance text-[25px] font-bold leading-[1.35] tracking-[-0.4px] text-foreground">
+          {t("home.headline")}
+        </h1>
 
         {/* 묻는 자리. 화면에서 유일하게 테두리가 켜져 있는 곳이라, 로그인
             없이 지금 할 수 있는 일이 무엇인지 설명 없이 읽힌다. */}

@@ -112,8 +112,7 @@ const ko = {
     visaOther: "기타",
   },
   guest: {
-    noLoginNote: "로그인 없이도 사용할 수 있어요",
-    askPlaceholder: "무엇이든 물어보세요 (로그인 불필요)",
+    askPlaceholder: "무엇이든 물어보세요",
     suggested: ["학비 낼 돈이 부족해요", "계좌는 어떻게 만들어요?", "월세 계약 확인해줘"],
     browseTitle: "둘러보기 · 실행하려면 로그인이 필요해요",
     loginCta: "로그인하고 전체 기능 이용하기",
@@ -498,8 +497,7 @@ const en: typeof ko = {
     visaOther: "Other",
   },
   guest: {
-    noLoginNote: "You can use this without signing in",
-    askPlaceholder: "Ask anything (no sign-in needed)",
+    askPlaceholder: "Ask anything",
     suggested: ["I can't afford tuition", "How do I open a bank account?", "Check my lease contract"],
     browseTitle: "Browse - sign in to actually run these",
     loginCta: "Sign in for full access",
@@ -884,8 +882,7 @@ const zh: typeof ko = {
     visaOther: "其他",
   },
   guest: {
-    noLoginNote: "不登录也可以使用",
-    askPlaceholder: "有什么都可以问（无需登录）",
+    askPlaceholder: "有什么都可以问",
     suggested: ["学费不够怎么办", "银行账户怎么开？", "帮我看看房租合同"],
     browseTitle: "浏览 · 实际办理需要登录",
     loginCta: "登录以使用全部功能",
@@ -1266,8 +1263,7 @@ const vi: typeof ko = {
     visaOther: "Khác",
   },
   guest: {
-    noLoginNote: "Bạn có thể dùng mà không cần đăng nhập",
-    askPlaceholder: "Hỏi bất cứ điều gì (không cần đăng nhập)",
+    askPlaceholder: "Hỏi bất cứ điều gì",
     suggested: ["Tôi không đủ tiền đóng học phí", "Mở tài khoản ngân hàng thế nào?", "Kiểm tra hợp đồng thuê nhà giúp tôi"],
     browseTitle: "Xem trước - cần đăng nhập để thực hiện",
     loginCta: "Đăng nhập để dùng đầy đủ",
