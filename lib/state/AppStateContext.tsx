@@ -65,6 +65,18 @@ function computeToggledPassport(passport: FinancialPassport, id: string): Financ
   };
 }
 
+interface LimitRequestApiRow {
+  id: string;
+  amount: number;
+  purpose: PurposeCategory;
+  status: PendingRequest["status"];
+  created_at: string;
+}
+
+function toPendingRequest(r: LimitRequestApiRow): PendingRequest {
+  return { id: r.id, amount: r.amount, purpose: r.purpose, status: r.status, createdAt: r.created_at };
+}
+
 async function postJson<T>(url: string, body: unknown): Promise<T | null> {
   try {
     const res = await fetch(url, {
@@ -101,23 +113,7 @@ export function AppStateProvider({
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (cancelled || !data?.requests) return;
-        setPending(
-          data.requests.map(
-            (r: {
-              id: string;
-              amount: number;
-              purpose: PurposeCategory;
-              status: PendingRequest["status"];
-              created_at: string;
-            }) => ({
-              id: r.id,
-              amount: r.amount,
-              purpose: r.purpose,
-              status: r.status,
-              createdAt: r.created_at,
-            })
-          )
-        );
+        setPending((data.requests as LimitRequestApiRow[]).map(toPendingRequest));
       })
       .catch(() => {
         // 못 읽으면 빈 목록으로 둔다. 요청 자체는 서버에 남아 있다.
@@ -149,6 +145,14 @@ export function AppStateProvider({
         .catch(() => {
           // 실패해도 다음 포커스/가시성 전환에서 다시 시도된다.
         });
+      // "승인 대기" 줄도 같이 -- financial_passports/notifications와
+      // 별도로 관리되는 상태라 위 호출만으로는 안 채워진다.
+      fetch("/api/limit-requests")
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.requests) setPending((data.requests as LimitRequestApiRow[]).map(toPendingRequest));
+        })
+        .catch(() => {});
     }
     document.addEventListener("visibilitychange", resync);
     window.addEventListener("focus", resync);
@@ -176,6 +180,23 @@ export function AppStateProvider({
         },
         () => {
           setState((prev) => ({ ...prev, unreadNotificationCount: prev.unreadNotificationCount + 1 }));
+        }
+      )
+      // 금융여권 화면의 "승인 대기" 줄은 pendingRequests(이 컴포넌트가 따로
+      // 들고 있는 상태)를 그린다 -- financial_passports/notifications만
+      // 구독해서는 승인·거절 뱃지가 바뀌지 않는다. limit_requests 자체의
+      // status가 바뀌는 순간도 같이 구독해야 한다.
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "limit_requests",
+          filter: `user_id=eq.${state.userId}`,
+        },
+        (payload) => {
+          const row = payload.new as { id: string; status: PendingRequest["status"] };
+          setPending((prev) => prev.map((req) => (req.id === row.id ? { ...req, status: row.status } : req)));
         }
       )
       .on(
