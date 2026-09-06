@@ -95,12 +95,21 @@ export function AppStateProvider({
           }
         );
       },
+      /**
+       * 체크리스트 항목 표시.
+       *
+       * 서버가 거절하면 되돌린다. 예전에는 낙관적으로 켜 두기만 하고
+       * 실패를 무시해서, 서버가 "사실에서 판정되는 항목이라 못 켠다"고
+       * 400을 돌려줘도 화면에는 켜진 채로 남았다 — 새로고침하면 풀리는
+       * 체크가 등급이 오른 것처럼 보였다.
+       */
       toggleChecklistItem: (id) => {
+        const before = state.passport;
         setState((prev) => ({ ...prev, passport: computeToggledPassport(prev.passport, id) }));
         postJson<{ passport: FinancialPassport }>("/api/passport/checklist", {
           itemId: id,
         }).then((data) => {
-          if (data) setState((prev) => ({ ...prev, passport: data.passport }));
+          setState((prev) => ({ ...prev, passport: data ? data.passport : before }));
         });
       },
       /**

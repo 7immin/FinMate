@@ -12,10 +12,12 @@ import { PaymentHistoryChart } from "@/components/ui/PaymentHistoryChart";
 import { ReportView } from "@/components/flows/passport/ReportView";
 import { useAppState } from "@/lib/state/AppStateContext";
 import { isManualChecklistItem } from "@/lib/server/passport";
+import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LEVEL_ORDER } from "@/lib/mock/passport-levels";
 
 export default function PassportPage() {
+  const router = useRouter();
   const { state, toggleChecklistItem, pendingRequests } = useAppState();
   const { t, tOpt, tShared, lang } = useTranslation();
   const { passport, profile } = state;
@@ -31,7 +33,19 @@ export default function PassportPage() {
       setViewingReport(true);
       return;
     }
-    if (firstPending) toggleChecklistItem(firstPending.id);
+    if (!firstPending) return;
+
+    // 이 버튼이 목록의 첫 미완료 항목을 그냥 토글하고 있었다. 목록 행에는
+    // "사실에서 판정되는 항목은 누를 수 없다"를 걸어 두었는데, 이 버튼이
+    // 그 검사를 통째로 건너뛰어 목적 거래까지 손으로 켜졌다.
+    //
+    // 판정 항목은 켤 수 없다. 대신 그것을 실제로 채우는 자리로 보낸다 —
+    // 목적 거래는 홈의 네 흐름에서 한도를 요청하고 은행이 승인해야 쌓인다.
+    if (isManualChecklistItem(firstPending.id)) {
+      toggleChecklistItem(firstPending.id);
+      return;
+    }
+    if (firstPending.id.includes("purpose-tx")) router.push("/home");
   }
 
   const ctaLabel = isMature
@@ -39,6 +53,11 @@ export default function PassportPage() {
     : firstPending
       ? t(`passport.checklist.${firstPending.id}.cta`)
       : t(`passport.checklist.${passport.nextLevelChecklist[0]?.id}.cta`);
+
+  // 연체 정리는 앱 안에서 할 수 있는 일이 아니다(밀린 돈을 내야 한다).
+  // 누를 수 없는 버튼으로 두고, 무엇을 해야 하는지는 목록 줄이 말한다.
+  const ctaDisabled =
+    !isMature && firstPending !== undefined && firstPending.id === "overdue-clear";
 
   if (viewingReport) {
     return (
@@ -165,7 +184,7 @@ export default function PassportPage() {
           {t("passport.disclaimer")}
         </Card>
 
-        <Button onClick={handleCta} className="gap-2">
+        <Button onClick={handleCta} disabled={ctaDisabled} className="gap-2">
           {isMature && <Download className="h-4 w-4" />}
           {ctaLabel}
         </Button>
