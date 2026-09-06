@@ -527,6 +527,8 @@ const ko = {
     },
     guidance: {
       topBarTitle: "지금 할 일",
+      needPhone: "한국 휴대폰 번호부터 만드세요",
+      needPhoneHint: "은행은 본인 확인에 한국 번호를 씁니다. 알뜰폰 허브(과학기술정보통신부)에서 유학생이 쓸 수 있는 선불 요금제를 비교해 고를 수 있어요.",
       orderTitle: "순서",
       followUpTitle: "이어서 물어보기",
       next: "갈 수 있는 지점 보기",
@@ -578,7 +580,7 @@ const ko = {
       limitWarning: "계좌 개설 후 첫 한 달은 하루 이체 한도가 30만 원입니다. 정상적인 절차입니다.",
       langToggle: { ko: "한국어로 보기", en: "영어로 보기", zh: "중국어로 보기", vi: "베트남어로 보기" },
       atBranch: "{{branch}}에서 보여주세요",
-      complete: "계좌를 개설하고 왔어요 · 계좌 확인하기",
+      getPhoneCta: "번호 만들러 가기",
       request: {
         ko: { title: "외국인 유학생 계좌 개설 요청", body: "여권으로 개설 가능한 유학생 계좌를 만들고 싶습니다. 학비 납부 용도입니다." },
         en: {
@@ -1120,6 +1122,8 @@ const en: typeof ko = {
     },
     guidance: {
       topBarTitle: "What to do now",
+      needPhone: "Get a Korean phone number first",
+      needPhoneHint: "Banks use a Korean number to verify your identity. Compare prepaid plans open to international students on MVNO Hub, run by the Ministry of Science and ICT.",
       orderTitle: "Steps",
       followUpTitle: "Follow-up questions",
       next: "See branches you can visit",
@@ -1171,7 +1175,7 @@ const en: typeof ko = {
       limitWarning: "The daily transfer limit is 300,000 KRW for the first month after opening. This is standard procedure.",
       langToggle: { ko: "View in Korean", en: "View in English", zh: "View in Chinese", vi: "View in Vietnamese" },
       atBranch: "Show this at {{branch}}",
-      complete: "I opened my account - verify it",
+      getPhoneCta: "Get a number",
       request: {
         ko: { title: "외국인 유학생 계좌 개설 요청", body: "여권으로 개설 가능한 유학생 계좌를 만들고 싶습니다. 학비 납부 용도입니다." },
         en: {
@@ -1709,6 +1713,8 @@ const zh: typeof ko = {
     },
     guidance: {
       topBarTitle: "现在该做的事",
+      needPhone: "请先办理韩国手机号",
+      needPhoneHint: "银行用韩国号码进行本人确认。可在科学技术信息通信部运营的「알뜰폰 허브」比较适合留学生的预付费套餐。",
       orderTitle: "顺序",
       followUpTitle: "继续提问",
       next: "查看可前往的网点",
@@ -1760,7 +1766,7 @@ const zh: typeof ko = {
       limitWarning: "开户后首月每日转账额度为30万韩元，这是正常流程。",
       langToggle: { ko: "查看韩语", en: "查看英语", zh: "查看中文", vi: "查看越南语" },
       atBranch: "请在{{branch}}出示",
-      complete: "我已开户 · 去核实账户",
+      getPhoneCta: "去办理号码",
       request: {
         ko: { title: "외국인 유학생 계좌 개설 요청", body: "여권으로 개설 가능한 유학생 계좌를 만들고 싶습니다. 학비 납부 용도입니다." },
         en: {
@@ -2302,6 +2308,8 @@ const vi: typeof ko = {
     },
     guidance: {
       topBarTitle: "Việc cần làm bây giờ",
+      needPhone: "Hãy làm số điện thoại Hàn Quốc trước",
+      needPhoneHint: "Ngân hàng dùng số Hàn Quốc để xác minh danh tính. Bạn có thể so sánh các gói trả trước dành cho du học sinh trên MVNO Hub do Bộ Khoa học và ICT vận hành.",
       orderTitle: "Trình tự",
       followUpTitle: "Hỏi thêm",
       next: "Xem các chi nhánh có thể đến",
@@ -2353,7 +2361,7 @@ const vi: typeof ko = {
       limitWarning: "Hạn mức chuyển khoản hằng ngày trong tháng đầu sau khi mở tài khoản là 300,000 KRW. Đây là quy trình bình thường.",
       langToggle: { ko: "Xem tiếng Hàn", en: "Xem tiếng Anh", zh: "Xem tiếng Trung", vi: "Xem tiếng Việt" },
       atBranch: "Hãy xuất trình tại {{branch}}",
-      complete: "Tôi đã mở tài khoản · xác minh",
+      getPhoneCta: "Đi làm số",
       request: {
         ko: { title: "외국인 유학생 계좌 개설 요청", body: "여권으로 개설 가능한 유학생 계좌를 만들고 싶습니다. 학비 납부 용도입니다." },
         en: {

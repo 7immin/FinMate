@@ -55,7 +55,7 @@ export default function AccountOpeningPage() {
         <PrepCardStep
           documents={documents}
           branchName={branchName}
-          onVerifyAccount={() => router.push("/passport/verify/korean-account")}
+          onDone={() => router.push("/home")}
         />
       )}
     </AppShell>
