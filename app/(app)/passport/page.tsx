@@ -23,15 +23,21 @@ export default function PassportPage() {
   const levelOrder = LEVEL_ORDER.indexOf(passport.level) + 1;
   const isMature = passport.level === "S3" || passport.level === "S4";
   const nextLevelLabel = passport.level === "S4" ? null : LEVEL_ORDER[levelOrder];
+  const firstPending = passport.nextLevelChecklist.find((item) => !item.done);
 
   function handleCta() {
     if (isMature) {
       setViewingReport(true);
       return;
     }
-    const firstPending = passport.nextLevelChecklist.find((item) => !item.done);
     if (firstPending) toggleChecklistItem(firstPending.id);
   }
+
+  const ctaLabel = isMature
+    ? t(`passport.cta.${passport.level}`)
+    : firstPending
+      ? t(`passport.checklist.${firstPending.id}.cta`)
+      : t(`passport.checklist.${passport.nextLevelChecklist[0]?.id}.cta`);
 
   if (viewingReport) {
     return (
@@ -110,7 +116,7 @@ export default function PassportPage() {
 
         <Button onClick={handleCta} className="gap-2">
           {isMature && <Download className="h-4 w-4" />}
-          {t(`passport.cta.${passport.level}`)}
+          {ctaLabel}
         </Button>
       </div>
     </AppShell>
