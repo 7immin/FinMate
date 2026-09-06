@@ -11,6 +11,7 @@ import { ChecklistRow } from "@/components/ui/Checklist";
 import { PaymentHistoryChart } from "@/components/ui/PaymentHistoryChart";
 import { ReportView } from "@/components/flows/passport/ReportView";
 import { useAppState } from "@/lib/state/AppStateContext";
+import { isManualChecklistItem } from "@/lib/server/passport";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LEVEL_ORDER } from "@/lib/mock/passport-levels";
 
@@ -121,11 +122,24 @@ export default function PassportPage() {
             <Card className="divide-y divide-border">
               {passport.nextLevelChecklist.map((item) => (
                 <div key={item.id} className="first:pt-0 last:pb-0">
+                  {/* 사실에서 판정되는 항목은 누를 수 없다. 연체가 없으면
+                      "연체 정리"는 이미 끝나 있고, 목적 거래는 은행이
+                      승인해야 쌓인다 — 눌러서 켤 수 있으면 등급이 사실이
+                      아니라 자기 신고가 된다. */}
                   <ChecklistRow
                     status={item.done ? "done" : "pending"}
                     label={t(`passport.checklist.${item.id}.label`)}
-                    hint={tOpt(`passport.checklist.${item.id}.hint`)}
-                    onClick={() => toggleChecklistItem(item.id)}
+                    hint={
+                      isManualChecklistItem(item.id)
+                        ? tOpt(`passport.checklist.${item.id}.hint`)
+                        : (tOpt(`passport.checklist.${item.id}.hint`) ??
+                          t("passport.autoChecked"))
+                    }
+                    onClick={
+                      isManualChecklistItem(item.id)
+                        ? () => toggleChecklistItem(item.id)
+                        : undefined
+                    }
                   />
                 </div>
               ))}

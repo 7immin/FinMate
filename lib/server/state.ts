@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { AppState, ChecklistItem, PaymentRecord, PurposeCategory } from "@/lib/types";
+import { toPassportState } from "@/lib/server/passport";
 
 interface FetchResult {
   onboarded: boolean;
@@ -60,14 +61,17 @@ export async function fetchAppState(): Promise<FetchResult> {
       language: profile.language as AppState["profile"]["language"],
       notificationSettings: profile.notification_settings,
     },
-    passport: {
+    // 체크리스트는 저장된 값을 그대로 쓰지 않는다. "연체 정리"나 "목적
+    // 거래"는 사실에서 판정되는 항목이라, 읽을 때마다 다시 계산해야
+    // 연체가 새로 생기거나 승인이 취소됐을 때 되돌아간다(deriveChecklist).
+    passport: toPassportState({
       level: passport.level as AppState["passport"]["level"],
-      currentLimit: passport.current_limit,
-      nextLevelChecklist: passport.next_level_checklist,
-      paymentHistory: passport.payment_history,
-      purposeCounts: passport.purpose_counts ?? {},
-      verificationCode: passport.verification_code,
-    },
+      current_limit: passport.current_limit,
+      next_level_checklist: passport.next_level_checklist,
+      payment_history: passport.payment_history,
+      purpose_counts: passport.purpose_counts ?? {},
+      verification_code: passport.verification_code,
+    }),
     documents: {
       hasPassport: documents.has_passport as AppState["documents"]["hasPassport"],
       hasAlienRegistration: documents.has_alien_registration as AppState["documents"]["hasAlienRegistration"],

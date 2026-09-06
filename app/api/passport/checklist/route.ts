@@ -1,8 +1,20 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getPassportRow, savePassportRow, toPassportState } from "@/lib/server/passport";
-import { LEVEL_CONFIG, cloneChecklist, nextLevel } from "@/lib/mock/passport-levels";
+import {
+  applyLevelUpIfComplete,
+  getPassportRow,
+  isManualChecklistItem,
+  savePassportRow,
+  toPassportState,
+} from "@/lib/server/passport";
 
+/**
+ * 체크리스트 항목 표시.
+ *
+ * 수동 항목만 받는다. "연체 정리"나 "목적 거래"처럼 사실에서 판정되는
+ * 항목은 눌러서 켤 수 없다 — 켤 수 있게 두면 등급이 사실이 아니라 자기
+ * 신고가 되고, 은행에 내미는 금융여권이 아무것도 보증하지 못한다.
+ */
 export async function POST(request: Request) {
   const supabase = createClient();
   const {
@@ -11,29 +23,17 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const { itemId } = await request.json();
-  const row = await getPassportRow(supabase, user.id);
+  if (typeof itemId !== "string" || !isManualChecklistItem(itemId)) {
+    return NextResponse.json({ error: "not_manual" }, { status: 400 });
+  }
 
+  const row = await getPassportRow(supabase, user.id);
   const checklist = row.next_level_checklist.map((item) =>
     item.id === itemId ? { ...item, done: !item.done } : item
   );
-  const allDone = checklist.length > 0 && checklist.every((item) => item.done);
 
-  let updated;
-  if (!allDone) {
-    updated = await savePassportRow(supabase, user.id, { next_level_checklist: checklist });
-  } else {
-    const upgraded = nextLevel(row.level);
-    if (!upgraded) {
-      updated = await savePassportRow(supabase, user.id, { next_level_checklist: checklist });
-    } else {
-      const config = LEVEL_CONFIG[upgraded];
-      updated = await savePassportRow(supabase, user.id, {
-        level: upgraded,
-        current_limit: config.limit,
-        next_level_checklist: cloneChecklist(upgraded),
-      });
-    }
-  }
+  const saved = await savePassportRow(supabase, user.id, { next_level_checklist: checklist });
+  const updated = await applyLevelUpIfComplete(supabase, user.id, saved);
 
   return NextResponse.json({ passport: toPassportState(updated) });
 }

@@ -16,7 +16,7 @@ type Step = "upload" | "verifying" | "verify" | "protection" | "success";
 
 export default function DepositPage() {
   const router = useRouter();
-  const { recordPurposeTransaction, requestLimit } = useAppState();
+  const { requestLimit } = useAppState();
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>("upload");
   const [contract, setContract] = useState<LeaseContract>(LEASE_CONTRACT);
@@ -49,7 +49,6 @@ export default function DepositPage() {
     // 계약서로 임대인 계좌가 확인됐으니 보증금만큼 한도를 요청한다.
     // 학비와 같은 이유로, 여는 것은 은행이다.
     requestLimit(contract.deposit, "deposit", "lease-contract");
-    recordPurposeTransaction("deposit");
     setStep("success");
   }
 

@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { createAdminClient, isBankAccessCodeValid, isBankConsoleConfigured } from "@/lib/supabase/admin";
-import { getPassportRow, savePassportRow } from "@/lib/server/passport";
+import {
+  applyLevelUpIfComplete,
+  getPassportRow,
+  savePassportRow,
+} from "@/lib/server/passport";
+import { PurposeCategory } from "@/lib/types";
 
 export interface LimitRequestRow {
   id: string;
@@ -117,9 +122,23 @@ export async function POST(request: Request) {
 
   if (decision === "approved") {
     const row = await getPassportRow(admin, existing.user_id);
-    await savePassportRow(admin, existing.user_id, {
+    const now = new Date();
+    const month = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    // 승인은 세 가지를 한꺼번에 일으킨다: 한도가 열리고, 목적 거래 한 건이
+    // 쌓이고, 그 결과로 등급 조건이 채워지면 등급이 오른다. 예전에는 학생이
+    // 흐름을 끝내는 순간 스스로 기록했는데, 그러면 은행이 거절한 건까지
+    // 실적으로 남는다.
+    const purposeCounts = { ...(row.purpose_counts ?? {}) };
+    const purpose = existing.purpose as PurposeCategory;
+    purposeCounts[purpose] = (purposeCounts[purpose] ?? 0) + 1;
+
+    const saved = await savePassportRow(admin, existing.user_id, {
       current_limit: row.current_limit + existing.amount,
+      purpose_counts: purposeCounts,
+      payment_history: [...row.payment_history, { month, onTime: true }],
     });
+    await applyLevelUpIfComplete(admin, existing.user_id, saved);
   }
 
   const { error } = await admin
