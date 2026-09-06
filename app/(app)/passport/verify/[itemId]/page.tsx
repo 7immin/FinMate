@@ -40,7 +40,7 @@ type Status = "idle" | "submitting" | "success" | "failure";
 export default function PassportVerifyPage() {
   const params = useParams<{ itemId: string }>();
   const router = useRouter();
-  const { setPassportState } = useAppState();
+  const { setPassportState, setDocumentsState } = useAppState();
   const { t } = useTranslation();
 
   const itemId = params.itemId;
@@ -65,6 +65,7 @@ export default function PassportVerifyPage() {
       setResult(res.result);
       if (res.ok && res.passport) {
         setPassportState(res.passport);
+        if (res.documents) setDocumentsState(res.documents);
         setStatus("success");
       } else {
         setStatus("failure");
