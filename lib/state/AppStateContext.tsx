@@ -26,6 +26,9 @@ interface AppStateContextValue {
     evidencePath?: string | null
   ) => void;
   pendingRequests: PendingRequest[];
+  /** DB에서 처음 불러오기 전이면 false. 목록이 비어 있는 것과 구분해야
+   *  "아직 모른다"를 "0건"으로 잘못 단언하지 않는다. */
+  pendingRequestsLoaded: boolean;
   setLanguage: (language: Language) => void;
   setNotificationSettings: (settings: NotificationSettings) => void;
   markNotificationsRead: () => void;
@@ -38,6 +41,7 @@ export interface PendingRequest {
   amount: number;
   purpose: PurposeCategory;
   status: "pending" | "approved" | "rejected";
+  createdAt: string;
 }
 
 const AppStateContext = createContext<AppStateContextValue | null>(null);
@@ -89,6 +93,7 @@ export function AppStateProvider({
   // 한 번이면 "승인 대기" 줄이 통째로 사라졌다 — 사용자는 요청이 없어진
   // 줄 안다. DB에서 읽어 오고, 승인·거절 결과까지 함께 보여준다.
   const [pending, setPending] = useState<PendingRequest[]>([]);
+  const [pendingLoaded, setPendingLoaded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -97,16 +102,28 @@ export function AppStateProvider({
       .then((data) => {
         if (cancelled || !data?.requests) return;
         setPending(
-          data.requests.map((r: { id: string; amount: number; purpose: PurposeCategory; status: PendingRequest["status"] }) => ({
-            id: r.id,
-            amount: r.amount,
-            purpose: r.purpose,
-            status: r.status,
-          }))
+          data.requests.map(
+            (r: {
+              id: string;
+              amount: number;
+              purpose: PurposeCategory;
+              status: PendingRequest["status"];
+              created_at: string;
+            }) => ({
+              id: r.id,
+              amount: r.amount,
+              purpose: r.purpose,
+              status: r.status,
+              createdAt: r.created_at,
+            })
+          )
         );
       })
       .catch(() => {
         // 못 읽으면 빈 목록으로 둔다. 요청 자체는 서버에 남아 있다.
+      })
+      .finally(() => {
+        if (!cancelled) setPendingLoaded(true);
       });
     return () => {
       cancelled = true;
@@ -155,6 +172,7 @@ export function AppStateProvider({
     () => ({
       state,
       pendingRequests: pending,
+      pendingRequestsLoaded: pendingLoaded,
       setDocumentFlag: (key, docValue) => {
         setState((prev) => ({ ...prev, documents: { ...prev.documents, [key]: docValue } }));
         postJson<{ documents: DocumentFlags }>("/api/documents", { [key]: docValue }).then(
@@ -206,6 +224,7 @@ export function AppStateProvider({
           amount,
           purpose,
           status: "pending",
+          createdAt: new Date().toISOString(),
         };
         setPending((prev) => [optimistic, ...prev]);
         postJson<{ request: { id: string } }>("/api/passport/unlock", {
@@ -249,7 +268,7 @@ export function AppStateProvider({
         await supabase.auth.signOut();
       },
     }),
-    [state, pending]
+    [state, pending, pendingLoaded]
   );
 
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;

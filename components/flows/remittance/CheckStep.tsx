@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { TopBar } from "@/components/layout/TopBar";
 import { Badge } from "@/components/ui/Badge";
@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { ChecklistRow } from "@/components/ui/Checklist";
+import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 
 
@@ -23,30 +24,22 @@ export function CheckStep({
   onProceed: () => void;
 }) {
   const { t } = useTranslation();
-  // 이번 달에 올린 요청 수. 못 읽으면 줄 자체를 그리지 않는다 —
-  // 모르는 값을 0으로 채우면 "처음 보내는 것"이라고 단언하는 셈이다.
-  const [thisMonthCount, setThisMonthCount] = useState<number | null>(null);
+  const { pendingRequests, pendingRequestsLoaded } = useAppState();
+  const [nameChecked, setNameChecked] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/limit-requests")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (cancelled || !data?.requests) return;
-        const now = new Date();
-        const count = data.requests.filter((req: { created_at: string }) => {
-          const at = new Date(req.created_at);
-          return at.getFullYear() === now.getFullYear() && at.getMonth() === now.getMonth();
-        }).length;
-        setThisMonthCount(count);
-      })
-      .catch(() => {
-        // 조회 실패는 화면을 막지 않는다. 그 줄만 빠진다.
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // 이번 달에 올린 요청 수. 앱이 뜰 때 이미 한 번 불러온 목록을 그대로
+  // 쓴다 -- 이 화면에서 따로 또 불러오면 그 왕복이 끝날 때까지 몇 초간
+  // 줄이 비어 있다가 뒤늦게 나타난다. 못 불러왔으면(null) 줄 자체를
+  // 그리지 않는다 -- 모르는 값을 0으로 채우면 "처음 보내는 것"이라고
+  // 단언하는 셈이다.
+  const thisMonthCount = useMemo(() => {
+    if (!pendingRequestsLoaded) return null;
+    const now = new Date();
+    return pendingRequests.filter((req) => {
+      const at = new Date(req.createdAt);
+      return at.getFullYear() === now.getFullYear() && at.getMonth() === now.getMonth();
+    }).length;
+  }, [pendingRequests, pendingRequestsLoaded]);
 
   const shortfall = Math.max(0, amount - openLimit);
   const sufficient = shortfall === 0;
@@ -99,7 +92,11 @@ export function CheckStep({
         <div>
           <p className="mb-2 text-sm font-medium text-foreground-muted">{t("remittance.check.riskTitle")}</p>
           <Card className="divide-y divide-border">
-            <ChecklistRow status="active" label={t("remittance.risk.nameSelfCheck")} />
+            <ChecklistRow
+              status={nameChecked ? "done" : "active"}
+              label={t("remittance.risk.nameSelfCheck")}
+              onClick={() => setNameChecked((prev) => !prev)}
+            />
             {thisMonthCount !== null && (
               <ChecklistRow
                 status={thisMonthCount >= 3 ? "warning" : "done"}
