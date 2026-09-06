@@ -61,7 +61,7 @@ function AiPageContent() {
   }
 
   return (
-    <AppShell className="flex flex-col">
+    <AppShell showNav className="flex flex-col">
       <TopBar title={t("ai.topBarTitle")} />
 
       <div className="flex-1 space-y-4 overflow-y-auto px-5 py-4">

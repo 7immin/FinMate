@@ -20,6 +20,7 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 import { PROOF_OPTIONS, ProofOption } from "@/lib/mock/remittance";
 import { checkProofDocument, ProofCheckResult } from "@/lib/ocr/client";
 import { cn } from "@/lib/utils/cn";
+import { uploadEvidence } from "@/lib/evidence/upload";
 
 const ICONS: Record<ProofOption["id"], typeof FileText> = {
   employment: FileText,
@@ -30,7 +31,7 @@ const ICONS: Record<ProofOption["id"], typeof FileText> = {
 export function UnlockStep({
   onUnlocked,
 }: {
-  onUnlocked: (option: ProofOption, fileName: string) => void;
+  onUnlocked: (option: ProofOption, fileName: string, evidencePath: string | null) => void;
 }) {
   const { t } = useTranslation();
   const [selected, setSelected] = useState(PROOF_OPTIONS[0].id);
@@ -43,6 +44,7 @@ export function UnlockStep({
   const [check, setCheck] = useState<ProofCheckResult | null>(null);
   const [checking, setChecking] = useState(false);
   const [checkFailed, setCheckFailed] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   async function pickFile(picked: File) {
     setFile(picked);
@@ -192,9 +194,18 @@ export function UnlockStep({
         )}
 
         <Button
-          onClick={() => file && onUnlocked(current, file.name)}
-          disabled={!file || checking || mismatch}
+          onClick={async () => {
+            if (!file || submitting) return;
+            setSubmitting(true);
+            // 서류를 먼저 올리고 그 경로를 요청에 붙인다. 올리지 못해도
+            // 요청은 막지 않는다 — 파일명은 여전히 담당자에게 가고,
+            // 창구에서 원본을 보여줄 수 있다.
+            const path = await uploadEvidence(file);
+            onUnlocked(current, file.name, path);
+          }}
+          disabled={!file || checking || mismatch || submitting}
         >
+          {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
           {t(`remittance.proof.${current.id}.cta`)}
         </Button>
         {!file && (

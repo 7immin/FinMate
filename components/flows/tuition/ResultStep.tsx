@@ -53,7 +53,12 @@ export function ResultStep({
             label={t("tuition.result.dueLabel")}
             value={`${invoice.dueDate} ${computeDDay(invoice.dueDate)}`}
           />
-          <InfoRow label={t("tuition.result.recipientLabel")} value={tShared("school", invoice.recipient)} />
+          {/* 고지서에서 읽어 낸 기관을 보여준다. 못 읽었을 때만 프로필의
+              학교로 떨어진다 — 돈이 어디로 가는지를 우리가 지어내면 안 된다. */}
+          <InfoRow
+            label={t("tuition.result.recipientLabel")}
+            value={invoice.institutionName ?? tShared("school", invoice.recipient)}
+          />
           <InfoRow label={t("tuition.result.accountLabel")} value={invoice.virtualAccount} />
         </Card>
 

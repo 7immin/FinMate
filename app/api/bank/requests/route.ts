@@ -7,6 +7,15 @@ import {
 } from "@/lib/server/passport";
 import { PurposeCategory } from "@/lib/types";
 
+/**
+ * 서명 URL 유효기간.
+ *
+ * 창구에서 한 건을 검토하는 동안이면 충분하고, 그 뒤에는 링크가 죽어야
+ * 한다. 길게 잡으면 브라우저 기록이나 복사된 주소로 남의 근로계약서가
+ * 계속 열린다.
+ */
+const EVIDENCE_URL_TTL_SECONDS = 300;
+
 export interface LimitRequestRow {
   id: string;
   user_id: string;
@@ -16,6 +25,7 @@ export interface LimitRequestRow {
   status: "pending" | "approved" | "rejected";
   created_at: string;
   decided_at: string | null;
+  evidence_path: string | null;
 }
 
 /** 담당자가 보는 한 줄. 학생 이름과 등급을 함께 붙여야 판단이 된다. */
@@ -25,6 +35,8 @@ export interface BankRequestView extends LimitRequestRow {
   school: string;
   level: string;
   currentLimit: number;
+  /** 서류를 열 수 있는 임시 주소. 올라온 파일이 없으면 null. */
+  evidenceUrl: string | null;
 }
 
 /**
@@ -68,6 +80,20 @@ export async function GET(request: Request) {
   const profileBy = new Map((profiles ?? []).map((p) => [p.user_id, p]));
   const passportBy = new Map((passports ?? []).map((p) => [p.user_id, p]));
 
+  // 서류는 비공개 버킷에 있다. 담당자에게는 이 앱의 계정이 없으므로
+  // 서비스 롤로 짧은 유효기간의 서명 URL을 만들어 넘긴다. 영구 주소를
+  // 주면 그 링크가 어디로든 돌아다닐 수 있다.
+  const signedUrls = new Map<string, string>();
+  const paths = rows.map((row) => row.evidence_path).filter((p): p is string => Boolean(p));
+  if (paths.length > 0) {
+    const { data: signed } = await admin.storage
+      .from("limit-evidence")
+      .createSignedUrls(paths, EVIDENCE_URL_TTL_SECONDS);
+    for (const item of signed ?? []) {
+      if (item.path && item.signedUrl) signedUrls.set(item.path, item.signedUrl);
+    }
+  }
+
   const requests: BankRequestView[] = rows.map((row) => ({
     ...row,
     studentName: profileBy.get(row.user_id)?.name ?? "-",
@@ -75,6 +101,7 @@ export async function GET(request: Request) {
     school: profileBy.get(row.user_id)?.school ?? "-",
     level: passportBy.get(row.user_id)?.level ?? "-",
     currentLimit: passportBy.get(row.user_id)?.current_limit ?? 0,
+    evidenceUrl: row.evidence_path ? (signedUrls.get(row.evidence_path) ?? null) : null,
   }));
 
   return NextResponse.json({ requests });

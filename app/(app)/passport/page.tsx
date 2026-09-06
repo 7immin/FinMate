@@ -16,8 +16,6 @@ import { isManualChecklistItem, isDocumentVerifiedItem } from "@/lib/server/pass
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LEVEL_ORDER } from "@/lib/mock/passport-levels";
 
-const TRANSACTION_ITEMS = ["first-purpose-tx", "purpose-tx-2"];
-
 export default function PassportPage() {
   const router = useRouter();
   const { state, toggleChecklistItem, pendingRequests } = useAppState();
@@ -29,11 +27,6 @@ export default function PassportPage() {
   const isMature = passport.level === "S3" || passport.level === "S4";
   const nextLevelLabel = passport.level === "S4" ? null : LEVEL_ORDER[levelOrder];
   const firstPending = passport.nextLevelChecklist.find((item) => !item.done);
-  const isAutoPending = Boolean(
-    firstPending &&
-      !isManualChecklistItem(firstPending.id) &&
-      !isDocumentVerifiedItem(firstPending.id)
-  );
 
   const accountActiveDays = passport.accountLinkedAt
     ? Math.max(0, Math.floor((Date.now() - new Date(passport.accountLinkedAt).getTime()) / 86400000))
@@ -60,34 +53,35 @@ export default function PassportPage() {
     return undefined;
   }
 
-  function autoPendingCardText(itemId: string) {
-    if (itemId === "account-active") {
-      return t("passport.accountActiveHint", { days: Math.min(accountActiveDays, 30) });
-    }
-    if (TRANSACTION_ITEMS.includes(itemId)) {
-      return t("passport.transactionHint");
-    }
-    return t("passport.autoChecked");
-  }
-
   function handleCta() {
     if (isMature) {
       setViewingReport(true);
       return;
     }
-    if (!firstPending || isAutoPending) return;
+    if (!firstPending) return;
     if (isDocumentVerifiedItem(firstPending.id)) {
       router.push(`/passport/verify/${firstPending.id}`);
-    } else if (isManualChecklistItem(firstPending.id)) {
-      toggleChecklistItem(firstPending.id);
+      return;
     }
+    if (isManualChecklistItem(firstPending.id)) {
+      toggleChecklistItem(firstPending.id);
+      return;
+    }
+    if (firstPending.id.includes("purpose-tx")) router.push("/home");
   }
 
   const ctaLabel = isMature
     ? t(`passport.cta.${passport.level}`)
-    : firstPending
-      ? t(`passport.checklist.${firstPending.id}.cta`)
-      : t(`passport.checklist.${passport.nextLevelChecklist[0]?.id}.cta`);
+    : firstPending?.id === "account-active"
+      ? t("passport.accountActiveHint", { days: Math.min(accountActiveDays, 30) })
+      : firstPending
+        ? t(`passport.checklist.${firstPending.id}.cta`)
+        : t(`passport.checklist.${passport.nextLevelChecklist[0]?.id}.cta`);
+
+  const ctaDisabled =
+    !isMature &&
+    firstPending !== undefined &&
+    (firstPending.id === "overdue-clear" || firstPending.id === "account-active");
 
   if (viewingReport) {
     return (
@@ -188,16 +182,10 @@ export default function PassportPage() {
           {t("passport.disclaimer")}
         </Card>
 
-        {isAutoPending && firstPending ? (
-          <Card className="text-center text-sm text-foreground-muted">
-            {autoPendingCardText(firstPending.id)}
-          </Card>
-        ) : (
-          <Button onClick={handleCta} className="gap-2">
-            {isMature && <Download className="h-4 w-4" />}
-            {ctaLabel}
-          </Button>
-        )}
+        <Button onClick={handleCta} disabled={ctaDisabled} className="gap-2">
+          {isMature && <Download className="h-4 w-4" />}
+          {ctaLabel}
+        </Button>
       </div>
     </AppShell>
   );

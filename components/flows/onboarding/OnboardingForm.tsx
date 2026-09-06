@@ -10,6 +10,8 @@ import { ProgressBar } from "@/components/ui/ProgressBar";
 import { translate, translateShared, LANGUAGE_NATIVE_NAME } from "@/lib/i18n";
 import { Language, NationalityId, SchoolId } from "@/lib/types";
 import { COUNTRY_CODES } from "@/lib/data/countries";
+import { CountrySearchSheet } from "@/components/ui/CountrySearchSheet";
+import { ChevronDown } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 
 const LANGUAGES: Language[] = ["ko", "en", "zh", "vi"];
@@ -29,6 +31,7 @@ export function OnboardingForm() {
   const [school, setSchool] = useState<SchoolId | "">("");
   const [arrivalLabel, setArrivalLabel] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [countrySheetOpen, setCountrySheetOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Sorted by localized name so the list reads alphabetically in whichever
@@ -125,21 +128,19 @@ export function OnboardingForm() {
           />
         </Field>
 
+        {/* 나라가 250개라 <select>로는 자기 나라를 찾을 수 없다. 눌러서
+            검색하는 시트로 바꾼다(CountrySearchSheet 주석 참고). */}
         <Field label={t("onboarding.fieldNationality")}>
-          <select
-            value={nationality}
-            onChange={(e) => setNationality(e.target.value)}
-            className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-foreground outline-none focus:border-primary"
+          <button
+            type="button"
+            onClick={() => setCountrySheetOpen(true)}
+            className="flex h-12 w-full items-center justify-between rounded-xl border border-border bg-surface px-4 text-left text-[15px] outline-none focus:border-primary"
           >
-            <option value="" disabled>
-              {t("onboarding.selectPlaceholder")}
-            </option>
-            {sortedCountries.map((code) => (
-              <option key={code} value={code}>
-                {tShared("country", code)}
-              </option>
-            ))}
-          </select>
+            <span className={nationality ? "text-foreground" : "text-foreground-muted"}>
+              {nationality ? tShared("country", nationality) : t("onboarding.selectPlaceholder")}
+            </span>
+            <ChevronDown className="h-4 w-4 shrink-0 text-foreground-muted" />
+          </button>
         </Field>
 
         <Field label={t("onboarding.fieldVisa")}>
@@ -197,6 +198,15 @@ export function OnboardingForm() {
       <Button onClick={handleSubmit} disabled={submitting} className="mt-2">
         {submitting ? "…" : t("onboarding.next")}
       </Button>
+
+      <CountrySearchSheet
+        open={countrySheetOpen}
+        onClose={() => setCountrySheetOpen(false)}
+        codes={sortedCountries}
+        value={nationality || undefined}
+        onSelect={setNationality}
+        title={t("onboarding.fieldNationality")}
+      />
     </AppShell>
   );
 }

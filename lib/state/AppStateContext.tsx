@@ -17,7 +17,12 @@ interface AppStateContextValue {
   setDocumentFlag: (key: keyof DocumentFlags, value: "yes" | "no" | "unknown") => void;
   toggleChecklistItem: (id: string) => void;
   setPassportState: (passport: FinancialPassport) => void;
-  requestLimit: (amount: number, purpose: PurposeCategory, evidence?: string) => void;
+  requestLimit: (
+    amount: number,
+    purpose: PurposeCategory,
+    evidence?: string,
+    evidencePath?: string | null
+  ) => void;
   pendingRequests: PendingRequest[];
   setLanguage: (language: Language) => void;
   setNotificationSettings: (settings: NotificationSettings) => void;
@@ -91,12 +96,21 @@ export function AppStateProvider({
           }
         );
       },
+      /**
+       * 체크리스트 항목 표시.
+       *
+       * 서버가 거절하면 되돌린다. 예전에는 낙관적으로 켜 두기만 하고
+       * 실패를 무시해서, 서버가 "사실에서 판정되는 항목이라 못 켠다"고
+       * 400을 돌려줘도 화면에는 켜진 채로 남았다 — 새로고침하면 풀리는
+       * 체크가 등급이 오른 것처럼 보였다.
+       */
       toggleChecklistItem: (id) => {
+        const before = state.passport;
         setState((prev) => ({ ...prev, passport: computeToggledPassport(prev.passport, id) }));
         postJson<{ passport: FinancialPassport }>("/api/passport/checklist", {
           itemId: id,
         }).then((data) => {
-          if (data) setState((prev) => ({ ...prev, passport: data.passport }));
+          setState((prev) => ({ ...prev, passport: data ? data.passport : before }));
         });
       },
       // /api/passport/verify already did the real work (OCR + marking the
@@ -113,7 +127,7 @@ export function AppStateProvider({
        * 창구에 가서야 아직 안 열렸다는 것을 알게 된다 — 그 순간이 이
        * 제품이 없애려던 바로 그 순간이다.
        */
-      requestLimit: (amount, purpose, evidence) => {
+      requestLimit: (amount, purpose, evidence, evidencePath) => {
         const optimistic: PendingRequest = {
           id: `local-${Date.now()}`,
           amount,
@@ -125,6 +139,7 @@ export function AppStateProvider({
           amount,
           purpose,
           evidence,
+          evidencePath,
         }).then((data) => {
           if (!data) return;
           setPending((prev) =>

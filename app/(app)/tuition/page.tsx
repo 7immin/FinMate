@@ -12,6 +12,7 @@ import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { TUITION_INVOICE, TuitionInvoice } from "@/lib/mock/tuition";
 import { readTuitionInvoice, TuitionOcrResult } from "@/lib/ocr/client";
+import { uploadEvidence } from "@/lib/evidence/upload";
 
 type Step = "upload" | "scanning" | "result" | "edit" | "success";
 
@@ -26,16 +27,14 @@ export default function TuitionPage() {
   }));
   const [ocrFailed, setOcrFailed] = useState(false);
   const ocrPromiseRef = useRef<Promise<TuitionOcrResult | null>>(Promise.resolve(null));
+  // 판독에 쓴 고지서 원본. 한도 요청의 증빙으로 그대로 올라간다.
+  const fileRef = useRef<File | null>(null);
 
   function handleFileUploaded(file: File) {
+    fileRef.current = file;
     ocrPromiseRef.current = readTuitionInvoice(file).catch(() => {
       throw new Error("ocr_failed");
     });
-    setStep("scanning");
-  }
-
-  function handleMockSourceSelected() {
-    ocrPromiseRef.current = Promise.resolve(null);
     setStep("scanning");
   }
 
@@ -53,6 +52,7 @@ export default function TuitionPage() {
         setInvoice((prev) => ({
           ...prev,
           title: result.title || prev.title,
+          institutionName: result.institution?.trim() || null,
           amount: result.amount || prev.amount,
           dueDate: result.dueDate || prev.dueDate,
           virtualAccount: result.virtualAccount || prev.virtualAccount,
@@ -65,20 +65,27 @@ export default function TuitionPage() {
     setStep("result");
   }
 
-  function handleConfirm() {
+  async function handleConfirm() {
     // 고지서로 목적이 확인됐으니 그 금액만큼 한도를 열어 달라고 요청한다.
     // 여는 것은 은행이다 — 여기서 한도를 올려 버리면 화면에서만 열리고
     // 정작 은행 앱에서는 막혀 있어, 사용자가 마감 당일에야 그 사실을 안다.
-    requestLimit(invoice.amount, "tuition", "tuition-invoice");
     setStep("success");
+    const file = fileRef.current;
+    const path = file ? await uploadEvidence(file) : null;
+    requestLimit(
+      invoice.amount,
+      "tuition",
+      file ? `tuition-invoice · ${file.name}` : "tuition-invoice",
+      path
+    );
   }
 
   return (
     <AppShell className="flex flex-col">
       {step === "upload" && (
-        <UploadStep onFileUploaded={handleFileUploaded} onMockSourceSelected={handleMockSourceSelected} />
+        <UploadStep onFileUploaded={handleFileUploaded} />
       )}
-      {step === "scanning" && <ScanningStep school={invoice.recipient} onComplete={handleScanComplete} />}
+      {step === "scanning" && <ScanningStep onComplete={handleScanComplete} />}
       {step === "result" && (
         <ResultStep
           invoice={invoice}
@@ -103,7 +110,7 @@ export default function TuitionPage() {
           topBarTitle={t("tuition.topBarTitle")}
           title={t("tuition.success.title")}
           description={t("tuition.success.description", {
-            recipient: tShared("school", invoice.recipient),
+            recipient: invoice.institutionName ?? tShared("school", invoice.recipient),
             amount: invoice.amount.toLocaleString(),
           })}
           onDone={() => router.push("/home")}

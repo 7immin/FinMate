@@ -6,15 +6,20 @@ const SCHEMA = {
   type: "object",
   properties: {
     title: { type: "string", description: "고지서 제목 (예: 2026학년도 2학기 등록금)" },
+    institution: {
+      type: "string",
+      description: "고지서를 발급한 학교 이름. 문서에 적힌 그대로 (예: 한양대학교). 없으면 빈 문자열.",
+    },
     amount: { type: "number", description: "납부해야 할 총 금액, 원(KRW) 단위 숫자만" },
     dueDate: { type: "string", description: "납부 기한, 'YYYY.MM.DD' 형식" },
     virtualAccount: { type: "string", description: "입금 전용 가상계좌 번호" },
   },
-  required: ["title", "amount", "dueDate", "virtualAccount"],
+  required: ["title", "institution", "amount", "dueDate", "virtualAccount"],
 };
 
 const PROMPT = `이 이미지 또는 PDF는 한국 대학교의 등록금 고지서입니다. 다음 정보를 정확히 추출하세요:
 - 고지서 제목
+- 발급한 학교 이름 (문서에 적힌 그대로)
 - 납부해야 할 총 금액 (숫자만, 원 단위)
 - 납부 기한 (YYYY.MM.DD 형식)
 - 입금 전용 가상계좌 번호

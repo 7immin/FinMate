@@ -6,10 +6,17 @@ import { TopBar } from "@/components/layout/TopBar";
 import { ChecklistRow } from "@/components/ui/Checklist";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { SCANNING_STEP_IDS } from "@/lib/mock/tuition";
-import { SchoolId } from "@/lib/types";
 
-export function ScanningStep({ school, onComplete }: { school: SchoolId; onComplete: () => void }) {
-  const { t, tShared } = useTranslation();
+/**
+ * 판독 중 화면.
+ *
+ * 학교 이름을 띄우지 않는다. 이 시점에는 아직 고지서를 안 읽었으므로
+ * 여기 쓸 수 있는 이름은 프로필에 등록된 학교뿐인데, 한양대 고지서를
+ * 올린 사람에게 "고려대학교 확인"이라고 말하게 된다. 읽고 나서 결과
+ * 화면에서 실제로 읽어 낸 기관을 보여준다.
+ */
+export function ScanningStep({ onComplete }: { onComplete: () => void }) {
+  const { t } = useTranslation();
   const [doneCount, setDoneCount] = useState(0);
 
   useEffect(() => {
@@ -41,7 +48,7 @@ export function ScanningStep({ school, onComplete }: { school: SchoolId; onCompl
             <ChecklistRow
               key={id}
               status={idx < doneCount ? "done" : idx === doneCount ? "active" : "pending"}
-              label={t(`tuition.scanning.steps.${id}`, { school: tShared("school", school) })}
+              label={t(`tuition.scanning.steps.${id}`)}
             />
           ))}
         </div>

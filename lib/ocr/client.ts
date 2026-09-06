@@ -34,6 +34,8 @@ async function callOcrRoute<T>(endpoint: string, file: File): Promise<T> {
 
 export interface TuitionOcrResult {
   title: string;
+  /** 고지서에 적힌 발급 학교 이름. 못 읽었으면 빈 문자열. */
+  institution: string;
   amount: number;
   dueDate: string;
   virtualAccount: string;

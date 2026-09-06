@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const { amount, purpose, evidence } = await request.json();
+  const { amount, purpose, evidence, evidencePath } = await request.json();
   if (typeof amount !== "number" || amount <= 0) {
     return NextResponse.json({ error: "invalid amount" }, { status: 400 });
   }
@@ -34,6 +34,12 @@ export async function POST(request: Request) {
       purpose: PURPOSES.includes(purpose) ? purpose : "remittance",
       amount,
       evidence: typeof evidence === "string" ? evidence.slice(0, 200) : null,
+      // Storage에 올라간 파일의 경로. 담당자가 서명 URL로 열어 본다.
+      // 업로드가 실패했으면 null이고, 그 사실을 담당자 화면이 밝힌다.
+      evidence_path:
+        typeof evidencePath === "string" && evidencePath.startsWith(`${user.id}/`)
+          ? evidencePath
+          : null,
     })
     .select()
     .single();
