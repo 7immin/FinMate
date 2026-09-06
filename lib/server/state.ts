@@ -1,10 +1,28 @@
 import { createClient } from "@/lib/supabase/server";
-import { AppState, ChecklistItem, PaymentRecord, PurposeCategory } from "@/lib/types";
+import { AppNotification, AppState, ChecklistItem, PaymentRecord, PurposeCategory } from "@/lib/types";
 import { applyLevelUpIfComplete, PassportRow, toPassportState } from "@/lib/server/passport";
 
 interface FetchResult {
   onboarded: boolean;
   state: AppState | null;
+}
+
+interface NotificationRow {
+  id: string;
+  type: string;
+  payload: Record<string, unknown>;
+  read_at: string | null;
+  created_at: string;
+}
+
+function toNotification(row: NotificationRow): AppNotification {
+  return {
+    id: row.id,
+    type: row.type as AppNotification["type"],
+    payload: row.payload,
+    readAt: row.read_at,
+    createdAt: row.created_at,
+  };
 }
 
 interface FullStateRow {
@@ -51,13 +69,22 @@ export async function fetchAppState(): Promise<FetchResult> {
 
   const { profile, documents } = data;
 
-  // A count-only query (head: true) never transfers row data, so this stays
-  // cheap even as the notification history grows.
-  const { count: unreadNotificationCount } = await supabase
-    .from("notifications")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", data.passport.user_id)
-    .is("read_at", null);
+  // 알림 화면을 열 때 다시 불러오지 않도록 최근 알림 목록도 앱이 뜰 때
+  // 같이 실어 둔다 -- 배지 개수는 count-only 쿼리(head: true)로 따로
+  // 세서, 안 읽은 알림이 이 목록의 30건보다 많아도 정확하다.
+  const [{ count: unreadNotificationCount }, { data: notificationRows }] = await Promise.all([
+    supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", data.passport.user_id)
+      .is("read_at", null),
+    supabase
+      .from("notifications")
+      .select("id, type, payload, read_at, created_at")
+      .eq("user_id", data.passport.user_id)
+      .order("created_at", { ascending: false })
+      .limit(30),
+  ]);
 
   // 은행 승인이 다른 요청 안에서 이미 캐스케이드를 돌리지만, 레이아웃
   // 마운트는 그 요청을 거치지 않고 RPC에서 바로 읽으므로 여기서도 한 번
@@ -89,6 +116,7 @@ export async function fetchAppState(): Promise<FetchResult> {
       hasKoreanPhone: documents.has_korean_phone as AppState["documents"]["hasKoreanPhone"],
     },
     unreadNotificationCount: unreadNotificationCount ?? 0,
+    notifications: ((notificationRows ?? []) as NotificationRow[]).map(toNotification),
   };
 
   return { onboarded: true, state };

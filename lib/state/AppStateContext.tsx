@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 import {
+  AppNotification,
   AppState,
   DocumentFlags,
   FinancialPassport,
@@ -178,8 +179,26 @@ export function AppStateProvider({
           table: "notifications",
           filter: `user_id=eq.${state.userId}`,
         },
-        () => {
-          setState((prev) => ({ ...prev, unreadNotificationCount: prev.unreadNotificationCount + 1 }));
+        (payload) => {
+          const row = payload.new as {
+            id: string;
+            type: AppNotification["type"];
+            payload: AppNotification["payload"];
+            read_at: string | null;
+            created_at: string;
+          };
+          const notification: AppNotification = {
+            id: row.id,
+            type: row.type,
+            payload: row.payload,
+            readAt: row.read_at,
+            createdAt: row.created_at,
+          };
+          setState((prev) => ({
+            ...prev,
+            unreadNotificationCount: prev.unreadNotificationCount + 1,
+            notifications: [notification, ...prev.notifications],
+          }));
         }
       )
       // 금융여권 화면의 "승인 대기" 줄은 pendingRequests(이 컴포넌트가 따로

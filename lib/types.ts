@@ -69,6 +69,9 @@ export interface AppState {
   passport: FinancialPassport;
   documents: DocumentFlags;
   unreadNotificationCount: number;
+  /** 최근 알림 30건. 알림 화면을 열 때 다시 불러오지 않도록 앱이 뜰 때
+   *  같이 실어 둔다. */
+  notifications: AppNotification[];
 }
 
 export type NotificationType = "limit_approved";
