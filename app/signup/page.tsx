@@ -89,6 +89,12 @@ export default function SignupPage() {
           로그인
         </Link>
       </p>
+      <Link
+        href="/"
+        className="mt-4 block text-center text-sm font-medium text-foreground-muted hover:text-foreground"
+      >
+        비회원으로 이용하기
+      </Link>
     </AppShell>
   );
 }
