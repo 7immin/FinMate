@@ -20,6 +20,12 @@ export type NationalityId =
 
 export type SchoolId = "hanyang" | "snu" | "yonsei" | "korea" | "skk";
 
+export interface NotificationSettings {
+  paymentDue: boolean;
+  passportLevel: boolean;
+  marketing: boolean;
+}
+
 export interface UserProfile {
   name: string;
   nationality: NationalityId;
@@ -28,6 +34,18 @@ export interface UserProfile {
   school: SchoolId;
   arrivalLabel: string;
   language: Language;
+  notificationSettings: NotificationSettings;
+}
+
+export type SupportInquiryCategory = "bug" | "usage" | "other";
+export type SupportInquiryStatus = "received" | "answered";
+
+export interface SupportInquiry {
+  id: string;
+  category: SupportInquiryCategory;
+  message: string;
+  status: SupportInquiryStatus;
+  createdAt: string;
 }
 
 export interface PaymentRecord {

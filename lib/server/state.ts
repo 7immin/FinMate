@@ -15,6 +15,11 @@ interface FullStateRow {
     school: string;
     arrival_label: string;
     language: string;
+    notification_settings: {
+      paymentDue: boolean;
+      passportLevel: boolean;
+      marketing: boolean;
+    };
   };
   passport: {
     level: string;
@@ -53,6 +58,7 @@ export async function fetchAppState(): Promise<FetchResult> {
       school: profile.school as AppState["profile"]["school"],
       arrivalLabel: profile.arrival_label,
       language: profile.language as AppState["profile"]["language"],
+      notificationSettings: profile.notification_settings,
     },
     passport: {
       level: passport.level as AppState["passport"]["level"],

@@ -18,9 +18,9 @@ export default function MorePage() {
 
   const MENU = [
     { label: t("more.menu.language"), icon: Globe, onClick: () => setLangSheetOpen(true) },
-    { label: t("more.menu.notifications"), icon: Bell },
-    { label: t("more.menu.terms"), icon: FileText },
-    { label: t("more.menu.support"), icon: LifeBuoy },
+    { label: t("more.menu.notifications"), icon: Bell, onClick: () => router.push("/more/notifications") },
+    { label: t("more.menu.terms"), icon: FileText, onClick: () => router.push("/more/terms") },
+    { label: t("more.menu.support"), icon: LifeBuoy, onClick: () => router.push("/more/support") },
   ];
 
   async function handleSignOut() {

@@ -6,6 +6,7 @@ import {
   DocumentFlags,
   FinancialPassport,
   Language,
+  NotificationSettings,
   PurposeCategory,
 } from "@/lib/types";
 import { LEVEL_CONFIG, cloneChecklist, nextLevel } from "@/lib/mock/passport-levels";
@@ -18,6 +19,7 @@ interface AppStateContextValue {
   recordPurposeTransaction: (category: PurposeCategory) => void;
   unlockLimit: (amount: number) => void;
   setLanguage: (language: Language) => void;
+  setNotificationSettings: (settings: NotificationSettings) => void;
   signOut: () => Promise<void>;
 }
 
@@ -128,6 +130,19 @@ export function AppStateProvider({
       setLanguage: (language) => {
         setState((prev) => ({ ...prev, profile: { ...prev.profile, language } }));
         postJson("/api/language", { language });
+      },
+      setNotificationSettings: (settings) => {
+        setState((prev) => ({ ...prev, profile: { ...prev.profile, notificationSettings: settings } }));
+        postJson<{ notificationSettings: NotificationSettings }>("/api/notifications", settings).then(
+          (data) => {
+            if (data) {
+              setState((prev) => ({
+                ...prev,
+                profile: { ...prev.profile, notificationSettings: data.notificationSettings },
+              }));
+            }
+          }
+        );
       },
       signOut: async () => {
         const supabase = createClient();
