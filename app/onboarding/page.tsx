@@ -58,7 +58,7 @@ export default function OnboardingPage() {
             한도가 열립니다
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground-muted">
-            등록금·월세 같은 실제 지출을 Finmate가 직접 확인하고, 그 목적에만 이체 한도를 엽니다.
+            등록금·월세 같은 실제 지출을 FinMate가 직접 확인하고, 그 목적에만 이체 한도를 엽니다.
           </p>
         </div>
 
@@ -79,7 +79,7 @@ export default function OnboardingPage() {
           </div>
           <Button onClick={() => setStep(2)}>시작하기 →</Button>
           <p className="flex items-center justify-center gap-1.5 text-xs text-foreground-subtle">
-            <ShieldCheck className="h-3.5 w-3.5" /> Finmate는 은행 비밀번호를 절대 묻지 않습니다.
+            <ShieldCheck className="h-3.5 w-3.5" /> FinMate는 은행 비밀번호를 절대 묻지 않습니다.
           </p>
         </div>
       </AppShell>

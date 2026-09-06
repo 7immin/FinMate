@@ -23,7 +23,7 @@ function AiPageContent() {
 
   return (
     <AppShell className="flex flex-col">
-      <TopBar title="Finmate AI" />
+      <TopBar title="FinMate AI" />
       <div className="flex-1 px-5 pb-6 pt-2">
         {question ? (
           <AnswerCard question={question} answer={getAiAnswer(question)} />

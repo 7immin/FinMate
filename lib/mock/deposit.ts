@@ -47,7 +47,7 @@ export const PROTECTION_STEPS = [
   {
     title: "보증금은 임대인 계좌로만",
     hint: "필수",
-    description: "Finmate 한도는 검증된 계좌 1건에만 열립니다",
+    description: "FinMate 한도는 검증된 계좌 1건에만 열립니다",
   },
 ];
 

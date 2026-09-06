@@ -44,7 +44,7 @@ export function ScanningStep({ onComplete }: { onComplete: () => void }) {
         </div>
       </div>
       <p className="flex items-center justify-center gap-1.5 px-5 pb-6 text-center text-xs text-foreground-subtle">
-        <ShieldCheck className="h-3.5 w-3.5 shrink-0" /> Finmate는 은행 비밀번호를 절대 묻지
+        <ShieldCheck className="h-3.5 w-3.5 shrink-0" /> FinMate는 은행 비밀번호를 절대 묻지
         않습니다. 묻는 쪽이 있다면 사기입니다.
       </p>
     </div>

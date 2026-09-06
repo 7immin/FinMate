@@ -42,7 +42,7 @@ export default function HomePage() {
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white">
               F
             </span>
-            <span className="text-[15px] font-semibold text-foreground">Finmate</span>
+            <span className="text-[15px] font-semibold text-foreground">FinMate</span>
           </div>
           <span className="flex items-center gap-1 rounded-full bg-white/[0.06] px-3 py-1.5 text-xs text-foreground-muted">
             <Languages className="h-3.5 w-3.5" /> 한국어

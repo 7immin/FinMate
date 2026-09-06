@@ -16,7 +16,7 @@ export function UploadStep({ onUploaded }: { onUploaded: () => void }) {
             그대로 올려주세요
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground-muted">
-            기한·금액·입금 계좌를 Finmate가 직접 읽어 확인합니다. 사진 한 장이면 됩니다.
+            기한·금액·입금 계좌를 FinMate가 직접 읽어 확인합니다. 사진 한 장이면 됩니다.
           </p>
         </div>
 
@@ -47,7 +47,7 @@ export function UploadStep({ onUploaded }: { onUploaded: () => void }) {
         </div>
       </div>
       <p className="flex items-center justify-center gap-1.5 px-5 pb-6 text-center text-xs text-foreground-subtle">
-        <ShieldCheck className="h-3.5 w-3.5 shrink-0" /> Finmate는 은행 비밀번호를 절대 묻지
+        <ShieldCheck className="h-3.5 w-3.5 shrink-0" /> FinMate는 은행 비밀번호를 절대 묻지
         않습니다. 묻는 쪽이 있다면 사기입니다.
       </p>
     </div>
