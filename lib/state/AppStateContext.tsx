@@ -21,6 +21,7 @@ interface AppStateContextValue {
   setDocumentFlag: (key: keyof DocumentFlags, value: "yes" | "no" | "unknown") => void;
   toggleChecklistItem: (id: string) => void;
   recordPurposeTransaction: () => void;
+  unlockLimit: (amount: number) => void;
   resetDemo: () => void;
 }
 
@@ -106,6 +107,11 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
             },
           };
         }),
+      unlockLimit: (amount) =>
+        setState((prev) => ({
+          ...prev,
+          passport: { ...prev.passport, currentLimit: prev.passport.currentLimit + amount },
+        })),
       resetDemo: () => setState(initialAppState),
     }),
     [state, hydrated]
