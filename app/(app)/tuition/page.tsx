@@ -38,12 +38,6 @@ export default function TuitionPage() {
     setStep("scanning");
   }
 
-  function handleMockSourceSelected() {
-    fileRef.current = null;
-    ocrPromiseRef.current = Promise.resolve(null);
-    setStep("scanning");
-  }
-
   async function handleScanComplete() {
     try {
       const result = await ocrPromiseRef.current;
@@ -89,7 +83,7 @@ export default function TuitionPage() {
   return (
     <AppShell className="flex flex-col">
       {step === "upload" && (
-        <UploadStep onFileUploaded={handleFileUploaded} onMockSourceSelected={handleMockSourceSelected} />
+        <UploadStep onFileUploaded={handleFileUploaded} />
       )}
       {step === "scanning" && <ScanningStep onComplete={handleScanComplete} />}
       {step === "result" && (
