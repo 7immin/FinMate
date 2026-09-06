@@ -13,7 +13,7 @@ export interface ChecklistItem {
 // name at render time via translateShared(lang, "country", code).
 export type NationalityId = string;
 
-export type SchoolId = "hanyang" | "snu" | "yonsei" | "korea" | "skk";
+export type SchoolId = "hanyang" | "snu" | "yonsei" | "korea" | "skk" | "ewha";
 
 export interface NotificationSettings {
   paymentDue: boolean;

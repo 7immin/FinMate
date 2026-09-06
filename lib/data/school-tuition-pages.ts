@@ -13,4 +13,5 @@ import { SchoolId } from "@/lib/types";
 export const SCHOOL_TUITION_PAGE: Partial<Record<SchoolId, string>> = {
   korea: "https://registrar.korea.ac.kr/registrar/tuition/schedule.do",
   hanyang: "https://finance.hanyang.ac.kr/-12",
+  ewha: "https://www.ewha.ac.kr/ewha/etc/tuition01.do",
 };

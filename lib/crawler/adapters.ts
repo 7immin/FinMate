@@ -97,6 +97,26 @@ const hanyangAdapter = createAdapter({
 });
 
 /**
+ * 이화여자대학교.
+ *
+ * 고려대와 같은 CMS라 본문 선택자가 같다. 등록일정과 납부방법이 한
+ * 페이지에 함께 있어 combined로 넘긴다.
+ * 날짜 표기: 표 안에 "8. 24.(월)~8. 28.(금)" — 고려대와 또 다르다.
+ */
+const ewhaAdapter = createAdapter({
+  id: "ewha",
+  feeTableUrl: "https://www.ewha.ac.kr/ewha/etc/tuition01.do",
+  selectors: ["#jwxe_main_content"],
+  sources: [
+    {
+      kind: "combined",
+      url: "https://www.ewha.ac.kr/ewha/etc/tuition01.do",
+      snapshot: "ewha-tuition.html",
+    },
+  ],
+});
+
+/**
  * 지원하는 학교.
  *
  * SchoolId 전부를 덮지 않는다. 어댑터가 없는 학교는 화면이 "아직 읽어올 수
@@ -105,6 +125,7 @@ const hanyangAdapter = createAdapter({
 const ADAPTERS: Partial<Record<SchoolId, SchoolAdapter>> = {
   korea: koreaAdapter,
   hanyang: hanyangAdapter,
+  ewha: ewhaAdapter,
 };
 
 export function getAdapter(schoolId: SchoolId): SchoolAdapter | null {
