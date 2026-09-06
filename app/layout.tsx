@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { AppStateProvider } from "@/lib/state/AppStateContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,9 +16,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko" className="dark">
-      <body className="font-sans antialiased">
-        <AppStateProvider>{children}</AppStateProvider>
-      </body>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }

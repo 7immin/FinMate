@@ -166,7 +166,7 @@ const ko = {
       terms: "이용약관 및 개인정보처리방침",
       support: "고객센터 문의",
     },
-    resetDemo: "데모 초기화 (온보딩부터 다시 보기)",
+    signOut: "로그아웃",
     languageSheetTitle: "언어 선택",
   },
   ai: {
@@ -544,7 +544,7 @@ const en: typeof ko = {
       terms: "Terms & Privacy Policy",
       support: "Contact support",
     },
-    resetDemo: "Reset demo (restart from onboarding)",
+    signOut: "Sign out",
     languageSheetTitle: "Choose language",
   },
   ai: {
@@ -921,7 +921,7 @@ const zh: typeof ko = {
       terms: "服务条款及隐私政策",
       support: "联系客服",
     },
-    resetDemo: "重置演示（从引导流程重新开始）",
+    signOut: "退出登录",
     languageSheetTitle: "选择语言",
   },
   ai: {
@@ -1299,7 +1299,7 @@ const vi: typeof ko = {
       terms: "Điều khoản & Chính sách bảo mật",
       support: "Liên hệ hỗ trợ",
     },
-    resetDemo: "Đặt lại demo (bắt đầu lại từ onboarding)",
+    signOut: "Đăng xuất",
     languageSheetTitle: "Chọn ngôn ngữ",
   },
   ai: {

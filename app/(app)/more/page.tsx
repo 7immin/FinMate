@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Globe, Bell, FileText, LifeBuoy, RotateCcw, ChevronRight } from "lucide-react";
+import { Globe, Bell, FileText, LifeBuoy, LogOut, ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/Card";
 import { LanguageSwitcherSheet } from "@/components/ui/LanguageSwitcherSheet";
@@ -11,9 +11,10 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 
 export default function MorePage() {
   const router = useRouter();
-  const { resetDemo } = useAppState();
+  const { signOut } = useAppState();
   const { t } = useTranslation();
   const [langSheetOpen, setLangSheetOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   const MENU = [
     { label: t("more.menu.language"), icon: Globe, onClick: () => setLangSheetOpen(true) },
@@ -21,6 +22,13 @@ export default function MorePage() {
     { label: t("more.menu.terms"), icon: FileText },
     { label: t("more.menu.support"), icon: LifeBuoy },
   ];
+
+  async function handleSignOut() {
+    setSigningOut(true);
+    await signOut();
+    router.replace("/login");
+    router.refresh();
+  }
 
   return (
     <AppShell showNav>
@@ -44,14 +52,12 @@ export default function MorePage() {
 
         <button
           type="button"
-          onClick={() => {
-            resetDemo();
-            router.replace("/onboarding");
-          }}
-          className="flex w-full items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 text-left text-danger"
+          onClick={handleSignOut}
+          disabled={signingOut}
+          className="flex w-full items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 text-left text-danger disabled:opacity-50"
         >
-          <RotateCcw className="h-[18px] w-[18px]" />
-          <span className="text-[15px] font-medium">{t("more.resetDemo")}</span>
+          <LogOut className="h-[18px] w-[18px]" />
+          <span className="text-[15px] font-medium">{t("more.signOut")}</span>
         </button>
       </div>
 

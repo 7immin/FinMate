@@ -1,92 +1,89 @@
 "use client";
 
+import { createContext, useContext, useMemo, useState, ReactNode } from "react";
 import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  ReactNode,
-} from "react";
-import { AppState, DocumentFlags, Language, UserProfile } from "@/lib/types";
-import { initialAppState } from "@/lib/mock/initial-state";
+  AppState,
+  DocumentFlags,
+  FinancialPassport,
+  Language,
+} from "@/lib/types";
 import { LEVEL_CONFIG, cloneChecklist, nextLevel } from "@/lib/mock/passport-levels";
-
-const STORAGE_KEY = "finmate.appState.v1";
+import { createClient } from "@/lib/supabase/client";
 
 interface AppStateContextValue {
   state: AppState;
-  hydrated: boolean;
-  completeOnboarding: (profile: Partial<UserProfile>) => void;
   setDocumentFlag: (key: keyof DocumentFlags, value: "yes" | "no" | "unknown") => void;
   toggleChecklistItem: (id: string) => void;
   recordPurposeTransaction: () => void;
   unlockLimit: (amount: number) => void;
   setLanguage: (language: Language) => void;
-  resetDemo: () => void;
+  signOut: () => Promise<void>;
 }
 
 const AppStateContext = createContext<AppStateContextValue | null>(null);
 
-export function AppStateProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AppState>(initialAppState);
-  const [hydrated, setHydrated] = useState(false);
+function computeToggledPassport(passport: FinancialPassport, id: string): FinancialPassport {
+  const checklist = passport.nextLevelChecklist.map((item) =>
+    item.id === id ? { ...item, done: !item.done } : item
+  );
+  const allDone = checklist.length > 0 && checklist.every((item) => item.done);
+  if (!allDone) return { ...passport, nextLevelChecklist: checklist };
 
-  useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) setState(JSON.parse(raw));
-    } catch {
-      // ignore corrupted storage
-    }
-    setHydrated(true);
-  }, []);
+  const upgraded = nextLevel(passport.level);
+  if (!upgraded) return { ...passport, nextLevelChecklist: checklist };
 
-  useEffect(() => {
-    if (!hydrated) return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state, hydrated]);
+  const config = LEVEL_CONFIG[upgraded];
+  return {
+    ...passport,
+    level: upgraded,
+    currentLimit: config.limit,
+    nextLevelChecklist: cloneChecklist(upgraded),
+  };
+}
+
+async function postJson<T>(url: string, body: unknown): Promise<T | null> {
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
+
+export function AppStateProvider({
+  initialState,
+  children,
+}: {
+  initialState: AppState;
+  children: ReactNode;
+}) {
+  const [state, setState] = useState<AppState>(initialState);
 
   const value = useMemo<AppStateContextValue>(
     () => ({
       state,
-      hydrated,
-      completeOnboarding: (profile) =>
-        setState((prev) => ({
-          ...prev,
-          onboarded: true,
-          profile: { ...prev.profile, ...profile },
-        })),
-      setDocumentFlag: (key, docValue) =>
-        setState((prev) => ({
-          ...prev,
-          documents: { ...prev.documents, [key]: docValue },
-        })),
-      toggleChecklistItem: (id) =>
-        setState((prev) => {
-          const checklist = prev.passport.nextLevelChecklist.map((item) =>
-            item.id === id ? { ...item, done: !item.done } : item
-          );
-          const allDone = checklist.length > 0 && checklist.every((item) => item.done);
-          if (!allDone) {
-            return { ...prev, passport: { ...prev.passport, nextLevelChecklist: checklist } };
+      setDocumentFlag: (key, docValue) => {
+        setState((prev) => ({ ...prev, documents: { ...prev.documents, [key]: docValue } }));
+        postJson<{ documents: DocumentFlags }>("/api/documents", { [key]: docValue }).then(
+          (data) => {
+            if (data) setState((prev) => ({ ...prev, documents: data.documents }));
           }
-          const upgraded = nextLevel(prev.passport.level);
-          if (!upgraded) {
-            return { ...prev, passport: { ...prev.passport, nextLevelChecklist: checklist } };
-          }
-          const config = LEVEL_CONFIG[upgraded];
-          return {
-            ...prev,
-            passport: {
-              ...prev.passport,
-              level: upgraded,
-              currentLimit: config.limit,
-              nextLevelChecklist: cloneChecklist(upgraded),
-            },
-          };
-        }),
-      recordPurposeTransaction: () =>
+        );
+      },
+      toggleChecklistItem: (id) => {
+        setState((prev) => ({ ...prev, passport: computeToggledPassport(prev.passport, id) }));
+        postJson<{ passport: FinancialPassport }>("/api/passport/checklist", {
+          itemId: id,
+        }).then((data) => {
+          if (data) setState((prev) => ({ ...prev, passport: data.passport }));
+        });
+      },
+      recordPurposeTransaction: () => {
         setState((prev) => {
           const targetIdx = prev.passport.nextLevelChecklist.findIndex((item) =>
             item.id.includes("purpose-tx")
@@ -99,24 +96,38 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
             ...prev,
             passport: {
               ...prev.passport,
-              paymentHistory: [
-                ...prev.passport.paymentHistory,
-                { month: "2026.09", onTime: true },
-              ],
               nextLevelChecklist: checklist,
+              paymentHistory: [...prev.passport.paymentHistory, { month: "…", onTime: true }],
             },
           };
-        }),
-      unlockLimit: (amount) =>
+        });
+        postJson<{ passport: FinancialPassport }>("/api/passport/purpose-transaction", {}).then(
+          (data) => {
+            if (data) setState((prev) => ({ ...prev, passport: data.passport }));
+          }
+        );
+      },
+      unlockLimit: (amount) => {
         setState((prev) => ({
           ...prev,
           passport: { ...prev.passport, currentLimit: prev.passport.currentLimit + amount },
-        })),
-      setLanguage: (language) =>
-        setState((prev) => ({ ...prev, profile: { ...prev.profile, language } })),
-      resetDemo: () => setState(initialAppState),
+        }));
+        postJson<{ passport: FinancialPassport }>("/api/passport/unlock", { amount }).then(
+          (data) => {
+            if (data) setState((prev) => ({ ...prev, passport: data.passport }));
+          }
+        );
+      },
+      setLanguage: (language) => {
+        setState((prev) => ({ ...prev, profile: { ...prev.profile, language } }));
+        postJson("/api/language", { language });
+      },
+      signOut: async () => {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      },
     }),
-    [state, hydrated]
+    [state]
   );
 
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;

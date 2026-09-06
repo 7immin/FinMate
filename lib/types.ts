@@ -47,7 +47,6 @@ export interface DocumentFlags {
 }
 
 export interface AppState {
-  onboarded: boolean;
   profile: UserProfile;
   passport: FinancialPassport;
   documents: DocumentFlags;
