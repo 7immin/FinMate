@@ -1,11 +1,18 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { ChecklistItem, FinancialPassport, PassportLevel, PaymentRecord } from "@/lib/types";
+import {
+  ChecklistItem,
+  FinancialPassport,
+  PassportLevel,
+  PaymentRecord,
+  PurposeCategory,
+} from "@/lib/types";
 
 interface PassportRow {
   level: PassportLevel;
   current_limit: number;
   next_level_checklist: ChecklistItem[];
   payment_history: PaymentRecord[];
+  purpose_counts: Partial<Record<PurposeCategory, number>>;
 }
 
 export async function getPassportRow(supabase: SupabaseClient, userId: string) {
@@ -24,6 +31,7 @@ export function toPassportState(row: PassportRow): FinancialPassport {
     currentLimit: row.current_limit,
     nextLevelChecklist: row.next_level_checklist,
     paymentHistory: row.payment_history,
+    purposeCounts: row.purpose_counts ?? {},
   };
 }
 
@@ -35,6 +43,7 @@ export async function savePassportRow(
     current_limit: number;
     next_level_checklist: ChecklistItem[];
     payment_history: PaymentRecord[];
+    purpose_counts: Partial<Record<PurposeCategory, number>>;
   }>
 ) {
   const { data, error } = await supabase

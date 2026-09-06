@@ -20,6 +20,7 @@ create table if not exists public.financial_passports (
   current_limit bigint not null default 300000,
   next_level_checklist jsonb not null default '[]'::jsonb,
   payment_history jsonb not null default '[]'::jsonb,
+  purpose_counts jsonb not null default '{}'::jsonb,
   updated_at timestamptz not null default now()
 );
 

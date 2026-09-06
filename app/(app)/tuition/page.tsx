@@ -20,7 +20,7 @@ export default function TuitionPage() {
   const [step, setStep] = useState<Step>("upload");
 
   function handleConfirm() {
-    recordPurposeTransaction();
+    recordPurposeTransaction("tuition");
     setStep("success");
   }
 

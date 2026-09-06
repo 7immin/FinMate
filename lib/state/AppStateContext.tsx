@@ -6,6 +6,7 @@ import {
   DocumentFlags,
   FinancialPassport,
   Language,
+  PurposeCategory,
 } from "@/lib/types";
 import { LEVEL_CONFIG, cloneChecklist, nextLevel } from "@/lib/mock/passport-levels";
 import { createClient } from "@/lib/supabase/client";
@@ -14,7 +15,7 @@ interface AppStateContextValue {
   state: AppState;
   setDocumentFlag: (key: keyof DocumentFlags, value: "yes" | "no" | "unknown") => void;
   toggleChecklistItem: (id: string) => void;
-  recordPurposeTransaction: () => void;
+  recordPurposeTransaction: (category: PurposeCategory) => void;
   unlockLimit: (amount: number) => void;
   setLanguage: (language: Language) => void;
   signOut: () => Promise<void>;
@@ -83,29 +84,35 @@ export function AppStateProvider({
           if (data) setState((prev) => ({ ...prev, passport: data.passport }));
         });
       },
-      recordPurposeTransaction: () => {
+      recordPurposeTransaction: (category) => {
         setState((prev) => {
           const targetIdx = prev.passport.nextLevelChecklist.findIndex((item) =>
             item.id.includes("purpose-tx")
           );
-          if (targetIdx === -1) return prev;
-          const checklist = prev.passport.nextLevelChecklist.map((item, idx) =>
-            idx === targetIdx ? { ...item, done: true } : item
-          );
+          const checklist =
+            targetIdx === -1
+              ? prev.passport.nextLevelChecklist
+              : prev.passport.nextLevelChecklist.map((item, idx) =>
+                  idx === targetIdx ? { ...item, done: true } : item
+                );
           return {
             ...prev,
             passport: {
               ...prev.passport,
               nextLevelChecklist: checklist,
               paymentHistory: [...prev.passport.paymentHistory, { month: "…", onTime: true }],
+              purposeCounts: {
+                ...prev.passport.purposeCounts,
+                [category]: (prev.passport.purposeCounts[category] ?? 0) + 1,
+              },
             },
           };
         });
-        postJson<{ passport: FinancialPassport }>("/api/passport/purpose-transaction", {}).then(
-          (data) => {
-            if (data) setState((prev) => ({ ...prev, passport: data.passport }));
-          }
-        );
+        postJson<{ passport: FinancialPassport }>("/api/passport/purpose-transaction", {
+          category,
+        }).then((data) => {
+          if (data) setState((prev) => ({ ...prev, passport: data.passport }));
+        });
       },
       unlockLimit: (amount) => {
         setState((prev) => ({

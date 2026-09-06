@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { AppState, ChecklistItem, PaymentRecord } from "@/lib/types";
+import { AppState, ChecklistItem, PaymentRecord, PurposeCategory } from "@/lib/types";
 
 interface FetchResult {
   onboarded: boolean;
@@ -39,6 +39,7 @@ export async function fetchAppState(): Promise<FetchResult> {
       currentLimit: passport.current_limit,
       nextLevelChecklist: passport.next_level_checklist as ChecklistItem[],
       paymentHistory: passport.payment_history as PaymentRecord[],
+      purposeCounts: (passport.purpose_counts ?? {}) as Partial<Record<PurposeCategory, number>>,
     },
     documents: {
       hasPassport: documents.has_passport,

@@ -9,15 +9,16 @@ import { Button } from "@/components/ui/Button";
 import { SegmentedProgress } from "@/components/ui/ProgressBar";
 import { ChecklistRow } from "@/components/ui/Checklist";
 import { PaymentHistoryChart } from "@/components/ui/PaymentHistoryChart";
+import { ReportView } from "@/components/flows/passport/ReportView";
 import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LEVEL_ORDER } from "@/lib/mock/passport-levels";
 
 export default function PassportPage() {
   const { state, toggleChecklistItem } = useAppState();
-  const { t, tOpt, tShared } = useTranslation();
+  const { t, tOpt, tShared, lang } = useTranslation();
   const { passport, profile } = state;
-  const [reportGenerated, setReportGenerated] = useState(false);
+  const [viewingReport, setViewingReport] = useState(false);
 
   const levelOrder = LEVEL_ORDER.indexOf(passport.level) + 1;
   const isMature = passport.level === "S3" || passport.level === "S4";
@@ -25,11 +26,24 @@ export default function PassportPage() {
 
   function handleCta() {
     if (isMature) {
-      setReportGenerated(true);
+      setViewingReport(true);
       return;
     }
     const firstPending = passport.nextLevelChecklist.find((item) => !item.done);
     if (firstPending) toggleChecklistItem(firstPending.id);
+  }
+
+  if (viewingReport) {
+    return (
+      <AppShell className="flex flex-col">
+        <ReportView
+          profile={profile}
+          passport={passport}
+          defaultLanguage={lang}
+          onClose={() => setViewingReport(false)}
+        />
+      </AppShell>
+    );
   }
 
   return (
@@ -96,7 +110,7 @@ export default function PassportPage() {
 
         <Button onClick={handleCta} className="gap-2">
           {isMature && <Download className="h-4 w-4" />}
-          {reportGenerated ? t("passport.reportReady") : t(`passport.cta.${passport.level}`)}
+          {t(`passport.cta.${passport.level}`)}
         </Button>
       </div>
     </AppShell>

@@ -20,7 +20,7 @@ export default function DepositPage() {
   const [step, setStep] = useState<Step>("upload");
 
   function handleConfirm() {
-    recordPurposeTransaction();
+    recordPurposeTransaction("deposit");
     setStep("success");
   }
 

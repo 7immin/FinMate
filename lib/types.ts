@@ -1,5 +1,7 @@
 export type PassportLevel = "S1" | "S2" | "S3" | "S4";
 
+export type PurposeCategory = "tuition" | "deposit" | "remittance" | "account";
+
 export type Language = "ko" | "en" | "zh" | "vi";
 
 export interface ChecklistItem {
@@ -38,6 +40,7 @@ export interface FinancialPassport {
   currentLimit: number;
   nextLevelChecklist: ChecklistItem[];
   paymentHistory: PaymentRecord[];
+  purposeCounts: Partial<Record<PurposeCategory, number>>;
 }
 
 export interface DocumentFlags {
