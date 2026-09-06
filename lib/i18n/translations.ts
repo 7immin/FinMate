@@ -1354,7 +1354,7 @@ const vi: typeof ko = {
   tuition: {
     topBarTitle: "Mở hạn mức học phí",
     upload: {
-      headline: "Tải lên hóa đơn của trường\ny nguyên như vậy",
+      headline: "Tải lên hóa đơn của trường\ny như vậy, không cần chỉnh sửa",
       description: "FinMate sẽ trực tiếp đọc hạn nộp, số tiền và tài khoản nhận. Chỉ cần một tấm ảnh.",
       boxLabel: "Hóa đơn PDF hoặc ảnh chụp",
       orTitle: "Hoặc lấy trực tiếp từ trường",

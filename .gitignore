@@ -34,3 +34,4 @@ next-env.d.ts
 
 # local smoke-test screenshots
 /shots/
+/shots_i18n/
