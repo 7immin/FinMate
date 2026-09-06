@@ -245,6 +245,12 @@ const ko = {
       confirm: "맞습니다, 한도 열기 →",
       retry: "내용이 달라요",
     },
+    edit: {
+      title: "정보 수정",
+      headline: "잘못된 내용을 고쳐주세요",
+      description: "실제 고지서와 다른 항목이 있으면 직접 수정할 수 있어요.",
+      save: "수정 완료",
+    },
     success: {
       title: "등록금 이체 한도가 열렸어요",
       description: "{{recipient}}에 {{amount}}원을 납부할 수 있는 한도가 확보됐습니다. 금융여권에도 반영됐어요.",
@@ -613,6 +619,12 @@ const en: typeof ko = {
       confirm: "Correct, unlock limit →",
       retry: "Something's off",
     },
+    edit: {
+      title: "Edit details",
+      headline: "Fix what's wrong",
+      description: "If anything doesn't match the real invoice, you can correct it here.",
+      save: "Save changes",
+    },
     success: {
       title: "Your tuition transfer limit is open",
       description: "You can now send {{amount}} KRW to {{recipient}}. It's also reflected in your Financial Passport.",
@@ -977,6 +989,12 @@ const zh: typeof ko = {
       },
       confirm: "确认无误，开通额度 →",
       retry: "信息有误",
+    },
+    edit: {
+      title: "修改信息",
+      headline: "请修正有误的内容",
+      description: "如果与实际缴费通知单不符，可以在这里直接修改。",
+      save: "完成修改",
     },
     success: {
       title: "学费转账额度已开通",
@@ -1345,6 +1363,12 @@ const vi: typeof ko = {
       },
       confirm: "Đúng rồi, mở hạn mức →",
       retry: "Thông tin không đúng",
+    },
+    edit: {
+      title: "Chỉnh sửa thông tin",
+      headline: "Sửa lại thông tin chưa đúng",
+      description: "Nếu có mục nào không khớp với hóa đơn thật, bạn có thể chỉnh sửa trực tiếp ở đây.",
+      save: "Lưu thay đổi",
     },
     success: {
       title: "Hạn mức chuyển khoản học phí đã được mở",

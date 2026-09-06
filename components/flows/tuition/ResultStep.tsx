@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ChecklistRow } from "@/components/ui/Checklist";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { TUITION_INVOICE, TUITION_RISK_CHECK_IDS } from "@/lib/mock/tuition";
+import { TuitionInvoice, TUITION_RISK_CHECK_IDS, computeDDay } from "@/lib/mock/tuition";
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
@@ -19,14 +19,15 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 export function ResultStep({
+  invoice,
   onConfirm,
   onRetry,
 }: {
+  invoice: TuitionInvoice;
   onConfirm: () => void;
   onRetry: () => void;
 }) {
   const { t, tShared } = useTranslation();
-  const invoice = TUITION_INVOICE;
   return (
     <div className="flex flex-1 flex-col">
       <TopBar title={t("tuition.result.topBarTitle")} />
@@ -39,7 +40,10 @@ export function ResultStep({
 
         <Card className="divide-y divide-border">
           <InfoRow label={t("tuition.result.amountLabel")} value={`${invoice.amount.toLocaleString()} KRW`} />
-          <InfoRow label={t("tuition.result.dueLabel")} value={`${invoice.dueDate} ${invoice.dDay}`} />
+          <InfoRow
+            label={t("tuition.result.dueLabel")}
+            value={`${invoice.dueDate} ${computeDDay(invoice.dueDate)}`}
+          />
           <InfoRow label={t("tuition.result.recipientLabel")} value={tShared("school", invoice.recipient)} />
           <InfoRow label={t("tuition.result.accountLabel")} value={invoice.virtualAccount} />
         </Card>
