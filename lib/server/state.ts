@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { AppState, ChecklistItem, PaymentRecord, PurposeCategory } from "@/lib/types";
-import { toPassportState } from "@/lib/server/passport";
+import { applyLevelUpIfComplete, PassportRow, toPassportState } from "@/lib/server/passport";
 
 interface FetchResult {
   onboarded: boolean;
@@ -23,12 +23,14 @@ interface FullStateRow {
     };
   };
   passport: {
+    user_id: string;
     level: string;
     current_limit: number;
     next_level_checklist: ChecklistItem[];
     payment_history: PaymentRecord[];
     purpose_counts: Partial<Record<PurposeCategory, number>>;
     verification_code: string;
+    account_linked_at: string | null;
   };
   documents: {
     has_passport: string;
@@ -48,7 +50,15 @@ export async function fetchAppState(): Promise<FetchResult> {
 
   if (!data) return { onboarded: false, state: null };
 
-  const { profile, passport, documents } = data;
+  const { profile, documents } = data;
+
+  // Cascades a level-up if every item is now true purely from time passing
+  // (account-active's 30-day mark) with no other action to trigger it --
+  // the only path not already covered by an API route, since layout mounts
+  // read state straight from the RPC. user_id comes along for free since
+  // get_full_state() jsonb-ifies every column.
+  const passportRow = data.passport as unknown as PassportRow;
+  const passport = await applyLevelUpIfComplete(supabase, data.passport.user_id, passportRow);
 
   const state: AppState = {
     profile: {
@@ -62,16 +72,10 @@ export async function fetchAppState(): Promise<FetchResult> {
       notificationSettings: profile.notification_settings,
     },
     // 체크리스트는 저장된 값을 그대로 쓰지 않는다. "연체 정리"나 "목적
-    // 거래"는 사실에서 판정되는 항목이라, 읽을 때마다 다시 계산해야
-    // 연체가 새로 생기거나 승인이 취소됐을 때 되돌아간다(deriveChecklist).
-    passport: toPassportState({
-      level: passport.level as AppState["passport"]["level"],
-      current_limit: passport.current_limit,
-      next_level_checklist: passport.next_level_checklist,
-      payment_history: passport.payment_history,
-      purpose_counts: passport.purpose_counts ?? {},
-      verification_code: passport.verification_code,
-    }),
+    // 거래", "계좌 실사용 1개월"은 사실에서 판정되는 항목이라, 읽을 때마다
+    // 다시 계산해야 연체가 새로 생기거나 승인이 취소됐을 때 되돌아간다
+    // (deriveChecklist, toPassportState 안에서 호출됨).
+    passport: toPassportState(passport),
     documents: {
       hasPassport: documents.has_passport as AppState["documents"]["hasPassport"],
       hasAlienRegistration: documents.has_alien_registration as AppState["documents"]["hasAlienRegistration"],

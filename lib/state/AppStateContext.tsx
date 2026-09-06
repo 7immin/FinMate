@@ -16,6 +16,7 @@ interface AppStateContextValue {
   state: AppState;
   setDocumentFlag: (key: keyof DocumentFlags, value: "yes" | "no" | "unknown") => void;
   toggleChecklistItem: (id: string) => void;
+  setPassportState: (passport: FinancialPassport) => void;
   requestLimit: (
     amount: number,
     purpose: PurposeCategory,
@@ -111,6 +112,12 @@ export function AppStateProvider({
         }).then((data) => {
           setState((prev) => ({ ...prev, passport: data ? data.passport : before }));
         });
+      },
+      // /api/passport/verify already did the real work (OCR + marking the
+      // item done) before this is called -- this just adopts the server's
+      // response instead of guessing at an optimistic update client-side.
+      setPassportState: (passport) => {
+        setState((prev) => ({ ...prev, passport }));
       },
       /**
        * 한도 열기 요청.

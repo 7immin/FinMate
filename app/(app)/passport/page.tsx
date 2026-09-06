@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Download } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { TopBar } from "@/components/layout/TopBar";
@@ -11,8 +12,7 @@ import { ChecklistRow } from "@/components/ui/Checklist";
 import { PaymentHistoryChart } from "@/components/ui/PaymentHistoryChart";
 import { ReportView } from "@/components/flows/passport/ReportView";
 import { useAppState } from "@/lib/state/AppStateContext";
-import { isManualChecklistItem } from "@/lib/server/passport";
-import { useRouter } from "next/navigation";
+import { isManualChecklistItem, isDocumentVerifiedItem } from "@/lib/server/passport";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LEVEL_ORDER } from "@/lib/mock/passport-levels";
 
@@ -28,19 +28,41 @@ export default function PassportPage() {
   const nextLevelLabel = passport.level === "S4" ? null : LEVEL_ORDER[levelOrder];
   const firstPending = passport.nextLevelChecklist.find((item) => !item.done);
 
+  const accountActiveDays = passport.accountLinkedAt
+    ? Math.max(0, Math.floor((Date.now() - new Date(passport.accountLinkedAt).getTime()) / 86400000))
+    : 0;
+
+  function rowLabel(itemId: string, done: boolean) {
+    return (done ? tOpt(`passport.checklist.${itemId}.labelClear`) : undefined) ?? t(`passport.checklist.${itemId}.label`);
+  }
+
+  function rowHint(itemId: string, done: boolean) {
+    if (itemId === "account-active" && !done) {
+      return t("passport.accountActiveShortHint", { days: Math.min(accountActiveDays, 30) });
+    }
+    if (isManualChecklistItem(itemId) || isDocumentVerifiedItem(itemId)) {
+      return tOpt(`passport.checklist.${itemId}.hint`);
+    }
+    return done ? undefined : t("passport.autoChecked");
+  }
+
+  function rowOnClick(itemId: string, done: boolean) {
+    if (done) return undefined;
+    if (isDocumentVerifiedItem(itemId)) return () => router.push(`/passport/verify/${itemId}`);
+    if (isManualChecklistItem(itemId)) return () => toggleChecklistItem(itemId);
+    return undefined;
+  }
+
   function handleCta() {
     if (isMature) {
       setViewingReport(true);
       return;
     }
     if (!firstPending) return;
-
-    // 이 버튼이 목록의 첫 미완료 항목을 그냥 토글하고 있었다. 목록 행에는
-    // "사실에서 판정되는 항목은 누를 수 없다"를 걸어 두었는데, 이 버튼이
-    // 그 검사를 통째로 건너뛰어 목적 거래까지 손으로 켜졌다.
-    //
-    // 판정 항목은 켤 수 없다. 대신 그것을 실제로 채우는 자리로 보낸다 —
-    // 목적 거래는 홈의 네 흐름에서 한도를 요청하고 은행이 승인해야 쌓인다.
+    if (isDocumentVerifiedItem(firstPending.id)) {
+      router.push(`/passport/verify/${firstPending.id}`);
+      return;
+    }
     if (isManualChecklistItem(firstPending.id)) {
       toggleChecklistItem(firstPending.id);
       return;
@@ -50,14 +72,16 @@ export default function PassportPage() {
 
   const ctaLabel = isMature
     ? t(`passport.cta.${passport.level}`)
-    : firstPending
-      ? t(`passport.checklist.${firstPending.id}.cta`)
-      : t(`passport.checklist.${passport.nextLevelChecklist[0]?.id}.cta`);
+    : firstPending?.id === "account-active"
+      ? t("passport.accountActiveHint", { days: Math.min(accountActiveDays, 30) })
+      : firstPending
+        ? t(`passport.checklist.${firstPending.id}.cta`)
+        : t(`passport.checklist.${passport.nextLevelChecklist[0]?.id}.cta`);
 
-  // 연체 정리는 앱 안에서 할 수 있는 일이 아니다(밀린 돈을 내야 한다).
-  // 누를 수 없는 버튼으로 두고, 무엇을 해야 하는지는 목록 줄이 말한다.
   const ctaDisabled =
-    !isMature && firstPending !== undefined && firstPending.id === "overdue-clear";
+    !isMature &&
+    firstPending !== undefined &&
+    (firstPending.id === "overdue-clear" || firstPending.id === "account-active");
 
   if (viewingReport) {
     return (
@@ -104,11 +128,6 @@ export default function PassportPage() {
           </div>
         </Card>
 
-        {/*
-          올려 둔 한도 요청. 한도가 즉시 열리지 않으므로, 요청이 어디까지
-          갔는지 볼 자리가 없으면 사용자는 "눌렀는데 아무 일도 안 일어났다"고
-          느낀다. 승인 여부는 은행이 정하고 결과는 위 한도 숫자에 반영된다.
-        */}
         {pendingRequests.length > 0 && (
           <div>
             <p className="mb-2 text-sm font-medium text-foreground-muted">
@@ -141,32 +160,11 @@ export default function PassportPage() {
             <Card className="divide-y divide-border">
               {passport.nextLevelChecklist.map((item) => (
                 <div key={item.id} className="first:pt-0 last:pb-0">
-                  {/* 사실에서 판정되는 항목은 누를 수 없다. 연체가 없으면
-                      "연체 정리"는 이미 끝나 있고, 목적 거래는 은행이
-                      승인해야 쌓인다 — 눌러서 켤 수 있으면 등급이 사실이
-                      아니라 자기 신고가 된다. */}
                   <ChecklistRow
                     status={item.done ? "done" : "pending"}
-                    label={
-                      // 완료된 판정 항목은 할 일이 아니라 사실이다.
-                      // "연체 정리하기"가 체크된 채로 있으면 뭘 더 해야
-                      // 하는지 묻게 되므로, 그때는 "연체 없음"으로 말한다.
-                      (item.done
-                        ? tOpt(`passport.checklist.${item.id}.labelClear`)
-                        : undefined) ?? t(`passport.checklist.${item.id}.label`)
-                    }
-                    hint={
-                      isManualChecklistItem(item.id)
-                        ? tOpt(`passport.checklist.${item.id}.hint`)
-                        : item.done
-                          ? undefined
-                          : t("passport.autoChecked")
-                    }
-                    onClick={
-                      isManualChecklistItem(item.id)
-                        ? () => toggleChecklistItem(item.id)
-                        : undefined
-                    }
+                    label={rowLabel(item.id, item.done)}
+                    hint={rowHint(item.id, item.done)}
+                    onClick={rowOnClick(item.id, item.done)}
                   />
                 </div>
               ))}

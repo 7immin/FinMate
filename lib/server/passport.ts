@@ -1,5 +1,4 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { LEVEL_CONFIG, cloneChecklist, nextLevel } from "@/lib/mock/passport-levels";
 import {
   ChecklistItem,
   FinancialPassport,
@@ -7,14 +6,98 @@ import {
   PaymentRecord,
   PurposeCategory,
 } from "@/lib/types";
+import { LEVEL_CONFIG, cloneChecklist, nextLevel } from "@/lib/mock/passport-levels";
 
-interface PassportRow {
+export interface PassportRow {
   level: PassportLevel;
   current_limit: number;
   next_level_checklist: ChecklistItem[];
   payment_history: PaymentRecord[];
   purpose_counts: Partial<Record<PurposeCategory, number>>;
   verification_code: string;
+  account_linked_at: string | null;
+}
+
+type PassportPatch = Partial<{
+  level: PassportLevel;
+  current_limit: number;
+  next_level_checklist: ChecklistItem[];
+  payment_history: PaymentRecord[];
+  purpose_counts: Partial<Record<PurposeCategory, number>>;
+  account_linked_at: string | null;
+}>;
+
+const ACCOUNT_ACTIVE_DAYS = 30;
+
+/**
+ * 서류 업로드로 확인하는 항목. /api/passport/verify가 Gemini OCR로 실제
+ * 내용을 읽어야만 완료 처리한다 -- 눌러서 바로 켤 수 없다.
+ */
+const DOCUMENT_VERIFIED_ITEMS = new Set(["passport-verify", "korean-account"]);
+
+/**
+ * 클릭해서 표시하는 항목.
+ *
+ * 나머지는 사실에서 자동으로 판정된다 — 연체가 없으면 "연체 정리"는 이미
+ * 끝난 것이고, 은행이 승인한 목적 거래가 두 건이면 "목적 거래 2회"도
+ * 이미 끝난 것이다. 그런 항목까지 눌러서 켤 수 있게 두면 등급이 사실이
+ * 아니라 자기 신고가 되고, 그러면 은행에 내미는 금융여권이 아무것도
+ * 보증하지 못한다. phone-verify만 예외로 남아 있다 — 실제 SMS 인증에는
+ * 유료 API와 신규 계정이 필요해 아직 붙이지 못했다.
+ */
+const MANUAL_CHECKLIST_ITEMS = new Set(["phone-verify"]);
+
+export function isManualChecklistItem(id: string): boolean {
+  return MANUAL_CHECKLIST_ITEMS.has(id);
+}
+
+export function isDocumentVerifiedItem(id: string): boolean {
+  return DOCUMENT_VERIFIED_ITEMS.has(id);
+}
+
+/**
+ * 저장된 체크리스트 위에 "사실로 판정되는 항목"을 덮어쓴다.
+ *
+ * 저장된 값을 고치지 않고 읽을 때마다 다시 계산하는 이유: 연체가 새로
+ * 생기거나 승인이 취소되면 그 항목은 다시 미완료로 돌아가야 한다. 한 번
+ * 저장해 버리면 사실과 어긋난 채로 남는다.
+ *
+ * account-active만 규칙이 다르다 -- "지금 상태"가 아니라 "시점에서 얼마나
+ * 지났는지"로 판정한다. account_linked_at(계좌 연결이 처음 확인된 시각)
+ * 에서 30일이 지났는지를 매번 다시 계산한다. 레벨업 때 체크리스트 배열
+ * 자체는 새로 만들어지지만, 이 시점은 별도 컬럼에 남아 있어 사라지지
+ * 않는다.
+ */
+export function deriveChecklist(row: PassportRow): ChecklistItem[] {
+  const latePayments = row.payment_history.filter((record) => !record.onTime).length;
+  const approvedPurposeTx = Object.values(row.purpose_counts ?? {}).reduce<number>(
+    (sum, count) => sum + (count ?? 0),
+    0
+  );
+  const accountActiveDone = Boolean(
+    row.account_linked_at &&
+      (Date.now() - new Date(row.account_linked_at).getTime()) / 86400000 >= ACCOUNT_ACTIVE_DAYS
+  );
+
+  return row.next_level_checklist.map((item) => {
+    if (item.id === "overdue-clear") return { ...item, done: latePayments === 0 };
+    if (item.id === "first-purpose-tx") return { ...item, done: approvedPurposeTx >= 1 };
+    if (item.id === "purpose-tx-2") return { ...item, done: approvedPurposeTx >= 2 };
+    if (item.id === "account-active") return { ...item, done: item.done || accountActiveDone };
+    return item;
+  });
+}
+
+export function toPassportState(row: PassportRow): FinancialPassport {
+  return {
+    level: row.level,
+    currentLimit: row.current_limit,
+    nextLevelChecklist: deriveChecklist(row),
+    paymentHistory: row.payment_history,
+    purposeCounts: row.purpose_counts ?? {},
+    verificationCode: row.verification_code,
+    accountLinkedAt: row.account_linked_at,
+  };
 }
 
 export async function getPassportRow(supabase: SupabaseClient, userId: string) {
@@ -28,64 +111,11 @@ export async function getPassportRow(supabase: SupabaseClient, userId: string) {
 }
 
 /**
- * 클릭해서 표시하는 항목.
- *
- * 나머지는 사실에서 자동으로 판정된다 — 연체가 없으면 "연체 정리"는 이미
- * 끝난 것이고, 은행이 승인한 목적 거래가 두 건이면 "목적 거래 2회"도
- * 이미 끝난 것이다. 그런 항목까지 눌러서 켤 수 있게 두면 등급이 사실이
- * 아니라 자기 신고가 되고, 그러면 은행에 내미는 금융여권이 아무것도
- * 보증하지 못한다.
- */
-const MANUAL_CHECKLIST_ITEMS = new Set([
-  "passport-verify",
-  "korean-account",
-  "phone-verify",
-  "account-active",
-]);
-
-export function isManualChecklistItem(id: string): boolean {
-  return MANUAL_CHECKLIST_ITEMS.has(id);
-}
-
-/**
- * 저장된 체크리스트 위에 "사실로 판정되는 항목"을 덮어쓴다.
- *
- * 저장된 값을 고치지 않고 읽을 때마다 다시 계산하는 이유: 연체가 새로
- * 생기거나 승인이 취소되면 그 항목은 다시 미완료로 돌아가야 한다. 한 번
- * 저장해 버리면 사실과 어긋난 채로 남는다.
- */
-export function deriveChecklist(row: PassportRow): ChecklistItem[] {
-  const latePayments = row.payment_history.filter((record) => !record.onTime).length;
-  const approvedPurposeTx = Object.values(row.purpose_counts ?? {}).reduce<number>(
-    (sum, count) => sum + (count ?? 0),
-    0
-  );
-
-  return row.next_level_checklist.map((item) => {
-    if (item.id === "overdue-clear") return { ...item, done: latePayments === 0 };
-    if (item.id === "first-purpose-tx") return { ...item, done: approvedPurposeTx >= 1 };
-    if (item.id === "purpose-tx-2") return { ...item, done: approvedPurposeTx >= 2 };
-    return item;
-  });
-}
-
-export function toPassportState(row: PassportRow): FinancialPassport {
-  return {
-    level: row.level,
-    currentLimit: row.current_limit,
-    nextLevelChecklist: deriveChecklist(row),
-    paymentHistory: row.payment_history,
-    purposeCounts: row.purpose_counts ?? {},
-    verificationCode: row.verification_code,
-  };
-}
-
-/**
  * 체크리스트가 다 찼으면 등급을 올린다.
  *
- * 클릭(수동 항목)으로도, 은행 승인(자동 항목)으로도 다 찰 수 있으므로 두
- * 경로가 같은 함수를 쓴다. 각자 판단하게 두면 한쪽만 고쳤을 때 같은
- * 조건에서 등급이 오르기도 하고 안 오르기도 한다.
+ * 클릭(수동 항목)으로도, 서류 확인으로도, 은행 승인(자동 항목)으로도 다
+ * 찰 수 있으므로 모든 경로가 같은 함수를 쓴다. 각자 판단하게 두면 한쪽만
+ * 고쳤을 때 같은 조건에서 등급이 오르기도 하고 안 오르기도 한다.
  */
 export async function applyLevelUpIfComplete(
   supabase: SupabaseClient,
@@ -109,17 +139,7 @@ export async function applyLevelUpIfComplete(
   });
 }
 
-export async function savePassportRow(
-  supabase: SupabaseClient,
-  userId: string,
-  row: Partial<{
-    level: PassportLevel;
-    current_limit: number;
-    next_level_checklist: ChecklistItem[];
-    payment_history: PaymentRecord[];
-    purpose_counts: Partial<Record<PurposeCategory, number>>;
-  }>
-) {
+export async function savePassportRow(supabase: SupabaseClient, userId: string, row: PassportPatch) {
   const { data, error } = await supabase
     .from("financial_passports")
     .update(row)
@@ -128,4 +148,42 @@ export async function savePassportRow(
     .single();
   if (error) throw error;
   return data as PassportRow;
+}
+
+/**
+ * 서류 업로드로 확인한 항목을 완료 처리한다 (/api/passport/verify).
+ * korean-account가 처음 완료되는 순간을 account_linked_at에 남겨, 이후
+ * account-active의 30일 경과 판정이 여기서부터 시작하게 한다.
+ */
+export async function completeDocumentVerifiedItem(
+  supabase: SupabaseClient,
+  userId: string,
+  row: PassportRow,
+  itemId: string
+): Promise<PassportRow> {
+  const checklist = row.next_level_checklist.map((item) =>
+    item.id === itemId ? { ...item, done: true } : item
+  );
+  const patch: PassportPatch = { next_level_checklist: checklist };
+  if (itemId === "korean-account" && !row.account_linked_at) {
+    patch.account_linked_at = new Date().toISOString();
+  }
+  const saved = await savePassportRow(supabase, userId, patch);
+  return applyLevelUpIfComplete(supabase, userId, saved);
+}
+
+/**
+ * 아직 실제 인증을 붙이지 못한 항목(phone-verify)의 수동 토글.
+ */
+export async function toggleManualChecklistItem(
+  supabase: SupabaseClient,
+  userId: string,
+  row: PassportRow,
+  itemId: string
+): Promise<PassportRow> {
+  const checklist = row.next_level_checklist.map((item) =>
+    item.id === itemId ? { ...item, done: !item.done } : item
+  );
+  const saved = await savePassportRow(supabase, userId, { next_level_checklist: checklist });
+  return applyLevelUpIfComplete(supabase, userId, saved);
 }
