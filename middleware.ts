@@ -9,19 +9,26 @@ import { NextResponse, type NextRequest } from "next/server";
  * 요구받는 꼴이 된다. 루트는 비로그인 홈을 직접 그리고, 로그인한
  * 사용자만 app/page.tsx가 /home이나 /onboarding으로 넘긴다.
  */
-const PUBLIC_PATHS = ["/", "/login", "/signup"];
+const PUBLIC_PATHS = ["/", "/login", "/signup", "/bank"];
 
-/** 비로그인 홈에서 질문을 던질 수 있어야 하므로 상담 화면도 함께 연다. */
+/**
+ * 비로그인 홈에서 질문을 던질 수 있어야 하므로 상담 화면도 함께 연다.
+ *
+ * "/bank"도 공개다. 그 화면을 쓰는 사람은 학생이 아니라 은행 직원이고,
+ * 창구에서 계정을 만들라고 하면 아무도 쓰지 않는다. 노출 범위는 이미
+ * 공개인 /verify/[code]와 같다 — 학생이 건넨 코드가 있어야만 조회된다.
+ */
 const PUBLIC_PREFIXES = ["/guest/"];
 
 /**
  * 인증 없이 부를 수 있는 API.
  *
- * 이 목록에 무언가를 더할 때는 그 라우트가 Supabase를 아예 부르지 않는지
- * 먼저 확인해야 한다. 사용자 데이터를 읽는 라우트가 여기 들어오는 순간
- * 남의 데이터가 로그인 없이 나간다.
+ * 이 목록에 무언가를 더할 때는 그 라우트가 스스로 문턱을 갖는지 확인해야
+ * 한다. /api/ai/guest-chat은 Supabase를 아예 부르지 않고, /api/bank/*는
+ * 창구 접근 코드(BANK_ACCESS_CODE)를 헤더로 요구한다. 그 둘 중 어느
+ * 쪽도 아닌 라우트가 여기 들어오는 순간 남의 데이터가 로그인 없이 나간다.
  */
-const PUBLIC_API_PATHS = ["/api/ai/guest-chat"];
+const PUBLIC_API_PATHS = ["/api/ai/guest-chat", "/api/bank/verify", "/api/bank/requests"];
 
 export async function middleware(request: NextRequest) {
   // Publicly viewable regardless of auth state (e.g. a bank teller scanning a QR).

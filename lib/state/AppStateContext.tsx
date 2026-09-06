@@ -17,10 +17,19 @@ interface AppStateContextValue {
   setDocumentFlag: (key: keyof DocumentFlags, value: "yes" | "no" | "unknown") => void;
   toggleChecklistItem: (id: string) => void;
   recordPurposeTransaction: (category: PurposeCategory) => void;
-  unlockLimit: (amount: number) => void;
+  requestLimit: (amount: number, purpose: PurposeCategory, evidence?: string) => void;
+  pendingRequests: PendingRequest[];
   setLanguage: (language: Language) => void;
   setNotificationSettings: (settings: NotificationSettings) => void;
   signOut: () => Promise<void>;
+}
+
+/** 이번 세션에 올린 한도 요청 한 건. */
+export interface PendingRequest {
+  id: string;
+  amount: number;
+  purpose: PurposeCategory;
+  status: "pending";
 }
 
 const AppStateContext = createContext<AppStateContextValue | null>(null);
@@ -66,10 +75,14 @@ export function AppStateProvider({
   children: ReactNode;
 }) {
   const [state, setState] = useState<AppState>(initialState);
+  // 이번 세션에 올린 요청. 승인 여부는 은행이 정하므로 여기서는 "올렸다"는
+  // 사실만 들고 있다가 화면에 되돌려 준다.
+  const [pending, setPending] = useState<PendingRequest[]>([]);
 
   const value = useMemo<AppStateContextValue>(
     () => ({
       state,
+      pendingRequests: pending,
       setDocumentFlag: (key, docValue) => {
         setState((prev) => ({ ...prev, documents: { ...prev.documents, [key]: docValue } }));
         postJson<{ documents: DocumentFlags }>("/api/documents", { [key]: docValue }).then(
@@ -116,16 +129,32 @@ export function AppStateProvider({
           if (data) setState((prev) => ({ ...prev, passport: data.passport }));
         });
       },
-      unlockLimit: (amount) => {
-        setState((prev) => ({
-          ...prev,
-          passport: { ...prev.passport, currentLimit: prev.passport.currentLimit + amount },
-        }));
-        postJson<{ passport: FinancialPassport }>("/api/passport/unlock", { amount }).then(
-          (data) => {
-            if (data) setState((prev) => ({ ...prev, passport: data.passport }));
-          }
-        );
+      /**
+       * 한도 열기 요청.
+       *
+       * 한도를 낙관적으로 올리지 않는다. 이 앱이 할 수 있는 일은 요청까지고,
+       * 실제로 여는 것은 은행이다. 화면에서만 먼저 올려 두면 사용자는
+       * 창구에 가서야 아직 안 열렸다는 것을 알게 된다 — 그 순간이 이
+       * 제품이 없애려던 바로 그 순간이다.
+       */
+      requestLimit: (amount, purpose, evidence) => {
+        const optimistic: PendingRequest = {
+          id: `local-${Date.now()}`,
+          amount,
+          purpose,
+          status: "pending",
+        };
+        setPending((prev) => [optimistic, ...prev]);
+        postJson<{ request: { id: string } }>("/api/passport/unlock", {
+          amount,
+          purpose,
+          evidence,
+        }).then((data) => {
+          if (!data) return;
+          setPending((prev) =>
+            prev.map((req) => (req.id === optimistic.id ? { ...req, id: data.request.id } : req))
+          );
+        });
       },
       setLanguage: (language) => {
         setState((prev) => ({ ...prev, profile: { ...prev.profile, language } }));
@@ -149,7 +178,7 @@ export function AppStateProvider({
         await supabase.auth.signOut();
       },
     }),
-    [state]
+    [state, pending]
   );
 
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;

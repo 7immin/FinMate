@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Globe, Bell, FileText, LifeBuoy, ChevronRight } from "lucide-react";
+import { Globe, Bell, FileText, LifeBuoy, ChevronRight, CalendarClock } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/Card";
 import { LanguageSwitcherSheet } from "@/components/ui/LanguageSwitcherSheet";
@@ -14,6 +14,8 @@ export default function MorePage() {
   const [langSheetOpen, setLangSheetOpen] = useState(false);
 
   const MENU = [
+    // 학교 등록 일정은 학비 흐름의 출발점이지만 매번 보는 화면은 아니다.
+    { label: t("notice.menuLabel"), icon: CalendarClock, onClick: () => router.push("/notice") },
     { label: t("more.menu.language"), icon: Globe, onClick: () => setLangSheetOpen(true) },
     { label: t("more.menu.notifications"), icon: Bell, onClick: () => router.push("/more/notifications") },
     { label: t("more.menu.terms"), icon: FileText, onClick: () => router.push("/more/terms") },
