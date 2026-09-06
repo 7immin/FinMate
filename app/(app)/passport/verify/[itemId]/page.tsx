@@ -125,11 +125,16 @@ export default function PassportVerifyPage() {
               {/* 무엇을 보고 실패했는지 말한다. "인식하지 못했어요"만 띄우면
                   사용자는 같은 사진을 몇 번이고 다시 올린다 — 다른 문서를
                   올린 것인지 흐려서 못 읽은 것인지 알 방법이 없기 때문이다. */}
-              {result && (
-                <p className="mt-1.5 text-[13px] leading-relaxed text-foreground-muted">
-                  {t("passport.verify.failureHint")}
+              {/* 무엇으로 보였는지 먼저 말한다. "여권으로 보입니다"면
+                  사용자는 파일을 잘못 골랐다는 걸 바로 안다. */}
+              {typeof result?.documentKind === "string" && result.documentKind && (
+                <p className="mt-1.5 text-[13px] leading-relaxed text-warning">
+                  {t("passport.verify.looksLike", { kind: result.documentKind })}
                 </p>
               )}
+              <p className="mt-1.5 text-[13px] leading-relaxed text-foreground-muted">
+                {t("passport.verify.failureHint")}
+              </p>
             </div>
           </Card>
         ) : null}

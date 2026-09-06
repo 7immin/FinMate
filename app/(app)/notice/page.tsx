@@ -120,7 +120,7 @@ export default function NoticePage() {
         {notice && (
           <>
             <p className="text-[17px] font-bold text-foreground">
-              {notice.academicYear} {notice.semester}
+              {notice.term[lang] || notice.term.ko}
             </p>
 
             {/* 실시간 조회가 막혔다는 사실을 감추지 않는다. 저장된 사본을
@@ -195,10 +195,18 @@ export default function NoticePage() {
             <Section title={t("notice.terms")}>
               <dl className="space-y-2.5 text-[14px]">
                 {notice.terms.methods.length > 0 && (
-                  <Row label={t("notice.methods")} value={notice.terms.methods.join(", ")} />
+                  <Row
+                    label={t("notice.methods")}
+                    value={notice.terms.methods.map((m) => m[lang] || m.ko).join(", ")}
+                  />
                 )}
                 {notice.terms.virtualAccountBank && (
-                  <Row label={t("notice.bank")} value={notice.terms.virtualAccountBank} />
+                  <Row
+                    label={t("notice.bank")}
+                    value={
+                      notice.terms.virtualAccountBank[lang] || notice.terms.virtualAccountBank.ko
+                    }
+                  />
                 )}
               </dl>
             </Section>
