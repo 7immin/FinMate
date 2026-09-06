@@ -129,6 +129,35 @@ export function AppStateProvider({
       cancelled = true;
     };
   }, []);
+  /**
+   * 탭을 다시 볼 때 상태를 한 번 더 불러오는 안전망.
+   *
+   * realtime 구독은 채널이 막 연결된 직후처럼 아주 좁은 틈에서 이벤트를
+   * 놓칠 수 있다 -- 구독 자체는 실패하지 않았는데 그 틈으로 지나간
+   * 이벤트만 못 받는 경우다. 탭이 백그라운드에 있다가 돌아오는 순간
+   * (visibilitychange) 이나 창이 다시 포커스를 받는 순간(focus) 한 번
+   * 더 불러오면, 놓친 이벤트가 있어도 그 순간 메꿔진다.
+   */
+  useEffect(() => {
+    function resync() {
+      if (document.visibilityState === "hidden") return;
+      fetch("/api/state/sync")
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.state) setState(data.state);
+        })
+        .catch(() => {
+          // 실패해도 다음 포커스/가시성 전환에서 다시 시도된다.
+        });
+    }
+    document.addEventListener("visibilitychange", resync);
+    window.addEventListener("focus", resync);
+    return () => {
+      document.removeEventListener("visibilitychange", resync);
+      window.removeEventListener("focus", resync);
+    };
+  }, []);
+
   // 은행 승인은 서비스 롤이 다른 화면(창구 콘솔)에서 직접 DB를 바꾸는
   // 방식이라, 새로고침 전까지는 학생 화면이 그 변화를 알 길이 없었다.
   // financial_passports/notifications가 바뀌는 순간을 postgres_changes로
