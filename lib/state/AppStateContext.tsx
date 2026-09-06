@@ -16,7 +16,6 @@ interface AppStateContextValue {
   state: AppState;
   setDocumentFlag: (key: keyof DocumentFlags, value: "yes" | "no" | "unknown") => void;
   toggleChecklistItem: (id: string) => void;
-  recordPurposeTransaction: (category: PurposeCategory) => void;
   requestLimit: (amount: number, purpose: PurposeCategory, evidence?: string) => void;
   pendingRequests: PendingRequest[];
   setLanguage: (language: Language) => void;
@@ -95,36 +94,6 @@ export function AppStateProvider({
         setState((prev) => ({ ...prev, passport: computeToggledPassport(prev.passport, id) }));
         postJson<{ passport: FinancialPassport }>("/api/passport/checklist", {
           itemId: id,
-        }).then((data) => {
-          if (data) setState((prev) => ({ ...prev, passport: data.passport }));
-        });
-      },
-      recordPurposeTransaction: (category) => {
-        setState((prev) => {
-          const targetIdx = prev.passport.nextLevelChecklist.findIndex((item) =>
-            item.id.includes("purpose-tx")
-          );
-          const checklist =
-            targetIdx === -1
-              ? prev.passport.nextLevelChecklist
-              : prev.passport.nextLevelChecklist.map((item, idx) =>
-                  idx === targetIdx ? { ...item, done: true } : item
-                );
-          return {
-            ...prev,
-            passport: {
-              ...prev.passport,
-              nextLevelChecklist: checklist,
-              paymentHistory: [...prev.passport.paymentHistory, { month: "…", onTime: true }],
-              purposeCounts: {
-                ...prev.passport.purposeCounts,
-                [category]: (prev.passport.purposeCounts[category] ?? 0) + 1,
-              },
-            },
-          };
-        });
-        postJson<{ passport: FinancialPassport }>("/api/passport/purpose-transaction", {
-          category,
         }).then((data) => {
           if (data) setState((prev) => ({ ...prev, passport: data.passport }));
         });

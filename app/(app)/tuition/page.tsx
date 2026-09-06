@@ -17,7 +17,7 @@ type Step = "upload" | "scanning" | "result" | "edit" | "success";
 
 export default function TuitionPage() {
   const router = useRouter();
-  const { state, recordPurposeTransaction, requestLimit } = useAppState();
+  const { state, requestLimit } = useAppState();
   const { t, tShared } = useTranslation();
   const [step, setStep] = useState<Step>("upload");
   const [invoice, setInvoice] = useState<TuitionInvoice>(() => ({
@@ -70,7 +70,6 @@ export default function TuitionPage() {
     // 여는 것은 은행이다 — 여기서 한도를 올려 버리면 화면에서만 열리고
     // 정작 은행 앱에서는 막혀 있어, 사용자가 마감 당일에야 그 사실을 안다.
     requestLimit(invoice.amount, "tuition", "tuition-invoice");
-    recordPurposeTransaction("tuition");
     setStep("success");
   }
 
