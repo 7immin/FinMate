@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertTriangle, ArrowLeft, Loader2 } from "lucide-react";
 import { GuestLanguageProvider } from "@/lib/i18n/GuestLanguageContext";
@@ -75,7 +75,9 @@ function EvidenceGuard() {
 export default function BankEvidencePage() {
   return (
     <GuestLanguageProvider>
-      <EvidenceGuard />
+      <Suspense fallback={null}>
+        <EvidenceGuard />
+      </Suspense>
     </GuestLanguageProvider>
   );
 }
