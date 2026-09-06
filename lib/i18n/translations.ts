@@ -577,7 +577,8 @@ const ko = {
       tapWhenPacked: "챙겼으면 눌러서 표시하세요",
       limitWarning: "계좌 개설 후 첫 한 달은 하루 이체 한도가 30만 원입니다. 정상적인 절차입니다.",
       langToggle: { ko: "한국어로 보기", en: "영어로 보기", zh: "중국어로 보기", vi: "베트남어로 보기" },
-      complete: "개설 완료했어요",
+      atBranch: "{{branch}}에서 보여주세요",
+      complete: "계좌를 개설하고 왔어요 · 계좌 확인하기",
       request: {
         ko: { title: "외국인 유학생 계좌 개설 요청", body: "여권으로 개설 가능한 유학생 계좌를 만들고 싶습니다. 학비 납부 용도입니다." },
         en: {
@@ -590,11 +591,6 @@ const ko = {
           body: "Tôi muốn mở tài khoản sinh viên bằng hộ chiếu. Mục đích là để đóng học phí.",
         },
       },
-    },
-    success: {
-      title: "방문 준비가 끝났어요",
-      description: "{{branch}}에서 위 화면을 보여주면 바로 창구 상담을 받을 수 있어요.",
-      branchFallback: "지점",
     },
   },
   deposit: {
@@ -1174,7 +1170,8 @@ const en: typeof ko = {
       tapWhenPacked: "Tap once you have it with you",
       limitWarning: "The daily transfer limit is 300,000 KRW for the first month after opening. This is standard procedure.",
       langToggle: { ko: "View in Korean", en: "View in English", zh: "View in Chinese", vi: "View in Vietnamese" },
-      complete: "I've finished opening it",
+      atBranch: "Show this at {{branch}}",
+      complete: "I opened my account - verify it",
       request: {
         ko: { title: "외국인 유학생 계좌 개설 요청", body: "여권으로 개설 가능한 유학생 계좌를 만들고 싶습니다. 학비 납부 용도입니다." },
         en: {
@@ -1187,11 +1184,6 @@ const en: typeof ko = {
           body: "Tôi muốn mở tài khoản sinh viên bằng hộ chiếu. Mục đích là để đóng học phí.",
         },
       },
-    },
-    success: {
-      title: "You're ready for your visit",
-      description: "Show this screen at {{branch}} to get counter support right away.",
-      branchFallback: "the branch",
     },
   },
   deposit: {
@@ -1767,7 +1759,8 @@ const zh: typeof ko = {
       tapWhenPacked: "带好后请点击标记",
       limitWarning: "开户后首月每日转账额度为30万韩元，这是正常流程。",
       langToggle: { ko: "查看韩语", en: "查看英语", zh: "查看中文", vi: "查看越南语" },
-      complete: "我已完成开户",
+      atBranch: "请在{{branch}}出示",
+      complete: "我已开户 · 去核实账户",
       request: {
         ko: { title: "외국인 유학생 계좌 개설 요청", body: "여권으로 개설 가능한 유학생 계좌를 만들고 싶습니다. 학비 납부 용도입니다." },
         en: {
@@ -1780,11 +1773,6 @@ const zh: typeof ko = {
           body: "Tôi muốn mở tài khoản sinh viên bằng hộ chiếu. Mục đích là để đóng học phí.",
         },
       },
-    },
-    success: {
-      title: "到访准备已完成",
-      description: "在{{branch}}出示此界面即可立即获得窗口咨询服务。",
-      branchFallback: "该网点",
     },
   },
   deposit: {
@@ -2364,7 +2352,8 @@ const vi: typeof ko = {
       tapWhenPacked: "Nhấn khi bạn đã mang theo",
       limitWarning: "Hạn mức chuyển khoản hằng ngày trong tháng đầu sau khi mở tài khoản là 300,000 KRW. Đây là quy trình bình thường.",
       langToggle: { ko: "Xem tiếng Hàn", en: "Xem tiếng Anh", zh: "Xem tiếng Trung", vi: "Xem tiếng Việt" },
-      complete: "Tôi đã mở xong tài khoản",
+      atBranch: "Hãy xuất trình tại {{branch}}",
+      complete: "Tôi đã mở tài khoản · xác minh",
       request: {
         ko: { title: "외국인 유학생 계좌 개설 요청", body: "여권으로 개설 가능한 유학생 계좌를 만들고 싶습니다. 학비 납부 용도입니다." },
         en: {
@@ -2377,11 +2366,6 @@ const vi: typeof ko = {
           body: "Tôi muốn mở tài khoản sinh viên bằng hộ chiếu. Mục đích là để đóng học phí.",
         },
       },
-    },
-    success: {
-      title: "Đã chuẩn bị xong cho chuyến thăm",
-      description: "Xuất trình màn hình này tại {{branch}} để được hỗ trợ tại quầy ngay lập tức.",
-      branchFallback: "chi nhánh",
     },
   },
   deposit: {

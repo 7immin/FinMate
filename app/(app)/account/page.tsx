@@ -7,17 +7,14 @@ import { DocumentsStep } from "@/components/flows/account/DocumentsStep";
 import { GuidanceStep } from "@/components/flows/account/GuidanceStep";
 import { BranchFinderStep } from "@/components/flows/account/BranchFinderStep";
 import { PrepCardStep } from "@/components/flows/account/PrepCardStep";
-import { FlowSuccess } from "@/components/flows/FlowSuccess";
 import { useAppState } from "@/lib/state/AppStateContext";
-import { useTranslation } from "@/lib/i18n/useTranslation";
 import { DocumentFlags } from "@/lib/types";
 
-type Step = "documents" | "guidance" | "branch" | "prep" | "success";
+type Step = "documents" | "guidance" | "branch" | "prep";
 
 export default function AccountOpeningPage() {
   const router = useRouter();
   const { setDocumentFlag } = useAppState();
-  const { t } = useTranslation();
   const [step, setStep] = useState<Step>("documents");
   const [documents, setDocuments] = useState<DocumentFlags | null>(null);
   const [branchName, setBranchName] = useState<string | null>(null);
@@ -44,17 +41,21 @@ export default function AccountOpeningPage() {
           }}
         />
       )}
+      {/*
+        창구 준비 카드가 이 흐름의 끝이다.
+        여기 있던 완료 화면은 "{{지점}}에서 위 화면을 보여주면 됩니다"라고
+        했는데, 정작 그 "위 화면"은 방금 떠나온 준비 카드였다. 넘어가고
+        나면 가리킬 것이 아무것도 없다.
+
+        준비 카드를 창구에서 보여주는 것이 결과물이므로, 그 화면에 머무는
+        것이 맞다. 계좌를 실제로 개설하고 온 다음에 할 일(계좌 확인)은
+        준비 카드 안에서 이어 간다.
+      */}
       {step === "prep" && documents && (
-        <PrepCardStep documents={documents} onComplete={() => setStep("success")} />
-      )}
-      {step === "success" && (
-        <FlowSuccess
-          topBarTitle={t("account.topBarTitle")}
-          title={t("account.success.title")}
-          description={t("account.success.description", {
-            branch: branchName ?? t("account.success.branchFallback"),
-          })}
-          onDone={() => router.push("/home")}
+        <PrepCardStep
+          documents={documents}
+          branchName={branchName}
+          onVerifyAccount={() => router.push("/passport/verify/korean-account")}
         />
       )}
     </AppShell>

@@ -19,10 +19,14 @@ interface RequestPhrase {
 
 export function PrepCardStep({
   documents,
-  onComplete,
+  branchName,
+  onVerifyAccount,
 }: {
   documents: DocumentFlags;
-  onComplete: () => void;
+  /** 앞에서 고른 지점. 안 골랐으면 null. */
+  branchName: string | null;
+  /** 계좌를 실제로 개설하고 온 뒤 확인하러 가는 곳. */
+  onVerifyAccount: () => void;
 }) {
   const { t, lang } = useTranslation();
   const [langIdx, setLangIdx] = useState(() => Math.max(0, PHRASE_LANG_CYCLE.indexOf(lang)));
@@ -42,6 +46,13 @@ export function PrepCardStep({
       <TopBar title={t("account.prep.topBarTitle")} />
       <div className="flex-1 space-y-5 px-5 pb-6 pt-2">
         <h1 className="text-[22px] font-bold text-foreground">{t("account.prep.headline")}</h1>
+        {/* 어느 지점에 가는지 여기 남긴다. 예전에는 다음 화면에서야
+            지점 이름이 나왔는데, 그 화면은 창구에서 보여줄 것이 아니었다. */}
+        {branchName && (
+          <p className="-mt-2 text-[15px] text-foreground-muted">
+            {t("account.prep.atBranch", { branch: branchName })}
+          </p>
+        )}
 
         <Card raised className="space-y-2">
           <p className="text-sm font-medium text-foreground-muted">{phrase.title}</p>
@@ -98,9 +109,11 @@ export function PrepCardStep({
         >
           <Languages className="h-4 w-4" /> {t(`account.prep.langToggle.${nextLang}`)}
         </Button>
+        {/* 창구에 다녀온 뒤에 할 일. 여기서 흐름이 끝나므로, 다음에
+            무엇을 하면 되는지는 이 줄이 말한다. */}
         <button
           type="button"
-          onClick={onComplete}
+          onClick={onVerifyAccount}
           className="w-full text-center text-sm text-foreground-muted"
         >
           {t("account.prep.complete")}
