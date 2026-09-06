@@ -42,3 +42,5 @@ next-env.d.ts
 
 # supabase CLI local cache
 /supabase/.temp/
+/shots_profile/
+/shots_verify/

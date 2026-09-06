@@ -8,13 +8,7 @@ import { Card } from "@/components/ui/Card";
 import { translate, translateShared } from "@/lib/i18n";
 import { FinancialPassport, Language, UserProfile } from "@/lib/types";
 
-function verificationCode(seed: string, nationalityCode: string) {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
-  return `FM-${hash.toString(36).toUpperCase().padStart(4, "0").slice(0, 4)}-${nationalityCode}`;
-}
-
-function DocRow({ label, value }: { label: string; value: string }) {
+export function DocRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
       <span className="text-sm text-neutral-500">{label}</span>
@@ -68,10 +62,7 @@ export function ReportView({
   const lastMonth = passport.paymentHistory[passport.paymentHistory.length - 1]?.month;
   const periodValue = firstMonth && lastMonth ? `${firstMonth} - ${lastMonth}` : t("passport.report.noHistory");
 
-  const code = useMemo(
-    () => verificationCode(profile.name + passport.level, profile.nationalityCode),
-    [profile.name, passport.level, profile.nationalityCode]
-  );
+  const code = passport.verificationCode;
   const issueDate = useMemo(() => {
     const d = new Date();
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(
@@ -88,17 +79,11 @@ export function ReportView({
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   useEffect(() => {
     if (!showQr) return;
-    const payload = [
-      "FINMATE-VERIFICATION",
-      `code:${code}`,
-      `name:${profile.name}`,
-      `tier:${passport.level}`,
-      `issued:${issueDate}`,
-    ].join("|");
-    QRCode.toDataURL(payload, { width: 240, margin: 1 })
+    const verifyUrl = `${window.location.origin}/verify/${code}`;
+    QRCode.toDataURL(verifyUrl, { width: 240, margin: 1 })
       .then(setQrDataUrl)
       .catch(() => setQrDataUrl(null));
-  }, [showQr, code, profile.name, passport.level, issueDate]);
+  }, [showQr, code]);
 
   return (
     <div className="flex flex-1 flex-col">

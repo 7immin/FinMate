@@ -22,7 +22,7 @@ export default function ProfilePage() {
 
   return (
     <AppShell showNav>
-      <div className="space-y-6 px-5 pb-10 pt-8">
+      <div className="space-y-8 px-5 pb-10 pt-8">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 text-xl font-bold text-primary">
             {profile.name.slice(0, 1)}
@@ -36,7 +36,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <Link href="/passport">
+        <Link href="/passport" className="block">
           <Card raised className="flex items-center justify-between">
             <div>
               <p className="text-sm text-foreground-muted">{t("profile.passportRow")}</p>

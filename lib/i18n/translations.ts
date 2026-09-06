@@ -90,6 +90,11 @@ const ko = {
     chooseFile: "파일 선택",
   },
   nav: { home: "홈", ai: "AI", profile: "내 정보", more: "더보기" },
+  verify: {
+    pageTitle: "FinMate 검증 리포트",
+    footer: "FinMate가 검증한 요약 정보입니다. 상세 거래 내역은 공개되지 않습니다.",
+    notFound: "유효하지 않거나 만료된 검증 코드입니다.",
+  },
   onboarding: {
     headline: "목적을 증명하면\n한도가 열립니다",
     description: "등록금·월세 같은 실제 지출을 FinMate가 직접 확인하고, 그 목적에만 이체 한도를 엽니다.",
@@ -489,6 +494,11 @@ const en: typeof ko = {
     chooseFile: "Choose file",
   },
   nav: { home: "Home", ai: "AI", profile: "Profile", more: "More" },
+  verify: {
+    pageTitle: "FinMate verification report",
+    footer: "This is a summary verified by FinMate. No detailed transaction history is disclosed.",
+    notFound: "This verification code is invalid or has expired.",
+  },
   onboarding: {
     headline: "Prove your purpose,\nunlock your limit",
     description:
@@ -890,6 +900,11 @@ const zh: typeof ko = {
     chooseFile: "选择文件",
   },
   nav: { home: "首页", ai: "AI", profile: "我的", more: "更多" },
+  verify: {
+    pageTitle: "FinMate 验证报告",
+    footer: "这是 FinMate 验证的摘要信息，不公开详细交易记录。",
+    notFound: "验证码无效或已过期。",
+  },
   onboarding: {
     headline: "证明用途，\n即可开通额度",
     description: "学费、房租等实际支出由 FinMate 直接核实，并仅为该用途开通转账额度。",
@@ -1286,6 +1301,11 @@ const vi: typeof ko = {
     chooseFile: "Chọn tệp",
   },
   nav: { home: "Trang chủ", ai: "AI", profile: "Của tôi", more: "Thêm" },
+  verify: {
+    pageTitle: "Báo cáo xác minh FinMate",
+    footer: "Đây là thông tin tóm tắt đã được FinMate xác minh. Không công khai lịch sử giao dịch chi tiết.",
+    notFound: "Mã xác minh không hợp lệ hoặc đã hết hạn.",
+  },
   onboarding: {
     headline: "Chứng minh mục đích,\nhạn mức sẽ được mở",
     description:

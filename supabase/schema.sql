@@ -21,6 +21,8 @@ create table if not exists public.financial_passports (
   next_level_checklist jsonb not null default '[]'::jsonb,
   payment_history jsonb not null default '[]'::jsonb,
   purpose_counts jsonb not null default '{}'::jsonb,
+  verification_code text not null unique
+    default upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 8)),
   updated_at timestamptz not null default now()
 );
 
@@ -85,3 +87,44 @@ begin
   on conflict (user_id) do nothing;
 end;
 $$;
+
+-- Public, unauthenticated lookup for the "show this QR at the counter" report.
+-- Only returns the same non-sensitive summary already shown inside the app --
+-- never detailed scores or raw transaction amounts.
+create or replace function public.get_report_by_code(p_code text)
+returns table (
+  name text,
+  visa_status text,
+  nationality_code text,
+  school text,
+  level text,
+  on_time_count int,
+  total_count int,
+  purpose_counts jsonb,
+  period_start text,
+  period_end text
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  return query
+  select
+    p.name,
+    p.visa_status,
+    p.nationality_code,
+    p.school,
+    fp.level,
+    (select count(*)::int from jsonb_array_elements(fp.payment_history) e where (e->>'onTime')::boolean),
+    jsonb_array_length(fp.payment_history),
+    fp.purpose_counts,
+    (fp.payment_history->0->>'month'),
+    (fp.payment_history->(jsonb_array_length(fp.payment_history) - 1)->>'month')
+  from public.financial_passports fp
+  join public.profiles p on p.user_id = fp.user_id
+  where fp.verification_code = upper(p_code);
+end;
+$$;
+
+grant execute on function public.get_report_by_code(text) to anon, authenticated;

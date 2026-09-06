@@ -41,6 +41,7 @@ export interface FinancialPassport {
   nextLevelChecklist: ChecklistItem[];
   paymentHistory: PaymentRecord[];
   purposeCounts: Partial<Record<PurposeCategory, number>>;
+  verificationCode: string;
 }
 
 export interface DocumentFlags {

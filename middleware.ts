@@ -4,6 +4,11 @@ import { NextResponse, type NextRequest } from "next/server";
 const PUBLIC_PATHS = ["/login", "/signup"];
 
 export async function middleware(request: NextRequest) {
+  // Publicly viewable regardless of auth state (e.g. a bank teller scanning a QR).
+  if (request.nextUrl.pathname.startsWith("/verify/")) {
+    return NextResponse.next({ request });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(

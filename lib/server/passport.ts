@@ -13,6 +13,7 @@ interface PassportRow {
   next_level_checklist: ChecklistItem[];
   payment_history: PaymentRecord[];
   purpose_counts: Partial<Record<PurposeCategory, number>>;
+  verification_code: string;
 }
 
 export async function getPassportRow(supabase: SupabaseClient, userId: string) {
@@ -32,6 +33,7 @@ export function toPassportState(row: PassportRow): FinancialPassport {
     nextLevelChecklist: row.next_level_checklist,
     paymentHistory: row.payment_history,
     purposeCounts: row.purpose_counts ?? {},
+    verificationCode: row.verification_code,
   };
 }
 

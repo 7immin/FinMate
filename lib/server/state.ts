@@ -40,6 +40,7 @@ export async function fetchAppState(): Promise<FetchResult> {
       nextLevelChecklist: passport.next_level_checklist as ChecklistItem[],
       paymentHistory: passport.payment_history as PaymentRecord[],
       purposeCounts: (passport.purpose_counts ?? {}) as Partial<Record<PurposeCategory, number>>,
+      verificationCode: passport.verification_code,
     },
     documents: {
       hasPassport: documents.has_passport,
