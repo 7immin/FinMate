@@ -127,14 +127,27 @@ export default function PassportVerifyPage() {
                   올린 것인지 흐려서 못 읽은 것인지 알 방법이 없기 때문이다. */}
               {/* 무엇으로 보였는지 먼저 말한다. "여권으로 보입니다"면
                   사용자는 파일을 잘못 골랐다는 걸 바로 안다. */}
-              {typeof result?.documentKind === "string" && result.documentKind && (
+              {/* 이름이 남의 것으로 읽힌 경우는 사진 품질 문제가 아니다.
+                  "다시 찍어 올리세요"라고 하면 몇 번을 다시 찍어도 안 된다. */}
+              {result?.nameMatch === "mismatch" ? (
                 <p className="mt-1.5 text-[13px] leading-relaxed text-warning">
-                  {t("passport.verify.looksLike", { kind: result.documentKind })}
+                  {t("passport.verify.nameMismatch", {
+                    name: typeof result.name === "string" ? result.name : "",
+                  })}
+                </p>
+              ) : (
+                typeof result?.documentKind === "string" &&
+                result.documentKind && (
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-warning">
+                    {t("passport.verify.looksLike", { kind: result.documentKind })}
+                  </p>
+                )
+              )}
+              {result?.nameMatch !== "mismatch" && (
+                <p className="mt-1.5 text-[13px] leading-relaxed text-foreground-muted">
+                  {t("passport.verify.failureHint")}
                 </p>
               )}
-              <p className="mt-1.5 text-[13px] leading-relaxed text-foreground-muted">
-                {t("passport.verify.failureHint")}
-              </p>
             </div>
           </Card>
         ) : null}
