@@ -6,16 +6,14 @@ import { AppShell } from "@/components/layout/AppShell";
 import { InputStep } from "@/components/flows/remittance/InputStep";
 import { CheckStep } from "@/components/flows/remittance/CheckStep";
 import { UnlockStep } from "@/components/flows/remittance/UnlockStep";
-import { ChannelStep } from "@/components/flows/remittance/ChannelStep";
-import { TrackingStep } from "@/components/flows/remittance/TrackingStep";
 import { FlowSuccess } from "@/components/flows/FlowSuccess";
 import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { RemittanceChannel, ReasonId } from "@/lib/mock/remittance";
+import { ReasonId } from "@/lib/mock/remittance";
 import { DEFAULT_COUNTRY_CODE } from "@/lib/remittance/countries";
 import { NationalityId } from "@/lib/types";
 
-type Step = "input" | "check" | "unlock" | "requested" | "channel" | "tracking";
+type Step = "input" | "check" | "unlock" | "requested";
 
 export default function RemittancePage() {
   const router = useRouter();
@@ -26,7 +24,6 @@ export default function RemittancePage() {
   const [recipient, setRecipient] = useState("NGUYEN VAN MINH");
   const [reason, setReason] = useState<ReasonId>("living");
   const [amount, setAmount] = useState(1800000);
-  const [channel, setChannel] = useState<RemittanceChannel | null>(null);
 
   const openLimit = state.passport.currentLimit;
 
@@ -50,11 +47,7 @@ export default function RemittancePage() {
           amount={amount}
           openLimit={openLimit}
           onUnlock={() => setStep("unlock")}
-          onSendPartial={() => {
-            setAmount(openLimit);
-            setStep("channel");
-          }}
-          onProceed={() => setStep("channel")}
+          onProceed={() => router.push("/home")}
         />
       )}
       {/*
@@ -80,22 +73,6 @@ export default function RemittancePage() {
           topBarTitle={t("remittance.unlock.topBarTitle")}
           title={t("remittance.requested.title")}
           description={t("remittance.requested.description")}
-          onDone={() => router.push("/home")}
-        />
-      )}
-      {step === "channel" && (
-        <ChannelStep
-          onSelect={(selected) => {
-            setChannel(selected);
-            setStep("tracking");
-          }}
-        />
-      )}
-      {step === "tracking" && channel && (
-        <TrackingStep
-          recipient={recipient}
-          amount={amount}
-          channel={channel}
           onDone={() => router.push("/home")}
         />
       )}

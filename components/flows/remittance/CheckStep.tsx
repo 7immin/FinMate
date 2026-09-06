@@ -15,13 +15,11 @@ export function CheckStep({
   amount,
   openLimit,
   onUnlock,
-  onSendPartial,
   onProceed,
 }: {
   amount: number;
   openLimit: number;
   onUnlock: () => void;
-  onSendPartial: () => void;
   onProceed: () => void;
 }) {
   const { t } = useTranslation();
@@ -117,12 +115,7 @@ export function CheckStep({
         {sufficient ? (
           <Button onClick={onProceed}>{t("remittance.check.proceed")}</Button>
         ) : (
-          <>
-            <Button onClick={onUnlock}>{t("remittance.check.unlock")}</Button>
-            <Button variant="outline" onClick={onSendPartial}>
-              {t("remittance.check.sendPartial", { amount: openLimit.toLocaleString() })}
-            </Button>
-          </>
+          <Button onClick={onUnlock}>{t("remittance.check.unlock")}</Button>
         )}
       </div>
     </div>

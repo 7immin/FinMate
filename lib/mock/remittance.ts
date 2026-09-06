@@ -23,14 +23,3 @@ export const PROOF_OPTIONS: ProofOption[] = [
   { id: "homeRemittance", bonus: 2000000 },
   { id: "scholarship", bonus: 1500000 },
 ];
-
-export interface RemittanceChannel {
-  id: "partner" | "wire";
-  fee: number;
-  recommended?: boolean;
-}
-
-export const CHANNELS: RemittanceChannel[] = [
-  { id: "partner", fee: 5000, recommended: true },
-  { id: "wire", fee: 15000 },
-];
