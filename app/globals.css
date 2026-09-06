@@ -39,3 +39,19 @@ input::placeholder,
 textarea::placeholder {
   color: #6e6e7c;
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-report,
+  .printable-report * {
+    visibility: visible;
+  }
+  .printable-report {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

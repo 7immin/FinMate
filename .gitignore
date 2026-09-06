@@ -38,6 +38,7 @@ next-env.d.ts
 /shots_supabase/
 /shots_report/
 /shots_report2/
+/shots_qrprint/
 
 # supabase CLI local cache
 /supabase/.temp/

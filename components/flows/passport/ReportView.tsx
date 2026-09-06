@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import QRCode from "qrcode";
 import { Download, QrCode, Languages as LanguagesIcon, EyeOff, ChevronRight } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
@@ -84,11 +85,26 @@ export function ReportView({
       t("passport.report.categoryCount", { label: t(`passport.report.category.${category}`), count: count! })
     );
 
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!showQr) return;
+    const payload = [
+      "FINMATE-VERIFICATION",
+      `code:${code}`,
+      `name:${profile.name}`,
+      `tier:${passport.level}`,
+      `issued:${issueDate}`,
+    ].join("|");
+    QRCode.toDataURL(payload, { width: 240, margin: 1 })
+      .then(setQrDataUrl)
+      .catch(() => setQrDataUrl(null));
+  }, [showQr, code, profile.name, passport.level, issueDate]);
+
   return (
     <div className="flex flex-1 flex-col">
       <TopBar title={t("passport.report.title")} closeIcon onBack={onClose} />
       <div className="flex-1 space-y-5 px-5 pb-6 pt-2">
-        <div className="space-y-4 rounded-2xl bg-white p-5 shadow-card">
+        <div className="printable-report space-y-4 rounded-2xl bg-white p-5 shadow-card">
           <div className="flex items-start justify-between">
             <p className="text-xs font-medium tracking-wide text-neutral-400">
               {t("passport.report.masthead")}
@@ -127,14 +143,12 @@ export function ReportView({
 
         {showQr && (
           <div className="flex flex-col items-center gap-3 rounded-2xl bg-white p-6 shadow-card">
-            <div className="grid h-40 w-40 grid-cols-5 grid-rows-5 gap-1 rounded-lg bg-white p-3">
-              {Array.from({ length: 25 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={(i * 7 + code.length) % 3 === 0 ? "rounded-sm bg-black" : "rounded-sm bg-white"}
-                />
-              ))}
-            </div>
+            {qrDataUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={qrDataUrl} alt={t("passport.report.qrCaption")} className="h-40 w-40" />
+            ) : (
+              <div className="h-40 w-40 animate-pulse rounded-lg bg-neutral-200" />
+            )}
             <p className="text-xs text-neutral-500">{t("passport.report.qrCaption")}</p>
           </div>
         )}
