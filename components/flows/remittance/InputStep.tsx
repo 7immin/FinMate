@@ -3,15 +3,17 @@
 import { TopBar } from "@/components/layout/TopBar";
 import { Chip } from "@/components/ui/Chip";
 import { Button } from "@/components/ui/Button";
-import { COUNTRIES, REASONS, EXCHANGE_RATE_TO_VND } from "@/lib/mock/remittance";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { COUNTRIES, EXCHANGE_RATE_TO_VND, REASON_IDS, ReasonId } from "@/lib/mock/remittance";
+import { NationalityId } from "@/lib/types";
 
 interface InputStepProps {
-  country: string;
-  setCountry: (v: string) => void;
+  country: NationalityId;
+  setCountry: (v: NationalityId) => void;
   recipient: string;
   setRecipient: (v: string) => void;
-  reason: string;
-  setReason: (v: string) => void;
+  reason: ReasonId;
+  setReason: (v: ReasonId) => void;
   amount: number;
   setAmount: (v: number) => void;
   onSubmit: () => void;
@@ -28,22 +30,23 @@ export function InputStep({
   setAmount,
   onSubmit,
 }: InputStepProps) {
+  const { t, tShared } = useTranslation();
   const receivedAmount = Math.round(amount * EXCHANGE_RATE_TO_VND);
 
   return (
     <div className="flex flex-1 flex-col">
-      <TopBar title="해외 송금" />
+      <TopBar title={t("remittance.topBarTitle")} />
       <div className="flex-1 space-y-6 px-5 pb-6 pt-2">
         <div>
-          <h1 className="text-[22px] font-bold text-foreground">보내기 전에 먼저 점검합니다</h1>
+          <h1 className="text-[22px] font-bold text-foreground">{t("remittance.input.headline")}</h1>
         </div>
 
         <div>
-          <p className="mb-2 text-sm text-foreground-muted">받는 국가</p>
+          <p className="mb-2 text-sm text-foreground-muted">{t("remittance.input.countryLabel")}</p>
           <div className="flex flex-wrap gap-2">
             {COUNTRIES.slice(0, 4).map((c) => (
               <Chip key={c} selected={country === c} onClick={() => setCountry(c)}>
-                {c}
+                {tShared("country", c)}
               </Chip>
             ))}
             <Chip
@@ -56,28 +59,28 @@ export function InputStep({
         </div>
 
         <div>
-          <p className="mb-2 text-sm text-foreground-muted">받는 사람</p>
+          <p className="mb-2 text-sm text-foreground-muted">{t("remittance.input.recipientLabel")}</p>
           <input
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
             className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-foreground outline-none focus:border-primary"
           />
-          <p className="mt-1.5 text-xs text-foreground-subtle">여권과 똑같이 적어주세요</p>
+          <p className="mt-1.5 text-xs text-foreground-subtle">{t("remittance.input.recipientHint")}</p>
         </div>
 
         <div>
-          <p className="mb-2 text-sm text-foreground-muted">보내는 이유</p>
+          <p className="mb-2 text-sm text-foreground-muted">{t("remittance.input.reasonLabel")}</p>
           <div className="flex flex-wrap gap-2">
-            {REASONS.map((r) => (
+            {REASON_IDS.map((r) => (
               <Chip key={r} selected={reason === r} onClick={() => setReason(r)}>
-                {r}
+                {t(`remittance.reason.${r}`)}
               </Chip>
             ))}
           </div>
         </div>
 
         <div>
-          <p className="mb-2 text-sm text-foreground-muted">보내는 금액</p>
+          <p className="mb-2 text-sm text-foreground-muted">{t("remittance.input.amountLabel")}</p>
           <div className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3.5">
             <input
               type="number"
@@ -88,14 +91,14 @@ export function InputStep({
             <span className="shrink-0 text-sm text-foreground-muted">KRW</span>
           </div>
           <div className="mt-1.5 flex items-center justify-between text-xs text-foreground-subtle">
-            <span>받는 금액 약 {receivedAmount.toLocaleString()} VND</span>
-            <span>1 KRW = {EXCHANGE_RATE_TO_VND} VND</span>
+            <span>{t("remittance.input.receivedAmount", { amount: receivedAmount.toLocaleString() })}</span>
+            <span>{t("remittance.input.rate", { rate: EXCHANGE_RATE_TO_VND })}</span>
           </div>
         </div>
       </div>
       <div className="px-5 pb-6">
         <Button onClick={onSubmit} disabled={!recipient || amount <= 0}>
-          점검하기
+          {t("remittance.input.submit")}
         </Button>
       </div>
     </div>

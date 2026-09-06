@@ -9,7 +9,8 @@ import { UnlockStep } from "@/components/flows/remittance/UnlockStep";
 import { ChannelStep } from "@/components/flows/remittance/ChannelStep";
 import { TrackingStep } from "@/components/flows/remittance/TrackingStep";
 import { useAppState } from "@/lib/state/AppStateContext";
-import { RemittanceChannel } from "@/lib/mock/remittance";
+import { RemittanceChannel, ReasonId } from "@/lib/mock/remittance";
+import { NationalityId } from "@/lib/types";
 
 type Step = "input" | "check" | "unlock" | "channel" | "tracking";
 
@@ -17,9 +18,9 @@ export default function RemittancePage() {
   const router = useRouter();
   const { state, unlockLimit } = useAppState();
   const [step, setStep] = useState<Step>("input");
-  const [country, setCountry] = useState("베트남");
+  const [country, setCountry] = useState<NationalityId>("vietnam");
   const [recipient, setRecipient] = useState("NGUYEN VAN MINH");
-  const [reason, setReason] = useState("생활비");
+  const [reason, setReason] = useState<ReasonId>("living");
   const [amount, setAmount] = useState(1800000);
   const [channel, setChannel] = useState<RemittanceChannel | null>(null);
 

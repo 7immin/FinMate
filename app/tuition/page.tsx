@@ -8,6 +8,7 @@ import { ScanningStep } from "@/components/flows/tuition/ScanningStep";
 import { ResultStep } from "@/components/flows/tuition/ResultStep";
 import { FlowSuccess } from "@/components/flows/FlowSuccess";
 import { useAppState } from "@/lib/state/AppStateContext";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { TUITION_INVOICE } from "@/lib/mock/tuition";
 
 type Step = "upload" | "scanning" | "result" | "success";
@@ -15,6 +16,7 @@ type Step = "upload" | "scanning" | "result" | "success";
 export default function TuitionPage() {
   const router = useRouter();
   const { recordPurposeTransaction } = useAppState();
+  const { t, tShared } = useTranslation();
   const [step, setStep] = useState<Step>("upload");
 
   function handleConfirm() {
@@ -31,10 +33,12 @@ export default function TuitionPage() {
       )}
       {step === "success" && (
         <FlowSuccess
-          topBarTitle="학비 한도 개방"
-          title="등록금 이체 한도가 열렸어요"
-          description={`${TUITION_INVOICE.recipient}에 ${TUITION_INVOICE.amount.toLocaleString()}원을 납부할 수 있는 한도가 확보됐습니다. 금융여권에도 반영됐어요.`}
-          doneLabel="홈으로"
+          topBarTitle={t("tuition.topBarTitle")}
+          title={t("tuition.success.title")}
+          description={t("tuition.success.description", {
+            recipient: tShared("school", TUITION_INVOICE.recipient),
+            amount: TUITION_INVOICE.amount.toLocaleString(),
+          })}
           onDone={() => router.push("/home")}
         />
       )}
