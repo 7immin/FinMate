@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { AppShell } from "@/components/layout/AppShell";
@@ -89,12 +90,14 @@ export default function SignupPage() {
           로그인
         </Link>
       </p>
-      <Link
-        href="/"
-        className="mt-4 block text-center text-sm font-medium text-foreground-muted hover:text-foreground"
+      <Button
+        variant="outline"
+        onClick={() => router.push("/")}
+        className="mt-4 h-[50px] border-primary text-foreground"
       >
         비회원으로 이용하기
-      </Link>
+        <ArrowRight className="h-[15px] w-[15px] text-primary" />
+      </Button>
     </AppShell>
   );
 }
