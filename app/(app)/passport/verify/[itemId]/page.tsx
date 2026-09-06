@@ -41,18 +41,6 @@ const ITEM_CONFIG: Record<string, ItemConfig> = {
       { key: "accountHolder", labelKey: "accountHolder" },
     ],
   },
-  "overdue-clear": {
-    i18nKey: "overdueClear",
-    fields: [
-      { key: "billType", labelKey: "billType" },
-      {
-        key: "amount",
-        labelKey: "amount",
-        format: (v) => `${Number(v).toLocaleString()} KRW`,
-      },
-      { key: "paidDate", labelKey: "paidDate" },
-    ],
-  },
 };
 
 type Status = "idle" | "submitting" | "success" | "failure";

@@ -4,12 +4,18 @@ import { TopBar } from "@/components/layout/TopBar";
 import { Chip } from "@/components/ui/Chip";
 import { Button } from "@/components/ui/Button";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { COUNTRIES, EXCHANGE_RATE_TO_VND, REASON_IDS, ReasonId } from "@/lib/mock/remittance";
-import { NationalityId } from "@/lib/types";
+import { REASON_IDS, ReasonId } from "@/lib/mock/remittance";
+import { CountryPicker } from "@/components/flows/remittance/CountryPicker";
+import {
+  RATE_AS_OF,
+  findCountry,
+  formatRate,
+  formatReceived,
+} from "@/lib/remittance/countries";
 
 interface InputStepProps {
-  country: NationalityId;
-  setCountry: (v: NationalityId) => void;
+  country: string;
+  setCountry: (v: string) => void;
   recipient: string;
   setRecipient: (v: string) => void;
   reason: ReasonId;
@@ -30,8 +36,8 @@ export function InputStep({
   setAmount,
   onSubmit,
 }: InputStepProps) {
-  const { t, tShared } = useTranslation();
-  const receivedAmount = Math.round(amount * EXCHANGE_RATE_TO_VND);
+  const { t, lang } = useTranslation();
+  const selected = findCountry(country);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -43,19 +49,7 @@ export function InputStep({
 
         <div>
           <p className="mb-2 text-sm text-foreground-muted">{t("remittance.input.countryLabel")}</p>
-          <div className="flex flex-wrap gap-2">
-            {COUNTRIES.slice(0, 4).map((c) => (
-              <Chip key={c} selected={country === c} onClick={() => setCountry(c)}>
-                {tShared("country", c)}
-              </Chip>
-            ))}
-            <Chip
-              selected={COUNTRIES.slice(4).includes(country)}
-              onClick={() => setCountry(COUNTRIES[4])}
-            >
-              +{COUNTRIES.length - 4}
-            </Chip>
-          </div>
+          <CountryPicker value={country} onChange={setCountry} />
         </div>
 
         <div>
@@ -90,10 +84,26 @@ export function InputStep({
             />
             <span className="shrink-0 text-sm text-foreground-muted">KRW</span>
           </div>
-          <div className="mt-1.5 flex items-center justify-between text-xs text-foreground-subtle">
-            <span>{t("remittance.input.receivedAmount", { amount: receivedAmount.toLocaleString() })}</span>
-            <span>{t("remittance.input.rate", { rate: EXCHANGE_RATE_TO_VND })}</span>
-          </div>
+          {/* 받는 금액은 고른 나라의 통화로 보여준다. 어느 나라를 고르든
+              VND로 환산해 주면, 미국에 보내려는 사람에게 아무 뜻 없는
+              숫자를 보여주는 셈이다. */}
+          {selected && (
+            <div className="mt-1.5 space-y-1">
+              <div className="flex items-center justify-between text-xs text-foreground-subtle">
+                <span>
+                  {t("remittance.input.receivedAmount", {
+                    amount: formatReceived(amount, selected, lang),
+                  })}
+                </span>
+                <span className="font-mono">{formatRate(selected)}</span>
+              </div>
+              {/* 고정 환율이라는 사실을 감추지 않는다. 확정 금액처럼
+                  보여주면 사용자가 그 금액으로 계획을 세운다. */}
+              <p className="text-[11px] leading-relaxed text-foreground-subtle">
+                {t("remittance.input.rateNotice", { date: RATE_AS_OF })}
+              </p>
+            </div>
+          )}
         </div>
       </div>
       <div className="px-5 pb-6">

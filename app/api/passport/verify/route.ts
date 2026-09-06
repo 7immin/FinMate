@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { extractDocumentData } from "@/lib/ai/ocr";
-import { completeChecklistItem, getPassportRow, toPassportState } from "@/lib/server/passport";
+import { completeDocumentVerifiedItem, getPassportRow, toPassportState } from "@/lib/server/passport";
 
 interface Verifier {
   schema: Record<string, unknown>;
@@ -39,20 +39,6 @@ const VERIFIERS: Record<string, Verifier> = {
       "이 이미지는 한국 은행 통장 사본이거나 은행 앱의 계좌 정보 화면입니다. 은행명, 계좌번호, 예금주명을 추출하세요. 읽을 수 없는 항목은 빈 문자열로 채우세요. 절대 추측해서 지어내지 마세요.",
     isMeaningful: (r) => Boolean(r.bankName) && Boolean(r.accountNumber),
   },
-  "overdue-clear": {
-    schema: {
-      type: "object",
-      properties: {
-        billType: { type: "string", description: "공과금 종류 (전기세, 수도세, 가스비 등)" },
-        amount: { type: "number", description: "납부 금액, 원(KRW) 단위 숫자만" },
-        paidDate: { type: "string", description: "납부일, YYYY.MM.DD 형식" },
-      },
-      required: ["billType", "amount", "paidDate"],
-    },
-    prompt:
-      "이 이미지는 공과금 등 납부 완료를 증명하는 영수증 또는 결제 확인 화면입니다. 항목, 납부 금액(숫자만), 납부일(YYYY.MM.DD)을 추출하세요. 읽을 수 없는 항목은 빈 문자열이나 0으로 채우세요. 절대 추측해서 지어내지 마세요.",
-    isMeaningful: (r) => Boolean(r.billType) && Number(r.amount) > 0,
-  },
 };
 
 export async function POST(request: Request) {
@@ -87,7 +73,7 @@ export async function POST(request: Request) {
   }
 
   const row = await getPassportRow(supabase, user.id);
-  const updated = await completeChecklistItem(supabase, user.id, row, itemId);
+  const updated = await completeDocumentVerifiedItem(supabase, user.id, row, itemId);
 
   return NextResponse.json({ ok: true, result, passport: toPassportState(updated) });
 }

@@ -12,15 +12,10 @@ import { ChecklistRow } from "@/components/ui/Checklist";
 import { PaymentHistoryChart } from "@/components/ui/PaymentHistoryChart";
 import { ReportView } from "@/components/flows/passport/ReportView";
 import { useAppState } from "@/lib/state/AppStateContext";
+import { isManualChecklistItem, isDocumentVerifiedItem } from "@/lib/server/passport";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LEVEL_ORDER } from "@/lib/mock/passport-levels";
 
-// 항목마다 "완료"가 실제로 무슨 의미인지가 다르다:
-// - 문서 검증: 실물 서류를 올리면 OCR로 확인 → /passport/verify/[id]로 보낸다
-// - 수동 토글: 아직 실제 인증(SMS 등)을 붙이지 못해 탭하면 바로 완료 처리
-// - 자동: 사용자가 할 일이 없다. 시간이나 실거래가 쌓이면 저절로 체크된다
-const DOCUMENT_VERIFY_ITEMS = ["passport-verify", "korean-account", "overdue-clear"];
-const MANUAL_TOGGLE_ITEMS = ["phone-verify"];
 const TRANSACTION_ITEMS = ["first-purpose-tx", "purpose-tx-2"];
 
 export default function PassportPage() {
@@ -34,24 +29,45 @@ export default function PassportPage() {
   const isMature = passport.level === "S3" || passport.level === "S4";
   const nextLevelLabel = passport.level === "S4" ? null : LEVEL_ORDER[levelOrder];
   const firstPending = passport.nextLevelChecklist.find((item) => !item.done);
-  const isAutoPending = firstPending?.id === "account-active";
+  const isAutoPending = Boolean(
+    firstPending &&
+      !isManualChecklistItem(firstPending.id) &&
+      !isDocumentVerifiedItem(firstPending.id)
+  );
 
   const accountActiveDays = passport.accountLinkedAt
     ? Math.max(0, Math.floor((Date.now() - new Date(passport.accountLinkedAt).getTime()) / 86400000))
     : 0;
 
-  function rowOnClick(itemId: string, done: boolean) {
-    if (done) return undefined;
-    if (DOCUMENT_VERIFY_ITEMS.includes(itemId)) return () => router.push(`/passport/verify/${itemId}`);
-    if (MANUAL_TOGGLE_ITEMS.includes(itemId)) return () => toggleChecklistItem(itemId);
-    return undefined;
+  function rowLabel(itemId: string, done: boolean) {
+    return (done ? tOpt(`passport.checklist.${itemId}.labelClear`) : undefined) ?? t(`passport.checklist.${itemId}.label`);
   }
 
   function rowHint(itemId: string, done: boolean) {
     if (itemId === "account-active" && !done) {
       return t("passport.accountActiveShortHint", { days: Math.min(accountActiveDays, 30) });
     }
-    return tOpt(`passport.checklist.${itemId}.hint`);
+    if (isManualChecklistItem(itemId) || isDocumentVerifiedItem(itemId)) {
+      return tOpt(`passport.checklist.${itemId}.hint`);
+    }
+    return done ? undefined : t("passport.autoChecked");
+  }
+
+  function rowOnClick(itemId: string, done: boolean) {
+    if (done) return undefined;
+    if (isDocumentVerifiedItem(itemId)) return () => router.push(`/passport/verify/${itemId}`);
+    if (isManualChecklistItem(itemId)) return () => toggleChecklistItem(itemId);
+    return undefined;
+  }
+
+  function autoPendingCardText(itemId: string) {
+    if (itemId === "account-active") {
+      return t("passport.accountActiveHint", { days: Math.min(accountActiveDays, 30) });
+    }
+    if (TRANSACTION_ITEMS.includes(itemId)) {
+      return t("passport.transactionHint");
+    }
+    return t("passport.autoChecked");
   }
 
   function handleCta() {
@@ -59,13 +75,11 @@ export default function PassportPage() {
       setViewingReport(true);
       return;
     }
-    if (!firstPending) return;
-    if (DOCUMENT_VERIFY_ITEMS.includes(firstPending.id)) {
+    if (!firstPending || isAutoPending) return;
+    if (isDocumentVerifiedItem(firstPending.id)) {
       router.push(`/passport/verify/${firstPending.id}`);
-    } else if (MANUAL_TOGGLE_ITEMS.includes(firstPending.id)) {
+    } else if (isManualChecklistItem(firstPending.id)) {
       toggleChecklistItem(firstPending.id);
-    } else if (TRANSACTION_ITEMS.includes(firstPending.id)) {
-      router.push("/home");
     }
   }
 
@@ -120,11 +134,6 @@ export default function PassportPage() {
           </div>
         </Card>
 
-        {/*
-          올려 둔 한도 요청. 한도가 즉시 열리지 않으므로, 요청이 어디까지
-          갔는지 볼 자리가 없으면 사용자는 "눌렀는데 아무 일도 안 일어났다"고
-          느낀다. 승인 여부는 은행이 정하고 결과는 위 한도 숫자에 반영된다.
-        */}
         {pendingRequests.length > 0 && (
           <div>
             <p className="mb-2 text-sm font-medium text-foreground-muted">
@@ -159,18 +168,13 @@ export default function PassportPage() {
                 <div key={item.id} className="first:pt-0 last:pb-0">
                   <ChecklistRow
                     status={item.done ? "done" : "pending"}
-                    label={t(`passport.checklist.${item.id}.label`)}
+                    label={rowLabel(item.id, item.done)}
                     hint={rowHint(item.id, item.done)}
                     onClick={rowOnClick(item.id, item.done)}
                   />
                 </div>
               ))}
             </Card>
-            {firstPending && TRANSACTION_ITEMS.includes(firstPending.id) && (
-              <p className="mt-2 text-xs leading-relaxed text-foreground-subtle">
-                {t("passport.transactionHint")}
-              </p>
-            )}
           </div>
         )}
 
@@ -184,9 +188,9 @@ export default function PassportPage() {
           {t("passport.disclaimer")}
         </Card>
 
-        {isAutoPending ? (
+        {isAutoPending && firstPending ? (
           <Card className="text-center text-sm text-foreground-muted">
-            {t("passport.accountActiveHint", { days: Math.min(accountActiveDays, 30) })}
+            {autoPendingCardText(firstPending.id)}
           </Card>
         ) : (
           <Button onClick={handleCta} className="gap-2">
