@@ -1,8 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
-import { FileText, Landmark, GraduationCap, MessageCircleQuestion, ChevronRight } from "lucide-react";
+import {
+  FileText,
+  Landmark,
+  GraduationCap,
+  MessageCircleQuestion,
+  ChevronRight,
+  Paperclip,
+  X,
+} from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -15,9 +23,18 @@ const ICONS: Record<ProofOption["id"], typeof FileText> = {
   scholarship: GraduationCap,
 };
 
-export function UnlockStep({ onUnlocked }: { onUnlocked: (option: ProofOption) => void }) {
+export function UnlockStep({
+  onUnlocked,
+}: {
+  onUnlocked: (option: ProofOption, fileName: string) => void;
+}) {
   const { t } = useTranslation();
   const [selected, setSelected] = useState(PROOF_OPTIONS[0].id);
+  // 서류를 실제로 붙여야 요청이 올라간다. 예전에는 증빙 종류만 고르면
+  // 그대로 요청이 됐는데, 그러면 은행 담당자는 "근로계약서"라는 글자만
+  // 보고 승인 여부를 판단하게 된다 — 아무것도 증명되지 않은 셈이다.
+  const [file, setFile] = useState<File | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
   const current = PROOF_OPTIONS.find((o) => o.id === selected)!;
   const askQuestion = t("remittance.unlock.askQuestion");
 
@@ -71,8 +88,46 @@ export function UnlockStep({ onUnlocked }: { onUnlocked: (option: ProofOption) =
         </Link>
       </div>
 
-      <div className="px-5 pb-6">
-        <Button onClick={() => onUnlocked(current)}>{t(`remittance.proof.${current.id}.cta`)}</Button>
+      <div className="space-y-3 px-5 pb-6">
+        <input
+          ref={fileInput}
+          type="file"
+          accept="image/*,application/pdf"
+          className="hidden"
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+        />
+        {file ? (
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3">
+            <Paperclip className="h-4 w-4 shrink-0 text-primary" />
+            <span className="min-w-0 flex-1 truncate text-[14px] text-foreground">{file.name}</span>
+            <button
+              type="button"
+              onClick={() => setFile(null)}
+              aria-label={t("remittance.unlock.removeFile")}
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-foreground-muted hover:bg-white/[0.06]"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileInput.current?.click()}
+            className="flex w-full items-center gap-2 rounded-xl border border-dashed border-border-strong px-4 py-3 text-[14px] text-foreground-muted hover:border-primary/60"
+          >
+            <Paperclip className="h-4 w-4 shrink-0" />
+            {t("remittance.unlock.attach")}
+          </button>
+        )}
+
+        <Button onClick={() => file && onUnlocked(current, file.name)} disabled={!file}>
+          {t(`remittance.proof.${current.id}.cta`)}
+        </Button>
+        {!file && (
+          <p className="text-center text-xs leading-relaxed text-foreground-subtle">
+            {t("remittance.unlock.attachRequired")}
+          </p>
+        )}
       </div>
     </div>
   );

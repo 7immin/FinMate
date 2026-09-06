@@ -128,12 +128,20 @@ export default function PassportPage() {
                       아니라 자기 신고가 된다. */}
                   <ChecklistRow
                     status={item.done ? "done" : "pending"}
-                    label={t(`passport.checklist.${item.id}.label`)}
+                    label={
+                      // 완료된 판정 항목은 할 일이 아니라 사실이다.
+                      // "연체 정리하기"가 체크된 채로 있으면 뭘 더 해야
+                      // 하는지 묻게 되므로, 그때는 "연체 없음"으로 말한다.
+                      (item.done
+                        ? tOpt(`passport.checklist.${item.id}.labelClear`)
+                        : undefined) ?? t(`passport.checklist.${item.id}.label`)
+                    }
                     hint={
                       isManualChecklistItem(item.id)
                         ? tOpt(`passport.checklist.${item.id}.hint`)
-                        : (tOpt(`passport.checklist.${item.id}.hint`) ??
-                          t("passport.autoChecked"))
+                        : item.done
+                          ? undefined
+                          : t("passport.autoChecked")
                     }
                     onClick={
                       isManualChecklistItem(item.id)

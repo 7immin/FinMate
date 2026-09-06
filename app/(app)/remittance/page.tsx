@@ -12,7 +12,7 @@ import { FlowSuccess } from "@/components/flows/FlowSuccess";
 import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { RemittanceChannel, ReasonId } from "@/lib/mock/remittance";
-import { NationalityId } from "@/lib/types";
+import { DEFAULT_COUNTRY_CODE } from "@/lib/remittance/countries";
 
 type Step = "input" | "check" | "unlock" | "requested" | "channel" | "tracking";
 
@@ -21,7 +21,7 @@ export default function RemittancePage() {
   const { state, requestLimit } = useAppState();
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>("input");
-  const [country, setCountry] = useState<NationalityId>("vietnam");
+  const [country, setCountry] = useState<string>(DEFAULT_COUNTRY_CODE);
   const [recipient, setRecipient] = useState("NGUYEN VAN MINH");
   const [reason, setReason] = useState<ReasonId>("living");
   const [amount, setAmount] = useState(1800000);
@@ -63,8 +63,8 @@ export default function RemittancePage() {
       */}
       {step === "unlock" && (
         <UnlockStep
-          onUnlocked={(option) => {
-            requestLimit(option.bonus, "remittance", option.id);
+          onUnlocked={(option, fileName) => {
+            requestLimit(option.bonus, "remittance", `${option.id} · ${fileName}`);
             setStep("requested");
           }}
         />

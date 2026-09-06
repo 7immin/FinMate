@@ -189,8 +189,8 @@ const ko = {
       "phone-verify": { label: "한국 휴대폰 번호 인증", cta: "휴대폰 번호 인증하기" },
       "account-active": { label: "한국 계좌 실사용 1개월", cta: "계좌 활성 이력 확인하기" },
       "first-purpose-tx": { label: "목적 거래 1건 완료", cta: "목적 거래 확인하기" },
-      "purpose-tx-2": { label: "목적 거래 2건 중 1건 완료", hint: "1/2" },
-      "overdue-clear": { label: "연체 1건 정리하기", hint: "6월 공과금" },
+      "purpose-tx-2": { label: "목적 거래 2건 완료" },
+      "overdue-clear": { label: "연체 정리하기", labelClear: "연체 없음" },
     },
   },
   profile: {
@@ -428,6 +428,10 @@ const ko = {
   remittance: {
     topBarTitle: "해외 송금",
     input: {
+      otherCountry: "다른 나라",
+      countrySearch: "나라 이름으로 검색",
+      countryNoResult: "그 이름의 나라를 찾지 못했습니다",
+      rateNotice: "{{date}} 기준 참고 환율입니다. 실제 받는 금액은 송금 시점의 은행 고시 환율에 따라 달라집니다.",
       headline: "보내기 전에 먼저 점검합니다",
       countryLabel: "받는 국가",
       recipientLabel: "받는 사람",
@@ -455,15 +459,18 @@ const ko = {
       sendPartial: "{{amount}}원만 먼저 보내기",
     },
     risk: {
-      nameMatch: "수취인 이름이 여권 표기와 일치",
-      sanction: "제재 대상 목록에 없음",
-      frequency: "이 달 생활비 송금이 3회째입니다. 은행에서 자금 출처를 물을 수 있어요.",
+      nameSelfCheck: "받는 사람 이름이 여권 표기와 같은지 직접 확인하세요",
+      frequency: "이번 달 한도 요청 {{count}}회",
+      frequencyHint: "요청이 잦으면 은행에서 자금 출처를 물을 수 있어요",
     },
     requested: {
       title: "한도 열기 요청을 보냈습니다",
       description: "은행이 증빙을 확인하고 승인하면 한도가 열립니다. 결과는 금융여권 화면에서 볼 수 있어요.",
     },
     unlock: {
+      attach: "증빙 서류 첨부",
+      attachRequired: "서류를 첨부해야 요청할 수 있습니다",
+      removeFile: "첨부 빼기",
       topBarTitle: "한도 열기",
       headline: "셋 중 하나만 있으면 됩니다",
       description: "돈이 어디서 왔고 어디로 가는지 확인되면 그만큼 한도가 열립니다.",
@@ -737,8 +744,8 @@ const en: typeof ko = {
       "phone-verify": { label: "Verify Korean phone number", cta: "Verify phone number" },
       "account-active": { label: "1 month of account activity", cta: "Confirm account activity" },
       "first-purpose-tx": { label: "Complete 1 purpose transaction", cta: "Confirm purpose transaction" },
-      "purpose-tx-2": { label: "1 of 2 purpose transactions done", hint: "1/2" },
-      "overdue-clear": { label: "Clear 1 overdue payment", hint: "June utility bill" },
+      "purpose-tx-2": { label: "2 purpose transactions done" },
+      "overdue-clear": { label: "Clear your overdue payment", labelClear: "No overdue payments" },
     },
   },
   profile: {
@@ -972,6 +979,10 @@ const en: typeof ko = {
   remittance: {
     topBarTitle: "Send money abroad",
     input: {
+      otherCountry: "Other country",
+      countrySearch: "Search by country name",
+      countryNoResult: "No country matches that name",
+      rateNotice: "Reference rate as of {{date}}. The amount actually received depends on the bank's rate at the time of transfer.",
       headline: "We check before you send",
       countryLabel: "Recipient country",
       recipientLabel: "Recipient name",
@@ -999,15 +1010,18 @@ const en: typeof ko = {
       sendPartial: "Send just {{amount}} KRW for now",
     },
     risk: {
-      nameMatch: "Recipient name matches their passport",
-      sanction: "Not on any sanctions list",
-      frequency: "This is your 3rd living-expense transfer this month. Your bank may ask about the source of funds.",
+      nameSelfCheck: "Check yourself that the recipient's name matches their passport",
+      frequency: "{{count}} limit requests this month",
+      frequencyHint: "Frequent requests may prompt the bank to ask about your source of funds",
     },
     requested: {
       title: "Your limit request is in",
       description: "The bank will review your proof and open the limit once approved. You can track it on your Financial Passport.",
     },
     unlock: {
+      attach: "Attach your document",
+      attachRequired: "You need to attach a document to request",
+      removeFile: "Remove attachment",
       topBarTitle: "Unlock limit",
       headline: "Just one of these three works",
       description: "Once we can confirm where the money came from and where it's going, that much limit opens up.",
@@ -1278,8 +1292,8 @@ const zh: typeof ko = {
       "phone-verify": { label: "认证韩国手机号", cta: "认证手机号" },
       "account-active": { label: "账户实际使用1个月", cta: "确认账户使用记录" },
       "first-purpose-tx": { label: "完成1笔用途交易", cta: "确认用途交易" },
-      "purpose-tx-2": { label: "2笔用途交易完成1笔", hint: "1/2" },
-      "overdue-clear": { label: "处理1笔逾期款项", hint: "6月水电费" },
+      "purpose-tx-2": { label: "完成2笔用途交易" },
+      "overdue-clear": { label: "处理逾期款项", labelClear: "无逾期" },
     },
   },
   profile: {
@@ -1512,6 +1526,10 @@ const zh: typeof ko = {
   remittance: {
     topBarTitle: "境外汇款",
     input: {
+      otherCountry: "其他国家",
+      countrySearch: "按国家名称搜索",
+      countryNoResult: "没有找到该名称的国家",
+      rateNotice: "以 {{date}} 为准的参考汇率。实际到账金额以汇款时银行公布的汇率为准。",
       headline: "汇款前先为您核查",
       countryLabel: "收款国家",
       recipientLabel: "收款人",
@@ -1539,15 +1557,18 @@ const zh: typeof ko = {
       sendPartial: "先汇出 {{amount}} 韩元",
     },
     risk: {
-      nameMatch: "收款人姓名与护照一致",
-      sanction: "不在制裁名单中",
-      frequency: "这是本月第3次生活费汇款，银行可能会询问资金来源。",
+      nameSelfCheck: "请自行确认收款人姓名与护照一致",
+      frequency: "本月额度申请 {{count}} 次",
+      frequencyHint: "申请频繁时，银行可能会询问资金来源",
     },
     requested: {
       title: "已提交额度开通申请",
       description: "银行核实证明材料并批准后，额度就会开通。您可以在金融护照页面查看进度。",
     },
     unlock: {
+      attach: "上传证明材料",
+      attachRequired: "需要上传材料才能提交申请",
+      removeFile: "移除附件",
       topBarTitle: "开通额度",
       headline: "三选一即可",
       description: "只要能确认资金的来源和去向，就能开通相应的额度。",
@@ -1821,8 +1842,8 @@ const vi: typeof ko = {
       "phone-verify": { label: "Xác minh số điện thoại Hàn Quốc", cta: "Xác minh số điện thoại" },
       "account-active": { label: "Sử dụng tài khoản thực tế 1 tháng", cta: "Xác nhận lịch sử sử dụng tài khoản" },
       "first-purpose-tx": { label: "Hoàn tất 1 giao dịch đúng mục đích", cta: "Xác nhận giao dịch đúng mục đích" },
-      "purpose-tx-2": { label: "Hoàn tất 1/2 giao dịch đúng mục đích", hint: "1/2" },
-      "overdue-clear": { label: "Xử lý 1 khoản trễ hạn", hint: "Hóa đơn tiện ích tháng 6" },
+      "purpose-tx-2": { label: "Hoàn tất 2 giao dịch đúng mục đích" },
+      "overdue-clear": { label: "Xử lý khoản trễ hạn", labelClear: "Không có khoản trễ hạn" },
     },
   },
   profile: {
@@ -2056,6 +2077,10 @@ const vi: typeof ko = {
   remittance: {
     topBarTitle: "Chuyển tiền ra nước ngoài",
     input: {
+      otherCountry: "Quốc gia khác",
+      countrySearch: "Tìm theo tên quốc gia",
+      countryNoResult: "Không tìm thấy quốc gia nào khớp",
+      rateNotice: "Tỷ giá tham khảo tính đến {{date}}. Số tiền thực nhận phụ thuộc tỷ giá ngân hàng công bố tại thời điểm chuyển.",
       headline: "Chúng tôi kiểm tra trước khi bạn gửi",
       countryLabel: "Quốc gia nhận",
       recipientLabel: "Người nhận",
@@ -2083,15 +2108,18 @@ const vi: typeof ko = {
       sendPartial: "Gửi trước {{amount}} KRW",
     },
     risk: {
-      nameMatch: "Tên người nhận khớp với hộ chiếu",
-      sanction: "Không có trong danh sách cấm vận",
-      frequency: "Đây là lần chuyển sinh hoạt phí thứ 3 trong tháng này. Ngân hàng có thể hỏi về nguồn tiền.",
+      nameSelfCheck: "Hãy tự kiểm tra tên người nhận có khớp hộ chiếu không",
+      frequency: "{{count}} yêu cầu hạn mức trong tháng này",
+      frequencyHint: "Yêu cầu quá thường xuyên có thể khiến ngân hàng hỏi về nguồn tiền",
     },
     requested: {
       title: "Đã gửi yêu cầu mở hạn mức",
       description: "Ngân hàng sẽ xem xét giấy tờ và mở hạn mức sau khi duyệt. Bạn có thể theo dõi ở màn hình Hộ chiếu tài chính.",
     },
     unlock: {
+      attach: "Đính kèm giấy tờ",
+      attachRequired: "Cần đính kèm giấy tờ mới gửi được yêu cầu",
+      removeFile: "Bỏ tệp đính kèm",
       topBarTitle: "Mở hạn mức",
       headline: "Chỉ cần một trong ba loại này",
       description: "Khi xác nhận được tiền đến từ đâu và đi đến đâu, hạn mức tương ứng sẽ được mở.",
