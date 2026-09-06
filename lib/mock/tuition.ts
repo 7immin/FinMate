@@ -33,7 +33,6 @@ export const TUITION_INVOICE: TuitionInvoice = {
 
 export const SCANNING_STEP_IDS = ["issuer", "extract", "account", "fraud"] as const;
 
-export const TUITION_RISK_CHECK_IDS = ["matchSchool", "notPersonal", "notReported"] as const;
 
 /** Derives a "D-N" / "D-DAY" / "D+N" label from a "YYYY.MM.DD" due date string. */
 export function computeDDay(dueDate: string): string {

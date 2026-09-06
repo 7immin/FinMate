@@ -15,3 +15,19 @@ export const SCHOOL_TUITION_PAGE: Partial<Record<SchoolId, string>> = {
   hanyang: "https://finance.hanyang.ac.kr/-12",
   ewha: "https://www.ewha.ac.kr/ewha/etc/tuition01.do",
 };
+
+/**
+ * 학교 포털.
+ *
+ * 공지를 우리가 못 읽어 오는 학교에서, 학생이 직접 로그인해 확인할 곳이다.
+ * 등록금 안내 페이지(위)와 달리 로그인이 필요하다 — 화면이 그 사실을 함께
+ * 말한다.
+ *
+ * 여기 있는 주소는 전부 실제로 응답하는지 확인했다. 주소를 지어내면
+ * 사용자를 없는 페이지로 보내게 되고, 그건 안내가 아니라 방해다.
+ */
+export const SCHOOL_PORTAL: Partial<Record<SchoolId, string>> = {
+  snu: "https://my.snu.ac.kr",
+  yonsei: "https://portal.yonsei.ac.kr",
+  skk: "https://kingo.skku.edu",
+};
