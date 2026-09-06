@@ -67,6 +67,7 @@ export async function fetchAppState(): Promise<FetchResult> {
   const passport = await applyLevelUpIfComplete(supabase, data.passport.user_id, passportRow);
 
   const state: AppState = {
+    userId: data.passport.user_id,
     profile: {
       name: profile.name,
       nationality: profile.nationality as AppState["profile"]["nationality"],
