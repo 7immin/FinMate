@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Check, ChevronDown, Search, X } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { translateShared } from "@/lib/i18n";
+import { CountrySearchSheet } from "@/components/ui/CountrySearchSheet";
 import { REMITTANCE_COUNTRIES, findCountry } from "@/lib/remittance/countries";
 import { cn } from "@/lib/utils/cn";
 
@@ -34,25 +34,6 @@ export function CountryPicker({
 
   const selected = findCountry(value);
   const selectedIsQuick = QUICK_CODES.includes(value);
-
-  const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    // 이름은 팀원이 만든 translateShared("country")를 그대로 쓴다.
-    // 같은 일을 하는 함수를 둘 두면 언젠가 두 화면의 나라 이름이 갈린다.
-    const withNames = REMITTANCE_COUNTRIES.map((country) => ({
-      ...country,
-      label: tShared("country", country.code),
-      english: translateShared("en", "country", country.code),
-    }));
-    if (!q) return withNames;
-    return withNames.filter(
-      (c) =>
-        c.label.toLowerCase().includes(q) ||
-        c.english.toLowerCase().includes(q) ||
-        c.currency.toLowerCase().includes(q) ||
-        c.code.toLowerCase().includes(q)
-    );
-  }, [query, tShared]);
 
   return (
     <>
@@ -94,74 +75,19 @@ export function CountryPicker({
         </button>
       </div>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-30 flex items-end justify-center bg-black/60"
-          onClick={() => setOpen(false)}
-        >
-          <div
-            className="flex max-h-[70vh] w-full max-w-[480px] flex-col rounded-t-3xl border-t border-border bg-surface"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-5 pb-3 pt-5">
-              <p className="text-[15px] font-semibold text-foreground">
-                {t("remittance.input.countryLabel")}
-              </p>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label={t("common.back")}
-                className="flex h-7 w-7 items-center justify-center rounded-full text-foreground-muted hover:bg-white/[0.06]"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="px-5 pb-3">
-              <div className="flex items-center gap-2 rounded-xl border border-border bg-background px-3">
-                <Search className="h-4 w-4 shrink-0 text-foreground-muted" />
-                <input
-                  autoFocus
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={t("remittance.input.countrySearch")}
-                  className="h-11 w-full bg-transparent text-[15px] text-foreground outline-none placeholder:text-foreground-muted"
-                />
-              </div>
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-6">
-              {results.length === 0 && (
-                <p className="px-2 py-6 text-center text-[14px] text-foreground-muted">
-                  {t("remittance.input.countryNoResult")}
-                </p>
-              )}
-              {results.map((country) => (
-                <button
-                  key={country.code}
-                  type="button"
-                  onClick={() => {
-                    onChange(country.code);
-                    setOpen(false);
-                  }}
-                  className={cn(
-                    "flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left",
-                    value === country.code ? "bg-primary/15" : "hover:bg-white/[0.04]"
-                  )}
-                >
-                  <span className="min-w-0 flex-1 truncate text-[15px] text-foreground">
-                    {country.label}
-                  </span>
-                  <span className="shrink-0 font-mono text-[12px] text-foreground-muted">
-                    {country.currency}
-                  </span>
-                  {value === country.code && <Check className="h-4 w-4 shrink-0 text-primary" />}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      <CountrySearchSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        codes={REMITTANCE_COUNTRIES.map((c) => c.code)}
+        value={value}
+        onSelect={onChange}
+        title={t("remittance.input.countryLabel")}
+        renderMeta={(code) => (
+          <span className="shrink-0 font-mono text-[12px] text-foreground-muted">
+            {findCountry(code)?.currency}
+          </span>
+        )}
+      />
     </>
   );
 }

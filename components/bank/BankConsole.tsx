@@ -2,7 +2,16 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Check, Loader2, Lock, RefreshCw, Search, X } from "lucide-react";
+import {
+  Check,
+  ExternalLink,
+  FileText,
+  Loader2,
+  Lock,
+  RefreshCw,
+  Search,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Logo } from "@/components/ui/Logo";
@@ -23,6 +32,7 @@ interface BankRequest {
   school: string;
   level: string;
   currentLimit: number;
+  evidenceUrl: string | null;
 }
 
 interface BankReport {
@@ -273,18 +283,39 @@ function RequestQueue({ accessCode, onSignOut }: { accessCode: string; onSignOut
               <QueueRow label={t("bank.purpose")} value={t(`passport.report.category.${req.purpose}`)} />
               {/* 무엇으로 목적을 증명했는지가 담당자가 판단하는 근거다.
                   이것 없이 금액만 보여주면 승인이 그냥 도장 찍기가 된다. */}
-              {req.evidence && (
-                <QueueRow
-                  label={t("bank.evidence")}
-                  value={t(`remittance.proof.${req.evidence}.label`)}
-                />
-              )}
+              {req.evidence && <QueueRow label={t("bank.evidence")} value={req.evidence} />}
               <QueueRow
                 label={t("bank.currentLimit")}
                 value={`${req.currentLimit.toLocaleString()} KRW`}
               />
               <QueueRow label={t("bank.requestedAt")} value={formatWhen(req.created_at)} />
             </dl>
+
+            {/*
+              서류를 실제로 열어 본다. 이게 없으면 담당자는 "근로계약서"라는
+              글자와 파일명만 보고 승인 여부를 정하게 되고, 그러면 증빙을
+              요구한 의미가 없다.
+
+              올라온 파일이 없는 요청도 있다(업로드 실패, 또는 이 기능이
+              붙기 전에 올라온 건). 그때는 그 사실을 밝힌다 — 버튼만 사라지면
+              담당자는 자기가 못 찾는 것인지 원래 없는 것인지 알 수 없다.
+            */}
+            {req.evidenceUrl ? (
+              <a
+                href={req.evidenceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 rounded-xl border border-primary/50 px-4 py-2.5 text-[14px] font-medium text-primary hover:bg-primary/10"
+              >
+                <FileText className="h-4 w-4 shrink-0" />
+                {t("bank.openEvidence")}
+                <ExternalLink className="ml-auto h-3.5 w-3.5" />
+              </a>
+            ) : (
+              <p className="rounded-xl border border-dashed border-border-strong px-4 py-2.5 text-[13px] leading-relaxed text-foreground-muted">
+                {t("bank.noEvidenceFile")}
+              </p>
+            )}
 
             <div className="flex gap-2 pt-1">
               <Button

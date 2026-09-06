@@ -64,8 +64,13 @@ export default function RemittancePage() {
       */}
       {step === "unlock" && (
         <UnlockStep
-          onUnlocked={(option, fileName) => {
-            requestLimit(option.bonus, "remittance", `${option.id} · ${fileName}`);
+          onUnlocked={(option, fileName, evidencePath) => {
+            requestLimit(
+              option.bonus,
+              "remittance",
+              `${option.id} · ${fileName}`,
+              evidencePath
+            );
             setStep("requested");
           }}
         />

@@ -16,7 +16,12 @@ interface AppStateContextValue {
   state: AppState;
   setDocumentFlag: (key: keyof DocumentFlags, value: "yes" | "no" | "unknown") => void;
   toggleChecklistItem: (id: string) => void;
-  requestLimit: (amount: number, purpose: PurposeCategory, evidence?: string) => void;
+  requestLimit: (
+    amount: number,
+    purpose: PurposeCategory,
+    evidence?: string,
+    evidencePath?: string | null
+  ) => void;
   pendingRequests: PendingRequest[];
   setLanguage: (language: Language) => void;
   setNotificationSettings: (settings: NotificationSettings) => void;
@@ -106,7 +111,7 @@ export function AppStateProvider({
        * 창구에 가서야 아직 안 열렸다는 것을 알게 된다 — 그 순간이 이
        * 제품이 없애려던 바로 그 순간이다.
        */
-      requestLimit: (amount, purpose, evidence) => {
+      requestLimit: (amount, purpose, evidence, evidencePath) => {
         const optimistic: PendingRequest = {
           id: `local-${Date.now()}`,
           amount,
@@ -118,6 +123,7 @@ export function AppStateProvider({
           amount,
           purpose,
           evidence,
+          evidencePath,
         }).then((data) => {
           if (!data) return;
           setPending((prev) =>

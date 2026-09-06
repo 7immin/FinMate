@@ -11,6 +11,7 @@ import { useAppState } from "@/lib/state/AppStateContext";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { LEASE_CONTRACT, LeaseContract } from "@/lib/mock/deposit";
 import { readLeaseContract } from "@/lib/ocr/client";
+import { uploadEvidence } from "@/lib/evidence/upload";
 
 type Step = "upload" | "verifying" | "verify" | "protection" | "success";
 
@@ -52,11 +53,18 @@ export default function DepositPage() {
     setStep("verify");
   }
 
-  function handleConfirm() {
+  async function handleConfirm() {
     // 계약서로 임대인 계좌가 확인됐으니 보증금만큼 한도를 요청한다.
     // 학비와 같은 이유로, 여는 것은 은행이다.
-    requestLimit(contract.deposit, "deposit", "lease-contract");
     setStep("success");
+    const file = fileRef.current;
+    const path = file ? await uploadEvidence(file) : null;
+    requestLimit(
+      contract.deposit,
+      "deposit",
+      file ? `lease-contract · ${file.name}` : "lease-contract",
+      path
+    );
   }
 
   return (

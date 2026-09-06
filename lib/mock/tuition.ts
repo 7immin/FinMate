@@ -5,7 +5,19 @@ export interface TuitionInvoice {
   title: string;
   amount: number;
   dueDate: string;
+  /**
+   * 프로필에 등록된 학교. 고지서를 못 읽었을 때의 대비책이다.
+   * 실제로 화면에 쓰는 것은 institutionName이 있으면 그쪽이다.
+   */
   recipient: SchoolId;
+  /**
+   * 고지서에서 읽어 낸 발급 기관 이름.
+   *
+   * 프로필 학교를 그대로 보여주면, 한양대 고지서를 올렸는데 프로필이
+   * 고려대라는 이유로 "고려대학교"라고 뜬다. 돈이 어디로 가는지를
+   * 우리가 지어내는 셈이라 가장 하면 안 되는 종류의 오류다.
+   */
+  institutionName: string | null;
   virtualAccount: string;
 }
 
@@ -15,6 +27,7 @@ export const TUITION_INVOICE: TuitionInvoice = {
   amount: 4850000,
   dueDate: "2026.09.11",
   recipient: "hanyang",
+  institutionName: null,
   virtualAccount: "1002-•••-4471",
 };
 
