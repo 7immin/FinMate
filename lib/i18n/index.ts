@@ -35,9 +35,29 @@ export function translateOptional(lang: Language, key: string): string | undefin
   return typeof node === "string" ? node : undefined;
 }
 
-type SharedGroup = keyof typeof sharedTranslations.ko;
+type SharedGroup = "country" | keyof typeof sharedTranslations.ko;
+
+// Country names aren't hand-translated: with ~250 ISO codes to cover, a
+// per-language dictionary would be unmaintainable. Intl.DisplayNames resolves
+// any ISO 3166-1 alpha-2 code to a localized name on the fly instead.
+const DISPLAY_NAMES_LOCALE: Record<Language, string> = {
+  ko: "ko",
+  en: "en",
+  zh: "zh-Hans",
+  vi: "vi",
+};
 
 export function translateShared(lang: Language, group: SharedGroup, id: string): string {
+  if (group === "country") {
+    try {
+      const name = new Intl.DisplayNames([DISPLAY_NAMES_LOCALE[lang]], { type: "region" }).of(
+        id.toUpperCase()
+      );
+      return name ?? id;
+    } catch {
+      return id;
+    }
+  }
   const groupNode = sharedTranslations[lang][group] as Record<string, string>;
   return groupNode?.[id] ?? id;
 }

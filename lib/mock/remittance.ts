@@ -1,14 +1,6 @@
 import { NationalityId } from "@/lib/types";
 
-export const COUNTRIES: NationalityId[] = [
-  "vietnam",
-  "china",
-  "mongolia",
-  "nepal",
-  "myanmar",
-  "uzbekistan",
-  "cambodia",
-];
+export const COUNTRIES: NationalityId[] = ["VN", "CN", "MN", "NP", "MM", "UZ", "KH"];
 
 export const REASON_IDS = ["tuition", "dorm", "living", "general"] as const;
 export type ReasonId = (typeof REASON_IDS)[number];

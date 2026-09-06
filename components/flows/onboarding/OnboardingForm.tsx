@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, AlertCircle } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
@@ -9,28 +9,12 @@ import { Chip } from "@/components/ui/Chip";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { translate, translateShared, LANGUAGE_NATIVE_NAME } from "@/lib/i18n";
 import { Language, NationalityId, SchoolId } from "@/lib/types";
+import { COUNTRY_CODES } from "@/lib/data/countries";
 import { Logo } from "@/components/ui/Logo";
 
 const LANGUAGES: Language[] = ["ko", "en", "zh", "vi"];
-const NATIONALITIES: NationalityId[] = [
-  "vietnam",
-  "china",
-  "mongolia",
-  "nepal",
-  "uzbekistan",
-  "myanmar",
-];
 const VISA_TYPES = ["D-2", "D-4", "other"] as const;
 const SCHOOLS: SchoolId[] = ["hanyang", "snu", "yonsei", "korea", "skk"];
-const NATIONALITY_CODE: Record<NationalityId, string> = {
-  vietnam: "VNM",
-  china: "CHN",
-  mongolia: "MNG",
-  nepal: "NPL",
-  myanmar: "MMR",
-  uzbekistan: "UZB",
-  cambodia: "KHM",
-};
 
 export function OnboardingForm() {
   const router = useRouter();
@@ -39,15 +23,28 @@ export function OnboardingForm() {
   const tShared = (group: "country" | "school", id: string) => translateShared(lang, group, id);
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [name, setName] = useState("응우옌 티 흐엉");
-  const [nationality, setNationality] = useState<NationalityId>("vietnam");
-  const [visaStatus, setVisaStatus] = useState<(typeof VISA_TYPES)[number]>("D-2");
-  const [school, setSchool] = useState<SchoolId>("hanyang");
-  const [arrivalLabel, setArrivalLabel] = useState("2026년 3월");
+  const [name, setName] = useState("");
+  const [nationality, setNationality] = useState<NationalityId | "">("");
+  const [visaStatus, setVisaStatus] = useState<(typeof VISA_TYPES)[number] | "">("");
+  const [school, setSchool] = useState<SchoolId | "">("");
+  const [arrivalLabel, setArrivalLabel] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Sorted by localized name so the list reads alphabetically in whichever
+  // language the user picked, not by ISO code order.
+  const sortedCountries = useMemo(() => {
+    return [...COUNTRY_CODES].sort((a, b) =>
+      tShared("country", a).localeCompare(tShared("country", b), lang)
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
   async function handleSubmit() {
+    if (!name.trim() || !nationality || !visaStatus || !school || !arrivalLabel.trim()) {
+      setError(t("onboarding.fillAllFields"));
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
@@ -57,7 +54,7 @@ export function OnboardingForm() {
         body: JSON.stringify({
           name,
           nationality,
-          nationalityCode: NATIONALITY_CODE[nationality],
+          nationalityCode: nationality,
           visaStatus,
           school,
           arrivalLabel,
@@ -131,12 +128,15 @@ export function OnboardingForm() {
         <Field label={t("onboarding.fieldNationality")}>
           <select
             value={nationality}
-            onChange={(e) => setNationality(e.target.value as NationalityId)}
+            onChange={(e) => setNationality(e.target.value)}
             className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-foreground outline-none focus:border-primary"
           >
-            {NATIONALITIES.map((n) => (
-              <option key={n} value={n}>
-                {tShared("country", n)}
+            <option value="" disabled>
+              {t("onboarding.selectPlaceholder")}
+            </option>
+            {sortedCountries.map((code) => (
+              <option key={code} value={code}>
+                {tShared("country", code)}
               </option>
             ))}
           </select>
@@ -167,6 +167,9 @@ export function OnboardingForm() {
             onChange={(e) => setSchool(e.target.value as SchoolId)}
             className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-foreground outline-none focus:border-primary"
           >
+            <option value="" disabled>
+              {t("onboarding.selectPlaceholder")}
+            </option>
             {SCHOOLS.map((s) => (
               <option key={s} value={s}>
                 {tShared("school", s)}
@@ -179,6 +182,7 @@ export function OnboardingForm() {
           <input
             value={arrivalLabel}
             onChange={(e) => setArrivalLabel(e.target.value)}
+            placeholder={t("onboarding.arrivalPlaceholder")}
             className="h-12 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-foreground outline-none focus:border-primary"
           />
         </Field>

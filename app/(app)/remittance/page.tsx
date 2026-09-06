@@ -18,7 +18,7 @@ export default function RemittancePage() {
   const router = useRouter();
   const { state, unlockLimit } = useAppState();
   const [step, setStep] = useState<Step>("input");
-  const [country, setCountry] = useState<NationalityId>("vietnam");
+  const [country, setCountry] = useState<NationalityId>("VN");
   const [recipient, setRecipient] = useState("NGUYEN VAN MINH");
   const [reason, setReason] = useState<ReasonId>("living");
   const [amount, setAmount] = useState(1800000);
