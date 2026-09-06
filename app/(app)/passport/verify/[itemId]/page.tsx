@@ -39,8 +39,8 @@ const ITEM_CONFIG: Record<string, ItemConfig> = {
     i18nKey: "arcVerify",
     fields: [
       { key: "name", labelKey: "name" },
-      { key: "registrationNumber", labelKey: "registrationNumber" },
       { key: "visaStatus", labelKey: "visaStatus" },
+      { key: "expiryDate", labelKey: "expiryDate" },
     ],
   },
 };
