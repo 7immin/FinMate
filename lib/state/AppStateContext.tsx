@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 import {
   AppState,
   DocumentFlags,
@@ -10,6 +10,7 @@ import {
   PurposeCategory,
 } from "@/lib/types";
 import { LEVEL_CONFIG, cloneChecklist, nextLevel } from "@/lib/mock/passport-levels";
+import { PassportRow, toPassportState } from "@/lib/server/passport";
 import { createClient } from "@/lib/supabase/client";
 
 interface AppStateContextValue {
@@ -85,6 +86,45 @@ export function AppStateProvider({
   // 이번 세션에 올린 요청. 승인 여부는 은행이 정하므로 여기서는 "올렸다"는
   // 사실만 들고 있다가 화면에 되돌려 준다.
   const [pending, setPending] = useState<PendingRequest[]>([]);
+
+  // 은행 승인은 서비스 롤이 다른 화면(창구 콘솔)에서 직접 DB를 바꾸는
+  // 방식이라, 새로고침 전까지는 학생 화면이 그 변화를 알 길이 없었다.
+  // financial_passports/notifications가 바뀌는 순간을 postgres_changes로
+  // 직접 구독해서, 승인되는 즉시 한도와 알림 배지가 반영되게 한다.
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`app-state-${state.userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${state.userId}`,
+        },
+        () => {
+          setState((prev) => ({ ...prev, unreadNotificationCount: prev.unreadNotificationCount + 1 }));
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "financial_passports",
+          filter: `user_id=eq.${state.userId}`,
+        },
+        (payload) => {
+          setState((prev) => ({ ...prev, passport: toPassportState(payload.new as PassportRow) }));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [state.userId]);
 
   const value = useMemo<AppStateContextValue>(
     () => ({

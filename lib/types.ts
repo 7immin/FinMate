@@ -64,6 +64,7 @@ export interface DocumentFlags {
 }
 
 export interface AppState {
+  userId: string;
   profile: UserProfile;
   passport: FinancialPassport;
   documents: DocumentFlags;
