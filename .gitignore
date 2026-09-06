@@ -31,3 +31,6 @@ next-env.d.ts
 
 # claude code local settings
 .claude/
+
+# local smoke-test screenshots
+/shots/

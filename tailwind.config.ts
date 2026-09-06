@@ -44,10 +44,12 @@ const config: Config = {
       },
       fontFamily: {
         sans: [
-          "Pretendard Variable",
-          "Pretendard",
           "-apple-system",
           "BlinkMacSystemFont",
+          "Apple SD Gothic Neo",
+          "Pretendard Variable",
+          "Malgun Gothic",
+          "Noto Sans KR",
           "system-ui",
           "sans-serif",
         ],

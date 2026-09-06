@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 export type ChecklistStatus = "done" | "active" | "pending" | "warning";
@@ -36,8 +36,9 @@ export function ChecklistRow({
           status === "pending" && "border-white/[0.12]"
         )}
       >
-        {(status === "done" || status === "warning") && (
-          <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />
+        {status === "done" && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />}
+        {status === "warning" && (
+          <AlertTriangle className="h-3 w-3 text-white" strokeWidth={2.5} />
         )}
       </span>
       <span
