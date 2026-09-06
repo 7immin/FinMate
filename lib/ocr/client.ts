@@ -52,3 +52,39 @@ export function readTuitionInvoice(file: File) {
 export function readLeaseContract(file: File) {
   return callOcrRoute<DepositOcrResult>("/api/ocr/deposit", file);
 }
+
+export interface ProofCheckResult {
+  /** 고른 종류의 서류로 보이는지. 위조 여부가 아니라 종류만 본다. */
+  matches: boolean;
+  /** 실제로 무슨 문서로 보이는지. 사용자에게 "이건 여권 사진입니다"처럼 알려 준다. */
+  documentKind: string;
+  /** 그렇게 본 이유 한 문장. 그대로 화면에 띄운다. */
+  reason: string;
+}
+
+/**
+ * 증빙 서류가 고른 종류와 맞는지 확인한다.
+ *
+ * 통과하지 못하면 요청을 막는다. 아무 파일이나 붙여서 한도를 요청할 수
+ * 있으면, 담당자는 파일명만 보고 승인 여부를 정하게 된다.
+ */
+export function checkProofDocument(file: File, proofType: string): Promise<ProofCheckResult> {
+  return callOcrRouteWithBody<ProofCheckResult>("/api/ocr/proof", file, { proofType });
+}
+
+async function callOcrRouteWithBody<T>(
+  endpoint: string,
+  file: File,
+  extra: Record<string, unknown>
+): Promise<T> {
+  if (file.size > MAX_FILE_SIZE_BYTES) throw new OcrError("file_too_large");
+  const { data, mimeType } = await fileToBase64(file);
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data, mimeType, ...extra }),
+  });
+  if (!res.ok) throw new OcrError("request_failed");
+  const json = await res.json();
+  return json.result as T;
+}

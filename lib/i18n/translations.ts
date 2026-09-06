@@ -435,6 +435,9 @@ const ko = {
       description: "은행이 증빙을 확인하고 승인하면 한도가 열립니다. 결과는 금융여권 화면에서 볼 수 있어요.",
     },
     unlock: {
+      checking: "서류를 확인하는 중…",
+      mismatch: "{{kind}}(으)로 보입니다.",
+      checkFailed: "서류를 확인하지 못했습니다. 그대로 요청할 수 있지만, 담당자가 반려할 수 있습니다.",
       attach: "증빙 서류 첨부",
       attachRequired: "서류를 첨부해야 요청할 수 있습니다",
       removeFile: "첨부 빼기",
@@ -989,6 +992,9 @@ const en: typeof ko = {
       description: "The bank will review your proof and open the limit once approved. You can track it on your Financial Passport.",
     },
     unlock: {
+      checking: "Checking your document…",
+      mismatch: "This looks like a {{kind}}.",
+      checkFailed: "We couldn't check the document. You can still request, but the reviewer may reject it.",
       attach: "Attach your document",
       attachRequired: "You need to attach a document to request",
       removeFile: "Remove attachment",
@@ -1539,6 +1545,9 @@ const zh: typeof ko = {
       description: "银行核实证明材料并批准后，额度就会开通。您可以在金融护照页面查看进度。",
     },
     unlock: {
+      checking: "正在核对材料…",
+      mismatch: "这看起来是{{kind}}。",
+      checkFailed: "无法核对材料。仍可提交申请，但审核人员可能会驳回。",
       attach: "上传证明材料",
       attachRequired: "需要上传材料才能提交申请",
       removeFile: "移除附件",
@@ -2093,6 +2102,9 @@ const vi: typeof ko = {
       description: "Ngân hàng sẽ xem xét giấy tờ và mở hạn mức sau khi duyệt. Bạn có thể theo dõi ở màn hình Hộ chiếu tài chính.",
     },
     unlock: {
+      checking: "Đang kiểm tra giấy tờ…",
+      mismatch: "Đây có vẻ là {{kind}}.",
+      checkFailed: "Không kiểm tra được giấy tờ. Bạn vẫn có thể gửi, nhưng người duyệt có thể từ chối.",
       attach: "Đính kèm giấy tờ",
       attachRequired: "Cần đính kèm giấy tờ mới gửi được yêu cầu",
       removeFile: "Bỏ tệp đính kèm",
