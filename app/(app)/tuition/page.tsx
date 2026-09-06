@@ -56,6 +56,8 @@ export default function TuitionPage() {
           amount: result.amount || prev.amount,
           dueDate: result.dueDate || prev.dueDate,
           virtualAccount: result.virtualAccount || prev.virtualAccount,
+          virtualAccountBank: result.virtualAccountBank || prev.virtualAccountBank,
+          accountHolder: result.accountHolder || prev.accountHolder,
         }));
       }
       setOcrFailed(false);

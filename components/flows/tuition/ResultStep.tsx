@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { AlertTriangle, ExternalLink, ShieldCheck } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { Badge } from "@/components/ui/Badge";
@@ -8,6 +10,11 @@ import { Button } from "@/components/ui/Button";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { TuitionInvoice, computeDDay } from "@/lib/mock/tuition";
 import { SCHOOL_TUITION_PAGE } from "@/lib/data/school-tuition-pages";
+import type {
+  AccountCheckVerdict,
+  TuitionAccountCheck,
+} from "@/app/api/tuition/verify-account/route";
+import { Check, HelpCircle } from "lucide-react";
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
@@ -31,6 +38,31 @@ export function ResultStep({
 }) {
   const { t, tShared } = useTranslation();
   const tuitionPage = SCHOOL_TUITION_PAGE[invoice.recipient];
+  // 고지서의 가상계좌를 학교 공지와 대조한다. 실패하면 null로 남고,
+  // 화면은 "직접 대조하세요"만 말한다.
+  const [check, setCheck] = useState<TuitionAccountCheck | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/tuition/verify-account", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        virtualAccountBank: invoice.virtualAccountBank,
+        accountHolder: invoice.accountHolder,
+      }),
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.check) setCheck(data.check);
+      })
+      .catch(() => {
+        // 대조에 실패해도 화면은 계속 간다.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [invoice.virtualAccountBank, invoice.accountHolder]);
   return (
     <div className="flex flex-1 flex-col">
       <TopBar title={t("tuition.result.topBarTitle")} />
@@ -79,7 +111,34 @@ export function ResultStep({
             {t("tuition.result.checkYourselfTitle")}
           </p>
           <Card className="space-y-3">
-            <p className="text-[14px] leading-relaxed text-foreground">
+            {/* 우리가 실제로 대조한 결과. 학교 공지에서 읽은 은행과
+                고지서에서 읽은 은행을 맞춰 본다. 확인 못 한 것은 통과로
+                뭉개지 않고 사용자에게 직접 대조하라고 말한다. */}
+            {check ? (
+              <div className="space-y-2.5">
+                <CheckLine
+                  verdict={check.bank}
+                  okLabel={t("tuition.result.bankOk", { bank: check.publishedBank ?? "" })}
+                  badLabel={t("tuition.result.bankMismatch", {
+                    bank: check.publishedBank ?? "",
+                  })}
+                  unknownLabel={t("tuition.result.bankUnknown")}
+                />
+                <CheckLine
+                  verdict={check.holder}
+                  okLabel={t("tuition.result.holderOk", { holder: check.invoiceHolder ?? "" })}
+                  badLabel={t("tuition.result.holderMismatch", {
+                    holder: check.invoiceHolder ?? "",
+                  })}
+                  unknownLabel={t("tuition.result.holderUnknown")}
+                />
+              </div>
+            ) : (
+              <p className="text-[14px] leading-relaxed text-foreground-muted">
+                {t("tuition.result.checking")}
+              </p>
+            )}
+            <p className="border-t border-border pt-3 text-[14px] leading-relaxed text-foreground">
               {t("tuition.result.checkAccount")}
             </p>
             {tuitionPage && (
@@ -111,5 +170,41 @@ export function ResultStep({
         </button>
       </div>
     </div>
+  );
+}
+
+/** 대조 결과 한 줄. 확인됨·불일치·확인 못 함을 색과 아이콘으로 나눈다. */
+function CheckLine({
+  verdict,
+  okLabel,
+  badLabel,
+  unknownLabel,
+}: {
+  verdict: AccountCheckVerdict;
+  okLabel: string;
+  badLabel: string;
+  unknownLabel: string;
+}) {
+  if (verdict === "ok") {
+    return (
+      <p className="flex items-start gap-2 text-[14px] leading-relaxed text-success">
+        <Check className="mt-0.5 h-4 w-4 shrink-0" />
+        {okLabel}
+      </p>
+    );
+  }
+  if (verdict === "mismatch") {
+    return (
+      <p className="flex items-start gap-2 text-[14px] font-medium leading-relaxed text-danger">
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+        {badLabel}
+      </p>
+    );
+  }
+  return (
+    <p className="flex items-start gap-2 text-[14px] leading-relaxed text-foreground-muted">
+      <HelpCircle className="mt-0.5 h-4 w-4 shrink-0" />
+      {unknownLabel}
+    </p>
   );
 }

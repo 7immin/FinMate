@@ -36,6 +36,10 @@ export interface TuitionOcrResult {
   title: string;
   /** 고지서에 적힌 발급 학교 이름. 못 읽었으면 빈 문자열. */
   institution: string;
+  /** 가상계좌의 은행명. 학교 공지와 대조하는 데 쓴다. */
+  virtualAccountBank: string;
+  /** 가상계좌의 예금주. 개인 이름이면 위조 신호다. */
+  accountHolder: string;
   amount: number;
   dueDate: string;
   virtualAccount: string;

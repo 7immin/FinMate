@@ -19,6 +19,10 @@ export interface TuitionInvoice {
    */
   institutionName: string | null;
   virtualAccount: string;
+  /** 가상계좌의 은행. 학교가 공지한 은행과 대조하는 데 쓴다. */
+  virtualAccountBank: string;
+  /** 가상계좌의 예금주. 개인 이름이면 위조 신호다. */
+  accountHolder: string;
 }
 
 export const TUITION_INVOICE: TuitionInvoice = {
@@ -29,6 +33,8 @@ export const TUITION_INVOICE: TuitionInvoice = {
   recipient: "hanyang",
   institutionName: null,
   virtualAccount: "1002-•••-4471",
+  virtualAccountBank: "",
+  accountHolder: "",
 };
 
 export const SCANNING_STEP_IDS = ["issuer", "extract", "account", "fraud"] as const;
